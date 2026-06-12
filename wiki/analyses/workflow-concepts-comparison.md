@@ -19,15 +19,17 @@ tags:
 
 ## 问题
 
-本页边界不是比较品牌生态、语言支持或各平台自造术语，而是把这些术语归并到更高层的编排模式后，比较四个系统作为多步、状态化工作编排底座时的控制表示、路由权威、状态恢复、副作用边界、动态性和时间语义。
+本页边界不是比较品牌生态、语言支持或各平台自造术语，而是把这些术语归并到更高层的编排模式后，比较四个系统作为多步、状态化工作编排底座时的控制规范、执行解释器、状态物化、恢复语义、副作用协议、动态性和时间语义。
 目标是回答：哪些差异只是命名差异，哪些差异会改变系统设计、恢复语义和选型边界。
 
 ## 答案
 
-结论是：原始比较中“按产品术语填矩阵”的抽象层级偏低；更稳妥的比较方式是先识别模式，再把
-Temporal、Airflow、Microsoft Agent Framework 和 LangGraph 映射到这些模式。
-四者确实重叠在 stateful multi-step orchestration 问题空间，但并不共享同一个
-workflow 抽象。
+结论是：Airflow DAG、Temporal workflow code、Microsoft Agent Framework workflow
+surface 和 LangGraph graph 在一个高层上确实同类： 它们都是用户写出的
+workflow/control
+specification，用来描述长期工作中有哪些步骤、依赖、等待、分支和副作用边界。
+真正的分化点不应放在“DAG 还是代码”这种表示形态上，而应放在执行语义上：
+谁解释这份控制规范，什么状态被持久化，崩溃后如何恢复，以及副作用如何被隔离和重试。
 
 关键分层是：
 **控制流决定哪些路径合法、谁能决定下一步、如何恢复和审计；LLM、工具、API
@@ -36,30 +38,38 @@ workflow 抽象。
 runtime；也不能因为它们都有 workflow、graph、task 或 step
 等术语，就假定这些词语有相同语义。
 
-### 模式词汇表
+因此，本页不再使用以 schedule 为中心的 Airflow 主标签。
+Temporal 也有 Schedule、trigger 和 Workflow Execution； 用“有没有
+schedule/run”区分 Airflow 和 Temporal 会误导。
+Airflow 与 Temporal 的关键差异是： Airflow
+持久化并推进任务图实例状态，核心问题是“哪些 task instance 现在可运行”； Temporal
+持久化事件历史并重放确定性程序，核心问题是“给定历史，workflow code
+下一步必然发出什么命令”。
 
-| 模式 | 含义 | 典型映射 |
+### 概念分层
+
+| 层 | 要问的问题 | 典型差异 |
 | --- | --- | --- |
-| event-sourced deterministic replay | 控制流写在确定性 Workflow 代码中，恢复依赖 Event History/replay；外部副作用被移出 replay 路径。 | Temporal |
-| schedule-first DAG | 由调度器按时间、资产或规则实例化运行，再按 task dependencies 执行。 | Airflow |
-| scheduler/task-state persistence | 持久化重点是 DagRun、TaskInstance、metadata DB、重试与 mapped task 状态，而不是恢复任意应用内存。 | Airflow |
-| checkpointed application/graph state | 按 thread 或 graph execution 保存应用状态，恢复依赖 checkpointer/store 配置。 | LangGraph |
-| durable backend/integration hosting | 通过独立 durable backend 托管 checkpoint/resume/HITL，但不必然覆盖框架所有 API surface。 | Microsoft Agent Framework Durable Extension |
-| explicit graph/state machine | 显式节点、边、条件路由、循环或状态转移定义控制结构。 | Microsoft Agent Framework、LangGraph；部分 agent workflow 文献 |
-| runtime pause/resume | 运行时在节点/图执行中暂停，等待外部输入后按同一执行上下文恢复。 | LangGraph interrupts；MAF HITL integration |
-| learned/generated workflow | workflow graph 或编排策略由搜索、强化学习或服务端优化生成。 | FlowSteer、GraphFlow 等研究线；不能直接外推为四个产品的默认能力 |
+| 控制规范表示 | 用户用什么形态描述 workflow？ | 显式 DAG、确定性程序、显式 graph/state machine、agent-centric workflow surface。 |
+| 执行解释器 | 谁读取控制规范并决定下一步？ | scheduler、event-history replay runtime、graph runner、agent orchestration runtime。 |
+| 状态物化 | 哪些状态成为平台持久化真源？ | DagRun/TaskInstance metadata、Event History、checkpoint/store、Durable Task backend state。 |
+| 恢复语义 | 崩溃后恢复的是哪类“当前位置”？ | 可运行任务集合、程序逻辑与局部状态、graph thread state、durable orchestration state。 |
+| 副作用协议 | 外部 I/O、LLM/tool call 如何脱离控制流并被重试？ | task/operator、Activity、node/tool、executor/step/agent。 |
+| 动态性与拓扑 | 控制结构能否在运行时改变或展开？ | mapped tasks、代码分支/循环、conditional edge、interrupt/resume、generated workflow graph。 |
 
 ### 产品映射矩阵
 
-| 系统 | 控制模式 | 路由权威 | 状态与恢复模式 | 副作用边界 | 动态性与时间模型 | LLM/tool 所在层 |
+| 系统 | 控制规范表示 | 执行解释器 | 状态与恢复语义 | 副作用协议 | 动态性与时间模型 | LLM/tool 所在层 |
 | --- | --- | --- | --- | --- | --- | --- |
-| Temporal | event-sourced deterministic replay；Workflow 代码是 durable control plane | 确定性 Workflow 代码；外部事件、Signal、Activity 结果进入 Event History 后参与 replay | Event History/replay 恢复 Workflow；Timer 是持久的内部等待；Schedule 是独立外部启动规则 | Activity 承担非确定性 I/O、LLM/API/DB 调用，并需要考虑 retry/幂等 | 运行中可分支和等待，但 Workflow 逻辑必须 deterministic；Schedule 启动 Workflow Execution，Timer/Start Delay 属于不同层 | agent loop 或 LLM/tool call 是 durable execution 之上的 workload pattern，不是专用 agent runtime |
-| Airflow | schedule-first DAG；DAG/task graph 是主控制结构 | scheduler 根据 schedule、asset update、dependencies 和 mapped task 状态推进执行 | metadata DB、DagRun、TaskInstance、XCom、retry 与 mapped task 状态；不是 in-process workflow replay | task/operator 是副作用和重试边界 | 时间/资产触发与 DAG 实例化强耦合；Dynamic Task Mapping 是 scheduler 管理的拓扑展开 | LLM/agent operator 被塞进 DAG task 语义中，可形成显式 fan-out/fan-in pipeline |
-| Microsoft Agent Framework | agent framework 内的 explicit graph workflow 与 functional workflow facade | graph surface 由 executors/edges 路由；functional surface 由 Python 控制流表达；human/agent 可参与流程 | checkpoint/resume/HITL 可由 Durable Extension 通过 Durable Task-backed hosting 提供；不能外推为所有 surface 的默认能力 | executor、step 或 agent 承担节点工作；文档不足以证明其副作用隔离等价于 Temporal Activity | 条件路由、并行、HITL 和 durable hosting 更接近业务流程/agent 编排，不是 schedule-first | agent 是框架一等对象，workflow 用来显式组织 agent、step 与多 agent orchestration |
-| LangGraph | checkpointed stateful graph runtime；explicit graph/state machine 倾向明显 | 条件边、节点返回、human interrupt、tool/LLM 结果共同决定下一步 | checkpointer 保存 thread-scoped graph state，store 保存跨 thread memory；未配置 persistence 时不应假定可恢复 | node/tool 是执行边界；fault tolerance 通过 per-node retry、timeout、error handler 组合 | runtime-first；interrupt/resume 是图/节点级暂停恢复，不是批调度器；不提供 Airflow 式 schedule-first DAG | LLM/tool 通常是 node 内 payload，但 runtime 原生支持 stateful agent graph、HITL 和长生命周期执行 |
+| Temporal | 确定性 workflow program；代码是控制规范，不只是普通业务脚本 | worker 通过 Event History replay 重新执行 deterministic workflow code，并由代码发出 Activity、Timer 等 commands | Event History 是真源；恢复时通过 replay 重建 replay-safe 局部状态与当前控制点，并校验或生成下一步命令，而不是持久化任意程序栈 | Activity 承担非确定性 I/O、LLM/API/DB 调用，并需要考虑 retry/幂等 | 代码可表达 replay-safe 的分支、循环和等待；Timer 是内部持久等待，Schedule 是外部启动 Workflow Execution 的规则 | agent loop 或 LLM/tool call 是 durable execution 之上的 workload pattern，不是专用 agent runtime |
+| Airflow | 显式 DAG/task graph；DAG 是声明式控制规范，不只是静态图图片 | scheduler 使用 serialized DAG/control spec 与 metadata DB 中的 DagRun、TaskInstance 和 mapped-task state，评估依赖、重试、pool 与并发约束，并将可调度 TaskInstance 入队给 Executor | metadata DB、DagRun、TaskInstance、XCom、retry 与 mapped task state 是真源；恢复的是任务图实例状态，不是任意程序栈 | task/operator 是副作用和重试边界 | schedule/asset/manual trigger 创建 DagRun；Dynamic Task Mapping 由 scheduler 管理运行时任务展开 | LLM/agent operator 作为 task/operator/decorator 层 payload 嵌入 DAG/task 语义，可形成显式 fan-out/fan-in pipeline |
+| Microsoft Agent Framework | graph workflow 用 executors/edges 表达控制规范；functional workflow 用 Python 控制流与 `@workflow`/`@step` 表达控制规范 | graph execution/superstep runner 解释 graph；functional runtime 解释 workflow/step 边界；human/agent 可参与流程 | checkpoint/resume/HITL 只有在 Durable Extension hosting 下才能按 Durable Task-backed execution 理解；不能外推为所有 surface 的默认能力 | executor、step 或 agent 承担节点工作；文档不足以证明其副作用隔离等价于 Temporal Activity | 条件路由、并行、streaming 与 HITL 更接近业务流程/agent 编排，不是 task scheduler 中心模型 | agent 是框架一等对象，workflow 用来显式组织 agent、step 与多 agent orchestration |
+| LangGraph | 显式 graph/state machine；graph 是长期运行 agent/workflow 的控制规范 | graph runner 根据节点返回、条件边、human interrupt、tool/LLM 结果推进下一步 | checkpointer 物化 thread-scoped graph state；store 提供跨 thread memory，不是当前位置；interrupt/resume 依赖 thread/checkpointer；未配置 persistence 时不应假定可恢复 | node/tool 承担 I/O；per-node retry、timeout、error handler 是节点级故障处理，不自动等价于 Temporal Activity 的副作用隔离/幂等 | 条件边和节点返回驱动路径；interrupt/resume 是图/节点级暂停恢复，不是 Airflow scheduler，也不是 Temporal Timer/Schedule | LLM/tool 通常是 node 内 payload，但 runtime 原生支持 stateful agent graph、HITL 和长生命周期执行 |
 
 ### 不能混淆的等价关系
 
+- DAG 与 workflow code 在“用户写的控制规范”这一层可以类比；
+  但它们的执行解释器、状态真源和恢复算法不同，不能直接等价。
 - Temporal replay 不等于 LangGraph checkpoint
   resume：前者重放确定性控制流，后者恢复保存的图状态。
 - Airflow retry/reschedule 不等于 durable in-process workflow
@@ -69,6 +79,9 @@ runtime；也不能因为它们都有 workflow、graph、task 或 step
   Durable Task-backed integration/hosting 层。
 - Timer 不等于 Schedule：Temporal Timer 是 Workflow Execution
   内部的持久等待，Schedule 是独立于 Workflow Execution 的启动规则。
+- Airflow 有 trigger/run，Temporal 也有 Schedule/Workflow Execution；
+  差异不在“谁有调度”，而在运行内部由 scheduler 解释 task graph，还是由
+  event-history replay 解释确定性程序。
 - “能调用 LLM/tool”不等于“agent runtime”：LLM/tool 可能只是
   Activity、task、executor、node 内的 payload。
 
@@ -92,10 +105,10 @@ DeepXiv 检索到的 arXiv 文献支持把 agent workflow
 
 ## 影响
 
-- 需要强确定性重放、长时间运行、持久 Timer，并把外部副作用关进受控边界：优先
-  Temporal。
-- 需要 schedule-first DAG、资产/时间触发、任务级可观测性和 scheduler-managed
-  fan-out/fan-in：优先 Airflow。
+- 需要强确定性重放、恢复程序逻辑与局部状态、长时间运行、持久
+  Timer，并把外部副作用关进受控边界：优先 Temporal。
+- 需要显式 DAG/task graph、资产/时间触发、任务级可观测性和 scheduler-managed
+  task-instance fan-out/fan-in：优先 Airflow。
 - 需要在 agent 框架内显式组织 agent、step、多 agent orchestration，并接受
   graph/functional/durable surfaces 成熟度不完全齐整：评估 Microsoft Agent
   Framework。
@@ -119,6 +132,7 @@ DeepXiv 检索到的 arXiv 文献支持把 agent workflow
 | wiki | [Temporal 动态 AI Agent 博客](../sources/temporal/dynamic-ai-agents-blog.md) | Temporal 承载动态 AI agent 的官方示例。 |
 | wiki | [Temporal Deep Research Agent 博客](../sources/temporal/deep-research-agents-blog.md) | Temporal 承载 deep research agent 的官方示例。 |
 | wiki | [Airflow DAG 文档](../sources/apache-airflow/dags-docs.md) | Airflow DAG、schedule、tasks 与 dependencies 的核心语义。 |
+| wiki | [Airflow Scheduler 文档](../sources/apache-airflow/scheduler-docs.md) | Airflow scheduler loop、DagRun 与 TaskInstance 推进语义。 |
 | wiki | [Airflow Dynamic Task Mapping 文档](../sources/apache-airflow/dynamic-task-mapping-docs.md) | 运行时动态展开 task 的语义。 |
 | wiki | [Airflow Asset Scheduling 文档](../sources/apache-airflow/asset-scheduling-docs.md) | 资产更新触发 DAG 的调度语义。 |
 | wiki | [Airflow Common AI Provider 博客](../sources/apache-airflow/common-ai-provider-blog.md) | Airflow common.ai provider、LLM/agent operators 与工具集。 |
@@ -137,16 +151,16 @@ DeepXiv 检索到的 arXiv 文献支持把 agent workflow
 | wiki | [GraphBit 论文](../sources/arxiv/graphbit-2605-13848.md) | engine-orchestrated typed DAG 和 deterministic routing。 |
 | wiki | [GraphFlow 论文](../sources/arxiv/graphflow-2605-22566.md) | operation graph、task-adaptive workflow generation 与 KV state management。 |
 | wiki | [FlowSteer 论文](../sources/arxiv/flowsteer-2602-01664.md) | workflow graph policy、executable canvas 和 RL-based orchestration。 |
-| session | 当前会话 `eb8a80bb-159f-406e-af3e-c4037c085c4d` 的 `abstraction-critic`、`durable-patterns`、`scheduler-patterns`、`agent-graph-patterns` 与 `taxonomy-synthesis` subagent 输出 | 独立评审认为原页抽象层级“部分成立”，建议改为模式层矩阵；四路调研分别覆盖 durability、scheduler、agent graph 与 taxonomy。 |
+| session | 当前会话 `eb8a80bb-159f-406e-af3e-c4037c085c4d` 的 `abstraction-critic`、`durable-patterns`、`scheduler-patterns`、`agent-graph-patterns`、`taxonomy-synthesis`、`dag-code-equivalence`、`dag-code-distinction`、`workflow-abstraction`、`taxonomy-judge-2`、`taxonomy-red-team-2`、`review-temporal-control`、`review-airflow-control`、`review-maf-control` 与 `review-langgraph-control` subagent 输出 | 独立评审认为原页抽象层级“部分成立”；后续讨论进一步确认 DAG、workflow code、graph 都应先归入 control specification 层，真正差异在执行解释器、状态物化和恢复语义；逐产品审查要求收紧 Temporal、Airflow、MAF 和 LangGraph 行。 |
 
 ### 支撑的主张
 
 | 主张 | 证据 | 限制 |
 | --- | --- | --- |
-| 四者都属于多步状态化编排问题空间，但比较应从模式层开始，而不是直接比较产品术语。 | 上方全部 source page；本次 session subagent 评审与调研。 | 这是综合判断，不是任何单一厂商文档的原话。 |
+| 四者都属于多步状态化编排问题空间；DAG、workflow code、graph 和 workflow surface 都可视为控制规范表示，但比较不能停在表示形态，应继续比较执行解释器、状态物化和恢复语义。 | 上方全部 source page；本次 session subagent 评审与调研。 | 这是综合判断，不是任何单一厂商文档的原话；过度抽象会掩盖产品运行语义差异。 |
 | Temporal 的核心模式是 event-sourced deterministic replay；Activities 是副作用边界，Timer 是内部持久等待，Schedule 是独立外部启动规则。 | [Temporal Workflows 文档](../sources/temporal/workflows-docs.md)、[Temporal Workflow 确定性约束文档](../sources/temporal/workflow-deterministic-constraints-docs.md)、[Temporal Activities 文档](../sources/temporal/activities-docs.md)、[Temporal Timers and Start Delays 文档](../sources/temporal/timers-delays-docs.md)、[Temporal Schedule 文档](../sources/temporal/schedule-docs.md) | AI agent 只是可承载 workload pattern；Temporal Schedule 也不等同于 Airflow 的 DAG scheduler。 |
-| Airflow 的核心模式是 schedule-first DAG 与 scheduler/task-state persistence；dynamic mapping、asset scheduling 与 common.ai 扩展了同一 task graph 语义。 | [Airflow DAG 文档](../sources/apache-airflow/dags-docs.md)、[Airflow Dynamic Task Mapping 文档](../sources/apache-airflow/dynamic-task-mapping-docs.md)、[Airflow Asset Scheduling 文档](../sources/apache-airflow/asset-scheduling-docs.md)、[Airflow Common AI Provider 博客](../sources/apache-airflow/common-ai-provider-blog.md)、[Airflow Agentic Workloads 博客](../sources/apache-airflow/agentic-workloads-blog.md) | common.ai provider 是快速演进的增强层，不应当成 Airflow 核心语义已整体转向 agent runtime。 |
+| Airflow 的核心模式是显式 DAG/task graph 控制规范，加上 scheduler 和 metadata DB 对 DagRun/TaskInstance 状态的解释与推进；dynamic mapping、asset scheduling 与 common.ai 扩展了同一 task graph 语义。 | [Airflow DAG 文档](../sources/apache-airflow/dags-docs.md)、[Airflow Scheduler 文档](../sources/apache-airflow/scheduler-docs.md)、[Airflow Dynamic Task Mapping 文档](../sources/apache-airflow/dynamic-task-mapping-docs.md)、[Airflow Asset Scheduling 文档](../sources/apache-airflow/asset-scheduling-docs.md)、[Airflow Common AI Provider 博客](../sources/apache-airflow/common-ai-provider-blog.md)、[Airflow Agentic Workloads 博客](../sources/apache-airflow/agentic-workloads-blog.md) | common.ai provider 是快速演进的增强层，不应当成 Airflow 核心语义已整体转向 agent runtime；Airflow 与 Temporal 的差异也不是“是否有 schedule/trigger/run”。 |
 | Microsoft Agent Framework 更接近 agent framework 内的 explicit graph/functional workflow surfaces，Durable Extension 是可选 durable backend/integration hosting。 | [Microsoft Agent Framework Overview 文档](../sources/microsoft-agent-framework/overview-docs.md)、[Microsoft Agent Framework Workflows 概览](../sources/microsoft-agent-framework/workflows-overview-docs.md)、[Microsoft Agent Framework Functional Workflows 文档](../sources/microsoft-agent-framework/functional-workflows-docs.md)、[Microsoft Agent Framework WorkflowBuilder 文档](../sources/microsoft-agent-framework/workflow-builder-docs.md)、[Microsoft Agent Framework Durable Extension 文档](../sources/microsoft-agent-framework/durable-extension-docs.md) | functional API 明确 experimental，不能按统一 GA 处理；Durable Extension 不能外推为所有 surface 的默认语义。 |
-| LangGraph 的核心模式是 checkpointed stateful graph runtime；持久化依赖 checkpointers/stores，interrupt/resume 是图/节点级 runtime pause/resume。 | [LangGraph Overview 文档](../sources/langgraph/overview-docs.md)、[LangGraph Persistence 文档](../sources/langgraph/persistence-docs.md)、[LangGraph Interrupts 文档](../sources/langgraph/interrupts-docs.md)、[LangGraph Fault Tolerance 文档](../sources/langgraph/fault-tolerance-docs.md) | durability 是配置后的能力，不是无条件默认；它不是 schedule-first batch scheduler。 |
+| LangGraph 的核心模式是 checkpointed stateful graph runtime；checkpointer/store 与 interrupt/resume 共同支撑 thread-scoped graph state、cross-thread memory 和图/节点级暂停恢复。 | [LangGraph Overview 文档](../sources/langgraph/overview-docs.md)、[LangGraph Persistence 文档](../sources/langgraph/persistence-docs.md)、[LangGraph Interrupts 文档](../sources/langgraph/interrupts-docs.md)、[LangGraph Fault Tolerance 文档](../sources/langgraph/fault-tolerance-docs.md) | durability 是配置后的能力，不是无条件默认；store 不等于当前位置，fault tolerance 也不自动等价于 Temporal Activity 的副作用隔离。 |
 | 控制流与 LLM/tool 执行应分层比较；LLM/tool 调用通常是 Activity/task/executor/node 内 payload，而不是自动成为控制抽象。 | [StateFlow 论文](../sources/arxiv/stateflow-2403-11322.md)、[GraphBit 论文](../sources/arxiv/graphbit-2605-13848.md)、Temporal/Airflow/MAF/LangGraph source pages。 | MAF 和 LangGraph 对 agent/workflow runtime 的原生建模程度更高，但也不能消除控制流与节点工作负载的分层。 |
 | agent workflow 文献提供模式语言，但不能直接外推为四个产品的默认能力或成熟度保证。 | [Agent Workflow Survey 论文](../sources/arxiv/agent-workflow-survey-2508-01186.md)、[GraphFlow 论文](../sources/arxiv/graphflow-2605-22566.md)、[FlowSteer 论文](../sources/arxiv/flowsteer-2602-01664.md) | arXiv 论文包含预印本和系统论文，结论应作为研究趋势和概念补充，而不是产品成熟度证明。 |
