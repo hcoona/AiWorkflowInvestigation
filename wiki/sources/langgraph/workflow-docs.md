@@ -43,7 +43,7 @@ checkpointers/stores/interrupts/fault tolerance 的持久化与恢复语义。
   state，后者负责 cross-thread memory。
 - Interrupts 允许图执行在任意位置暂停并等待外部输入，依赖 checkpointer 与
   thread_id 恢复。
-- Fault tolerance 提供 per-node retries、timeouts 与 error handlers
+- Fault tolerance 提供图节点级 retries、timeouts 与 error handlers
   的组合式处理。
 
 ## 限制与冲突
@@ -71,4 +71,4 @@ checkpointers/stores/interrupts/fault tolerance 的持久化与恢复语义。
 | LangGraph 是面向长生命周期、状态化 agent/workflow 的低层 orchestration runtime。 | 上方证据单元 1。 | 它强调 runtime，而不是通用批调度。 |
 | LangGraph 的持久化由 checkpointers 和 stores 组成。 | 上方证据单元 2。 | durability 依赖配置；不是默认无条件成立。 |
 | `interrupt()` 使图执行可以暂停、等待外部输入并在相同 thread_id 下恢复。 | 上方证据单元 3。 | 恢复需要 checkpointer 与一致的 thread_id。 |
-| fault tolerance 通过 per-node retries、timeouts 与 error handlers 组合实现。 | 上方证据单元 4。 | 故障处理是节点/图语义，不是全局作业调度器。 |
+| fault tolerance 通过图节点级 retries、timeouts 与 error handlers 组合实现。 | 上方证据单元 4。 | 故障处理是图节点/图语义，不是全局作业调度器。 |

@@ -19,15 +19,15 @@ tags:
 ## 来源边界
 
 本页只投影 LangGraph fault tolerance 文档。
-它用于说明 retries、timeouts 和 error handlers 的 graph/node execution
+它用于说明 retries、timeouts 和 error handlers 的图/图节点 execution
 故障处理语义。
 原始材料未保存到 `raw/`；本页直接引用外部 URL 作为主证据。
 
 ## 可复用关键主张
 
-- LangGraph 提供 node-level retries、timeouts 和 error handlers。
-- fault tolerance 用于 graph/node execution 失败处理。
-- per-node timeouts 和 node-level error handlers 要求 `langgraph>=1.2`。
+- LangGraph 提供图节点级 retries、timeouts 和 error handlers。
+- fault tolerance 用于图/图节点 execution 失败处理。
+- 图节点级 timeouts 和 error handlers 要求 `langgraph>=1.2`。
 
 ## 限制与冲突
 
@@ -48,4 +48,4 @@ tags:
 | 主张 | 证据 | 限制 |
 | --- | --- | --- |
 | LangGraph 提供 retries、timeouts 和 error handlers 等故障处理能力。 | 上方证据单元。 | 这些能力需要配合节点设计和外部副作用治理。 |
-| per-node timeouts 和 node-level error handlers 要求 `langgraph>=1.2`。 | 上方证据单元。 | timeouts 是 async-only；timeouts/error handlers 是 Python-only。 |
+| 图节点级 timeouts 和 error handlers 要求 `langgraph>=1.2`。 | 上方证据单元。 | timeouts 是 async-only；timeouts/error handlers 是 Python-only。 |
