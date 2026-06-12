@@ -16,11 +16,14 @@ tags:
 
 ## 目的
 
-本仓库已初始化为 LLM-Wiki：持久综合分析写入 `wiki/`，精选入库证据保存在 `raw/`，代理操作规则由根目录 [`AGENTS.md`](../AGENTS.md) 维护。
+本仓库已初始化为 LLM-Wiki：持久综合分析写入 `wiki/`，精选入库证据保存在
+`raw/`，代理操作规则由根目录 [`AGENTS.md`](../AGENTS.md) 维护。
 
 ## 当前状态
 
-知识库当前包含根级操作说明、起始模板、追加式日志、[`mise.toml`](../mise.toml) 中声明的可执行校验任务，以及 [`hk.pkl`](../hk.pkl) 中声明的 pre-commit 校验入口。
+知识库当前包含根级操作说明、起始模板、追加式日志、[`mise.toml`](../mise.toml)
+中声明的可执行校验任务，以及 [`hk.pkl`](../hk.pkl) 中声明的 pre-commit
+校验入口。
 
 ## 证据与限制
 
