@@ -1,2 +1,9 @@
 # Project-level rumdl configuration.
 # Keep this file minimal; add only repository-specific deviations from rumdl defaults.
+
+[MD013]
+reflow = true
+reflow-mode = "semantic-line-breaks"
+
+[MD060]
+enabled = true
