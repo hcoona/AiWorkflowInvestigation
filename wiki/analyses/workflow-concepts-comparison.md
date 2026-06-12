@@ -36,9 +36,11 @@ common.ai provider 让它能覆盖更多 agentic workload，但本质仍是
 schedule-/task-centric orchestrator，而不是 LangGraph/MAF 这种原生 agent
 runtime。
 Microsoft Agent Framework 明确区分 agents 与 workflows：graph `WorkflowBuilder`
-和 Python functional workflow surface 都是编排入口，Durable Extension 则把
-Durable Task-backed durability 引入这些工作流；不过公开文档对 functional
-API、安装包和集成层的成熟度信号并不完全一致。
+和 Python functional `@workflow` surface 都是编排入口，其中 functional API 明确
+experimental。
+Durable Extension 文档覆盖 agents、multi-agent orchestrations 与 Agent Framework
+workflows 的 Durable Task-backed hosting；不过不应在未核对具体 integration path
+时假定每个 workflow surface 具备同等 durability。
 LangGraph 则是面向长期运行、状态化 agent/workflow 的低层 orchestration
 runtime；checkpointers、stores、interrupts 与 fault tolerance
 让它在配置后具备持久化与恢复能力，但它不是通用 batch scheduler。
@@ -79,17 +81,33 @@ runtime；checkpointers、stores、interrupts 与 fault tolerance
 
 | 类型 | 引用 | 说明 |
 | --- | --- | --- |
-| wiki | [Temporal 工作流文档投影](../sources/temporal-workflow-docs.md) | Temporal 官方文档与博客的来源投影。 |
-| wiki | [Apache Airflow 工作流文档投影](../sources/apache-airflow-workflow-docs.md) | Airflow 官方文档与博客的来源投影。 |
-| wiki | [Microsoft Agent Framework 工作流文档投影](../sources/microsoft-agent-framework-workflow-docs.md) | Microsoft Agent Framework 官方文档的来源投影。 |
-| wiki | [LangGraph 工作流与持久化文档投影](../sources/langgraph-workflow-docs.md) | LangGraph 官方文档的来源投影。 |
+| wiki | [Temporal Workflows 文档](../sources/temporal-workflows-docs.md) | Temporal Workflow 定义、执行与 Event History/replay。 |
+| wiki | [Temporal Workflow 确定性约束文档](../sources/temporal-workflow-deterministic-constraints-docs.md) | Workflow 确定性约束与 replay-safe 行为。 |
+| wiki | [Temporal Activities 文档](../sources/temporal-activities-docs.md) | Activities 与外部副作用边界。 |
+| wiki | [Temporal 动态 AI Agent 博客](../sources/temporal-dynamic-ai-agents-blog.md) | Temporal 承载动态 AI agent 的官方示例。 |
+| wiki | [Temporal Deep Research Agent 博客](../sources/temporal-deep-research-agents-blog.md) | Temporal 承载 deep research agent 的官方示例。 |
+| wiki | [Airflow DAG 文档](../sources/apache-airflow-dags-docs.md) | Airflow DAG、schedule、tasks 与 dependencies 的核心语义。 |
+| wiki | [Airflow Dynamic Task Mapping 文档](../sources/apache-airflow-dynamic-task-mapping-docs.md) | 运行时动态展开 task 的语义。 |
+| wiki | [Airflow Asset Scheduling 文档](../sources/apache-airflow-asset-scheduling-docs.md) | 资产更新触发 DAG 的调度语义。 |
+| wiki | [Airflow Common AI Provider 博客](../sources/apache-airflow-common-ai-provider-blog.md) | Airflow common.ai provider、LLM/agent operators 与工具集。 |
+| wiki | [Airflow Agentic Workloads 博客](../sources/apache-airflow-agentic-workloads-blog.md) | Dynamic Task Mapping + common.ai 的显式 fan-out/fan-in pipeline。 |
+| wiki | [Microsoft Agent Framework Overview 文档](../sources/microsoft-agent-framework-overview-docs.md) | Microsoft Agent Framework 的 agents/workflows 总览。 |
+| wiki | [Microsoft Agent Framework Workflows 概览](../sources/microsoft-agent-framework-workflows-overview-docs.md) | Workflows 概览与编排定位。 |
+| wiki | [Microsoft Agent Framework Functional Workflows 文档](../sources/microsoft-agent-framework-functional-workflows-docs.md) | functional workflow API 与 `@workflow` / `@step`。 |
+| wiki | [Microsoft Agent Framework WorkflowBuilder 文档](../sources/microsoft-agent-framework-workflow-builder-docs.md) | `WorkflowBuilder` graph API、executors、edges 与 execution。 |
+| wiki | [Microsoft Agent Framework Durable Extension 文档](../sources/microsoft-agent-framework-durable-extension-docs.md) | Durable Extension 与 Durable Task-backed execution。 |
+| wiki | [LangGraph Overview 文档](../sources/langgraph-overview-docs.md) | LangGraph 的 low-level orchestration framework/runtime 定位。 |
+| wiki | [LangGraph Persistence 文档](../sources/langgraph-persistence-docs.md) | checkpointers 与 stores 的持久化分层。 |
+| wiki | [LangGraph Interrupts 文档](../sources/langgraph-interrupts-docs.md) | interrupt/resume/HITL 的暂停与恢复语义。 |
+| wiki | [LangGraph Fault Tolerance 文档](../sources/langgraph-fault-tolerance-docs.md) | retries、timeouts、error handlers 的 fault tolerance 语义。 |
 
 ### 支撑的主张
 
 | 主张 | 证据 | 限制 |
 | --- | --- | --- |
-| 四者都属于多步状态化工作编排系统，但分化点主要在控制抽象和状态/持久化机制。 | 上方四个 source page。 | 这是综合判断，不是任何单一厂商文档的原话。 |
-| Temporal 的工作流层要求确定性，Activities 承担非确定性副作用，并通过 Event History/replay 恢复。 | [Temporal 工作流文档投影](../sources/temporal-workflow-docs.md) | AI agent 只是可承载模式，不等于专用 agent runtime。 |
-| Airflow 仍是 DAG/task graph-centric；dynamic task mapping、asset scheduling 与 common.ai 扩展了 agentic 用法。 | [Apache Airflow 工作流文档投影](../sources/apache-airflow-workflow-docs.md) | common.ai provider 是快速演进的增强层，不应当成 Airflow 核心语义已整体转向 agent runtime。 |
-| Microsoft Agent Framework 同时暴露 graph 与 functional 两类 workflow surface，且公开文档对成熟度给出混合信号。 | [Microsoft Agent Framework 工作流文档投影](../sources/microsoft-agent-framework-workflow-docs.md) | functional API 明确 experimental，不能按统一 GA 处理。 |
-| LangGraph 是低层 orchestration runtime；持久化依赖 checkpointers/stores，无法配置 persistence 时不应假定可恢复。 | [LangGraph 工作流与持久化文档投影](../sources/langgraph-workflow-docs.md) | durability 是配置后的能力，不是无条件默认。 |
+| 四者都属于多步状态化工作编排系统，但分化点主要在控制抽象和状态/持久化机制。 | 上方全部 source page。 | 这是综合判断，不是任何单一厂商文档的原话。 |
+| Temporal 的工作流层要求确定性，Activities 承担非确定性副作用，并通过 Event History/replay 恢复。 | [Temporal Workflows 文档](../sources/temporal-workflows-docs.md)、[Temporal Workflow 确定性约束文档](../sources/temporal-workflow-deterministic-constraints-docs.md)、[Temporal Activities 文档](../sources/temporal-activities-docs.md) | AI agent 只是可承载模式，不等于专用 agent runtime。 |
+| Temporal 可以承载动态 AI agent 和 deep research agent，但这些是 durable execution 之上的应用模式。 | [Temporal 动态 AI Agent 博客](../sources/temporal-dynamic-ai-agents-blog.md)、[Temporal Deep Research Agent 博客](../sources/temporal-deep-research-agents-blog.md) | 官方博客是模式示例，不是独立 agent runtime 的定义。 |
+| Airflow 仍是 DAG/task graph-centric；dynamic task mapping、asset scheduling 与 common.ai 扩展了 agentic 用法。 | [Airflow DAG 文档](../sources/apache-airflow-dags-docs.md)、[Airflow Dynamic Task Mapping 文档](../sources/apache-airflow-dynamic-task-mapping-docs.md)、[Airflow Asset Scheduling 文档](../sources/apache-airflow-asset-scheduling-docs.md)、[Airflow Common AI Provider 博客](../sources/apache-airflow-common-ai-provider-blog.md)、[Airflow Agentic Workloads 博客](../sources/apache-airflow-agentic-workloads-blog.md) | common.ai provider 是快速演进的增强层，不应当成 Airflow 核心语义已整体转向 agent runtime。 |
+| Microsoft Agent Framework 同时暴露 graph 与 functional 两类 workflow surface，且公开文档对成熟度给出混合信号。 | [Microsoft Agent Framework Overview 文档](../sources/microsoft-agent-framework-overview-docs.md)、[Microsoft Agent Framework Workflows 概览](../sources/microsoft-agent-framework-workflows-overview-docs.md)、[Microsoft Agent Framework Functional Workflows 文档](../sources/microsoft-agent-framework-functional-workflows-docs.md)、[Microsoft Agent Framework WorkflowBuilder 文档](../sources/microsoft-agent-framework-workflow-builder-docs.md)、[Microsoft Agent Framework Durable Extension 文档](../sources/microsoft-agent-framework-durable-extension-docs.md) | functional API 明确 experimental，不能按统一 GA 处理。 |
+| LangGraph 是低层 orchestration runtime；持久化依赖 checkpointers/stores，无法配置 persistence 时不应假定可恢复。 | [LangGraph Overview 文档](../sources/langgraph-overview-docs.md)、[LangGraph Persistence 文档](../sources/langgraph-persistence-docs.md)、[LangGraph Interrupts 文档](../sources/langgraph-interrupts-docs.md)、[LangGraph Fault Tolerance 文档](../sources/langgraph-fault-tolerance-docs.md) | durability 是配置后的能力，不是无条件默认。 |

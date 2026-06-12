@@ -2,10 +2,10 @@
 schema_version: 2
 page_type: source
 title: "Microsoft Agent Framework 工作流文档投影"
-status: active
+status: superseded
 created: 2026-06-12
 updated: 2026-06-12
-summary: "Microsoft Agent Framework agents、workflows 与 Durable Extension 文档的来源投影。"
+summary: "已被更细粒度的 Microsoft Agent Framework 单来源投影页取代。"
 maintenance:
   edit_policy: update
 validation:
@@ -16,6 +16,19 @@ tags:
   - durability
   - agent-runtime
 ---
+
+> [!WARNING] 已被取代
+> 本页已被
+> [Microsoft Agent Framework Overview 文档](microsoft-agent-framework-overview-docs.md)、
+> [Microsoft Agent Framework Workflows 概览](microsoft-agent-framework-workflows-overview-docs.md)、
+> [Microsoft Agent Framework Functional Workflows 文档](microsoft-agent-framework-functional-workflows-docs.md)、
+> [Microsoft Agent Framework WorkflowBuilder 文档](microsoft-agent-framework-workflow-builder-docs.md)
+> 和
+> [Microsoft Agent Framework Durable Extension 文档](microsoft-agent-framework-durable-extension-docs.md)
+> 取代。
+> 原因：source page 应投影一个主要上游证据对象，不能把多个独立外链聚合为 n:
+> 1 证据锚点。 取代日期：2026-06-12。
+> 除修复该提示、链接或证据链外，不要继续更新本页。
 
 ## 来源边界
 

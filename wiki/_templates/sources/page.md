@@ -19,6 +19,11 @@ tags:
 说明该来源是什么、为什么重要，以及原始材料是否已保存在 `raw/`。
 如果直接引用外部资料而未写入 `raw/`，说明外部访问路径和未入库原因。
 
+本页只投影一个主要上游证据对象： 一个 raw 文件、一个外部 URL/文档/API 结果、一个
+issue/release note、 一个 session 项或一个 user-provided artifact。
+
+不要把多个独立外链或 raw 文件聚合进同一个 source page。
+
 ## 可复用关键主张
 
 只记录未来综合分析可能复用的主张。
@@ -33,7 +38,7 @@ tags:
 
 | 类型 | 引用 | 说明 |
 | --- | --- | --- |
-| external | `https://example.invalid/source` | 替换为主要 raw、external、session 或 user 证据引用；外部来源不必复制到 `raw/`，但本 source page 需要承载证据链。 |
+| external | `https://example.invalid/source` | 替换为本页唯一主要 raw、external、session 或 user 证据引用；外部来源不必复制到 `raw/`，但本 source page 需要承载证据链。 |
 
 ### 支撑的主张
 

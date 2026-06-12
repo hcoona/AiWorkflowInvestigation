@@ -2,10 +2,10 @@
 schema_version: 2
 page_type: source
 title: "LangGraph 工作流与持久化文档投影"
-status: active
+status: superseded
 created: 2026-06-12
 updated: 2026-06-12
-summary: "LangGraph 低层编排运行时、持久化、interrupt 与 fault tolerance 文档的来源投影。"
+summary: "已被更细粒度的 LangGraph 单来源投影页取代。"
 maintenance:
   edit_policy: update
 validation:
@@ -16,6 +16,15 @@ tags:
   - stateful-agents
   - orchestration-runtime
 ---
+
+> [!WARNING] 已被取代
+> 本页已被 [LangGraph Overview 文档](langgraph-overview-docs.md)、
+> [LangGraph Persistence 文档](langgraph-persistence-docs.md)、
+> [LangGraph Interrupts 文档](langgraph-interrupts-docs.md) 和
+> [LangGraph Fault Tolerance 文档](langgraph-fault-tolerance-docs.md) 取代。
+> 原因：source page 应投影一个主要上游证据对象，不能把多个独立外链聚合为 n:
+> 1 证据锚点。 取代日期：2026-06-12。
+> 除修复该提示、链接或证据链外，不要继续更新本页。
 
 ## 来源边界
 

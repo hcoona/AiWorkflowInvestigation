@@ -2,10 +2,10 @@
 schema_version: 2
 page_type: source
 title: "Apache Airflow 工作流文档投影"
-status: active
+status: superseded
 created: 2026-06-12
 updated: 2026-06-12
-summary: "Airflow DAG、动态映射、资产调度与 AI Provider 文档的来源投影。"
+summary: "已被更细粒度的 Airflow 单来源投影页取代。"
 maintenance:
   edit_policy: update
 validation:
@@ -16,6 +16,17 @@ tags:
   - agentic-workloads
   - ai-provider
 ---
+
+> [!WARNING] 已被取代
+> 本页已被 [Airflow DAG 文档](apache-airflow-dags-docs.md)、
+> [Airflow Dynamic Task Mapping 文档](apache-airflow-dynamic-task-mapping-docs.md)、
+> [Airflow Asset Scheduling 文档](apache-airflow-asset-scheduling-docs.md)、
+> [Airflow Common AI Provider 博客](apache-airflow-common-ai-provider-blog.md)
+> 和 [Airflow Agentic Workloads 博客](apache-airflow-agentic-workloads-blog.md)
+> 取代。
+> 原因：source page 应投影一个主要上游证据对象，不能把多个独立外链聚合为 n:
+> 1 证据锚点。 取代日期：2026-06-12。
+> 除修复该提示、链接或证据链外，不要继续更新本页。
 
 ## 来源边界
 

@@ -190,9 +190,21 @@ tokens.
 External evidence may be cited directly without being copied into `raw/`.
 When an external source is cited by a durable synthesis page
 and the original material is not preserved in `raw/`,
-create or update a `wiki/sources/` source page projection in
-that same synthesis task so the evidence chain remains traceable.
+create or update a `wiki/sources/` source page projection for
+that specific external source in that same synthesis task
+so the evidence chain remains traceable.
 Raw admission by itself does not require creating a source page.
+When a source page is created,
+its primary upstream evidence boundary is one source object: one raw file,
+one external document or URL, one API endpoint result,
+one issue or release note, one session item, or one user-provided artifact.
+Do not bundle multiple independent raw files
+or external links into a single source page merely
+because a synthesis page cites them together.
+A single raw source may support multiple source page projections
+when future synthesis needs different evidence anchors or claim boundaries;
+the expected relationship is raw-to-source-page `1:n`,
+not source-page-to-raw `n:1`.
 
 ### AGENTS.md
 
@@ -420,8 +432,8 @@ direct citation in a durable synthesis page, source projection,
 or synthesis with preserved provenance.
 Direct external citation does not require copying the original material into
 `raw/`, but external evidence cited by a durable synthesis page without a
-corresponding raw source needs a source page projection to preserve the evidence
-chain.
+corresponding raw source needs a source page projection for that exact external
+source to preserve the evidence chain.
 Raw promotion alone is not a trigger for source page creation.
 
 Use this lifecycle:
@@ -429,8 +441,8 @@ Use this lifecycle:
 | State | Meaning | Default handling |
 | --- | --- | --- |
 | `ephemeral lookup` | Temporary tool lookup used only for the current answer or decision. | Do not write to wiki, log, or raw. If used in the answer, disclose source type, time sensitivity, and reproducibility limits when they matter. |
-| `cited external evidence` | External evidence explicitly cited in an answer or durable page. | Record provenance such as URL, endpoint, command, version, accessed_at, and query parameters. If cited by a durable synthesis page without a corresponding raw source, also create or update the source page projection. |
-| `source page projection` | A `wiki/sources/` page for an external source that needs a durable source anchor, usually because a synthesis page cites external-only evidence. | Use as a source anchor and human-readable projection, not as the primary source itself. |
+| `cited external evidence` | External evidence explicitly cited in an answer or durable page. | Record provenance such as URL, endpoint, command, version, accessed_at, and query parameters. If cited by a durable synthesis page without a corresponding raw source, also create or update the source page projection for that specific external source. |
+| `source page projection` | A `wiki/sources/` page for one upstream evidence object that needs a durable source anchor, usually because a synthesis page cites external-only evidence. | Use as a source anchor and human-readable projection, not as the primary source itself. Do not aggregate multiple independent sources into one projection. |
 | `promoted raw source` | External material preserved in `raw/`. | Use only when it is worth long-term rereading, legal to preserve, reusable, unstable externally, or core evidence. Do not create a source page merely because a raw source was admitted. |
 | `durable synthesis` | Evidence compiled into analysis, entity, concept, or hub pages. | Preserve enough provenance to audit the claim later. |
 
@@ -440,8 +452,8 @@ Promotion thresholds:
   when it supports an important claim, number, version difference, judgment,
   or decision.
 - Promote `cited external evidence` to `source page projection` when a durable
-  synthesis page needs a reusable source anchor for evidence that is referenced
-  directly and not preserved in `raw/`.
+  synthesis page needs a reusable source anchor for a specific external source
+  that is referenced directly and not preserved in `raw/`.
 - Promote external source material to `promoted raw source` only
   when the user explicitly asks for or authorizes raw admission,
   the original text/data must be preserved for future rereading,
@@ -499,7 +511,7 @@ Create durable pages only when they materially support future synthesis.
 | Page type | When to create or update |
 | --- | --- |
 | `analysis` | A reusable answer, comparison, decision, playbook, or topic synthesis emerges. This is the primary compiled knowledge product. |
-| `source page` | A durable synthesis task needs a reusable source anchor, especially for external evidence that is cited directly and not preserved in `raw/`. A raw source may be cited directly by analyses; do not create a source page merely because raw was added. Ordinary one-off answer citations that are not written into wiki state do not trigger a source page. |
+| `source page` | A durable synthesis task needs a reusable source anchor for one upstream evidence object, especially an external source that is cited directly and not preserved in `raw/`. A raw source may be cited directly by analyses; do not create a source page merely because raw was added. Ordinary one-off answer citations that are not written into wiki state do not trigger a source page. |
 | `entity page` | A named thing recurs across sources or questions and carries durable relationships, events, claims, or direct query value. |
 | `concept page` | A reusable idea, mechanism, framework, argument, or pattern materially supports durable analyses. |
 | `hub` | A stable cluster of analyses needs an entry point, reading path, current-state summary, open questions, and maintenance boundary. |
@@ -507,6 +519,8 @@ Create durable pages only when they materially support future synthesis.
 Do not create:
 
 - one source page per raw file by default;
+- one aggregate source page for multiple independent raw files, URLs, issues,
+  release notes, or documents cited together;
 - one entity page per named mention;
 - one concept page per keyword;
 - one analysis page per chat answer;
@@ -516,6 +530,8 @@ Do not create:
 A source page should include what the source is, why it matters,
 upstream evidence/provenance, key claims used by the wiki, limits or conflicts,
 and whether raw was preserved.
+It should project one primary upstream evidence object;
+use ordinary links from analyses or hubs to relate multiple source pages.
 Do not create a source page for raw admission alone, one-off fact checks,
 low-value pages, or background material that does not support durable synthesis.
 Do not hand-maintain impacted-analysis or downstream-dependency sections;
@@ -535,7 +551,7 @@ When ingesting a source or evidence set:
    Raw admission by itself stops at `raw/` unless the current task also creates
    or updates durable synthesis that needs a source anchor.
    External evidence cited by durable synthesis without a corresponding raw
-   source must get a source page projection.
+   source must get a source page projection for that specific external source.
    Any new or external material admitted to `raw/` requires explicit user
    request or authorization plus legal, privacy, and sensitivity checks.
 4. Update existing analyses first

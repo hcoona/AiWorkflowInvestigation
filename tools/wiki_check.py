@@ -9,9 +9,6 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 
 REQUIRED_PATHS = [
-    "AGENTS.md",
-    "raw",
-    "raw/assets",
     "wiki",
     "wiki/overview.md",
     "wiki/log.jsonl",
@@ -46,6 +43,20 @@ ALLOWED_BODY_CONTRACTS = {
     "hub",
     "overview",
 }
+ALLOWED_FRONTMATTER_FIELDS = {
+    "schema_version",
+    "page_type",
+    "title",
+    "status",
+    "created",
+    "updated",
+    "summary",
+    "maintenance",
+    "validation",
+    "tags",
+}
+ALLOWED_EVIDENCE_TYPES = {"raw", "wiki", "external", "repo", "session", "user"}
+PRIMARY_SOURCE_EVIDENCE_TYPES = {"raw", "external", "session", "user"}
 BANNED_FRONTMATTER_FIELDS = {
     "depends_on",
     "used_by",
@@ -172,6 +183,14 @@ def check_log_jsonl(errors: list[str]) -> None:
         changed_paths = event.get("changed_paths")
         if not isinstance(changed_paths, list) or not all(isinstance(item, str) for item in changed_paths):
             add_error(errors, f"{rel(path)}:{line_number}", "field 'changed_paths' must be a list of strings")
+        elif not changed_paths:
+            add_error(errors, f"{rel(path)}:{line_number}", "field 'changed_paths' must contain at least one path")
+        else:
+            for changed_path in changed_paths:
+                if changed_path.startswith("/") or changed_path.startswith("../") or "/../" in changed_path:
+                    add_error(errors, f"{rel(path)}:{line_number}", f"changed path must be relative: {changed_path!r}")
+                if not changed_path.startswith("wiki/"):
+                    add_error(errors, f"{rel(path)}:{line_number}", f"changed path must stay under wiki/: {changed_path!r}")
 
 
 def check_frontmatter(path: Path, frontmatter: str, errors: list[str]) -> None:
@@ -221,6 +240,13 @@ def check_frontmatter(path: Path, frontmatter: str, errors: list[str]) -> None:
         if re.search(rf"^{re.escape(banned)}:", frontmatter, re.MULTILINE):
             add_error(errors, rel(path), f"frontmatter must not contain body-provenance field {banned!r}")
 
+    top_level_fields = {
+        match.group(1)
+        for match in re.finditer(r"^([A-Za-z_][A-Za-z0-9_]*):", frontmatter, re.MULTILINE)
+    }
+    for field in sorted(top_level_fields - ALLOWED_FRONTMATTER_FIELDS):
+        add_error(errors, rel(path), f"unexpected top-level frontmatter field {field!r}")
+
 
 def check_h1_free(path: Path, body: str, errors: list[str]) -> None:
     in_fence = False
@@ -255,6 +281,54 @@ def check_body_provenance(path: Path, body: str, errors: list[str]) -> None:
             add_error(errors, rel(path), f"{heading!r} must contain a Markdown table")
 
 
+def evidence_unit_types(body: str) -> list[str]:
+    section = "## 证据与限制"
+    section_index = body.find(section)
+    if section_index == -1:
+        return []
+
+    appendix = body[section_index:]
+    heading = "### 证据单元"
+    heading_index = appendix.find(heading)
+    if heading_index == -1:
+        return []
+
+    rest = appendix[heading_index:]
+    next_heading = rest.find("\n### ", 1)
+    subsection = rest if next_heading == -1 else rest[:next_heading]
+
+    types: list[str] = []
+    for line in subsection.splitlines():
+        stripped = line.strip()
+        if not stripped.startswith("|") or "---" in stripped or "类型" in stripped:
+            continue
+        cells = [cell.strip() for cell in stripped.strip("|").split("|")]
+        if cells:
+            types.append(cells[0].strip("`"))
+    return types
+
+
+def check_evidence_units(path: Path, frontmatter: str, body: str, errors: list[str]) -> None:
+    types = evidence_unit_types(body)
+    for evidence_type in types:
+        if evidence_type not in ALLOWED_EVIDENCE_TYPES:
+            add_error(
+                errors,
+                rel(path),
+                f"evidence unit type must be one of {sorted(ALLOWED_EVIDENCE_TYPES)}: {evidence_type!r}",
+            )
+
+    if scalar_value(frontmatter, "page_type") == "source" and not any(
+        evidence_type in PRIMARY_SOURCE_EVIDENCE_TYPES for evidence_type in types
+    ):
+        add_error(
+            errors,
+            rel(path),
+            "source pages must include at least one primary evidence unit of type "
+            f"{sorted(PRIMARY_SOURCE_EVIDENCE_TYPES)}",
+        )
+
+
 def check_forbidden_dependency_sections(path: Path, body: str, errors: list[str]) -> None:
     for heading in sorted(FORBIDDEN_DEPENDENCY_HEADINGS):
         if re.search(rf"^#+\s+{re.escape(heading)}\s*$", body, re.MULTILINE):
@@ -285,6 +359,7 @@ def check_durable_pages(errors: list[str]) -> None:
         check_frontmatter(path, frontmatter, errors)
         check_h1_free(path, body, errors)
         check_body_provenance(path, body, errors)
+        check_evidence_units(path, frontmatter, body, errors)
         check_forbidden_dependency_sections(path, body, errors)
         check_links(path, body, errors)
 

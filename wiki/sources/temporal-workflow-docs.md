@@ -2,10 +2,10 @@
 schema_version: 2
 page_type: source
 title: "Temporal 工作流文档投影"
-status: active
+status: superseded
 created: 2026-06-12
 updated: 2026-06-12
-summary: "Temporal Workflow、Activity、确定性约束与 AI agent 文章的来源投影。"
+summary: "已被更细粒度的 Temporal 单来源投影页取代。"
 maintenance:
   edit_policy: update
 validation:
@@ -16,6 +16,17 @@ tags:
   - durable-execution
   - ai-agents
 ---
+
+> [!WARNING] 已被取代
+> 本页已被 [Temporal Workflows 文档](temporal-workflows-docs.md)、
+> [Temporal Workflow 确定性约束文档](temporal-workflow-deterministic-constraints-docs.md)、
+> [Temporal Activities 文档](temporal-activities-docs.md)、
+> [Temporal 动态 AI Agent 博客](temporal-dynamic-ai-agents-blog.md) 和
+> [Temporal Deep Research Agent 博客](temporal-deep-research-agents-blog.md)
+> 取代。
+> 原因：source page 应投影一个主要上游证据对象，不能把多个独立外链聚合为 n:
+> 1 证据锚点。 取代日期：2026-06-12。
+> 除修复该提示、链接或证据链外，不要继续更新本页。
 
 ## 来源边界
 
