@@ -516,6 +516,15 @@ Create durable pages only when they materially support future synthesis.
 | `concept page` | A reusable idea, mechanism, framework, argument, or pattern materially supports durable analyses. |
 | `hub` | A stable cluster of analyses needs an entry point, reading path, current-state summary, open questions, and maintenance boundary. |
 
+When compiling evidence into durable synthesis,
+especially when creating or materially updating an analysis page,
+also check whether recurring concepts or named entities in
+that synthesis boundary meet the same threshold.
+Create or update concept/entity pages in the same task
+when they have independent durable retrieval value across sources, analyses,
+or future questions; otherwise keep them inside the current synthesis page.
+Source-page-only projection does not trigger concept/entity pages by itself.
+
 Do not create:
 
 - one source page per raw file by default;
@@ -556,9 +565,12 @@ When ingesting a source or evidence set:
    request or authorization plus legal, privacy, and sensitivity checks.
 4. Update existing analyses first
    when the new evidence refines the same question boundary.
-5. Create new pages only when they have independent durable retrieval value.
-6. Update hubs only when navigation or topic state changes.
-7. Record a log event only when durable wiki state changes.
+5. For durable synthesis tasks, perform a concept/entity triage pass:
+   identify reusable concepts and named entities in the evidence boundary,
+   then decide create/update/defer under the Section 7 thresholds.
+6. Create new pages only when they have independent durable retrieval value.
+7. Update hubs only when navigation or topic state changes.
+8. Record a log event only when durable wiki state changes.
 
 Ingest is integration, not automatic summarization.
 
