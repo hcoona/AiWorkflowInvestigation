@@ -46,6 +46,16 @@ Temporal workflow code 和 Microsoft Agent Framework functional workflow 只在
 code-authored surface 上相似。
 这些类比不能推出运行时等价。
 
+本页拆出的可复用概念入口包括
+[工作流控制表示面](../concepts/workflow-control-representation-surface.md)、
+[工作流执行与恢复语义](../concepts/workflow-execution-recovery-semantics.md)、
+[工作流副作用边界](../concepts/workflow-side-effect-boundary.md) 和
+[工作流时间与触发语义](../concepts/workflow-time-trigger-semantics.md)。
+四个产品级实体入口是 [Temporal](../entities/temporal.md)、
+[Apache Airflow](../entities/apache-airflow.md)、
+[Microsoft Agent Framework](../entities/microsoft-agent-framework.md) 和
+[LangGraph](../entities/langgraph.md)。
+
 ### 概念分层
 
 | 层 | 要问的问题 | 典型差异 |
