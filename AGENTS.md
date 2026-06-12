@@ -188,10 +188,11 @@ and `validation.body_contract` values remain the declared machine-readable
 tokens.
 
 External evidence may be cited directly without being copied into `raw/`.
-When an external source supports durable wiki state,
-create or update a `wiki/sources/` source page projection
-so the evidence chain remains traceable even
-when the original material is not preserved in `raw/`.
+When an external source is cited by a durable synthesis page
+and the original material is not preserved in `raw/`,
+create or update a `wiki/sources/` source page projection in
+that same synthesis task so the evidence chain remains traceable.
+Raw admission by itself does not require creating a source page.
 
 ### AGENTS.md
 
@@ -414,20 +415,23 @@ or permission to bypass paywalls, login walls, rate limits, robots rules,
 terms of service, or sandbox boundaries.
 If access is unavailable or not clearly authorized, ask or proceed without it.
 
-External evidence becomes durable only through explicit citation,
-source projection, raw promotion, or synthesis with preserved provenance.
+External evidence becomes durable only through raw promotion,
+direct citation in a durable synthesis page, source projection,
+or synthesis with preserved provenance.
 Direct external citation does not require copying the original material into
-`raw/`, but any external source that supports durable wiki state must have a
-source page projection to preserve the evidence chain.
+`raw/`, but external evidence cited by a durable synthesis page without a
+corresponding raw source needs a source page projection to preserve the evidence
+chain.
+Raw promotion alone is not a trigger for source page creation.
 
 Use this lifecycle:
 
 | State | Meaning | Default handling |
 | --- | --- | --- |
 | `ephemeral lookup` | Temporary tool lookup used only for the current answer or decision. | Do not write to wiki, log, or raw. If used in the answer, disclose source type, time sensitivity, and reproducibility limits when they matter. |
-| `cited external evidence` | External evidence explicitly cited in an answer or durable page. | Record provenance such as URL, endpoint, command, version, accessed_at, and query parameters. If written into durable wiki state, also create or update the source page projection. |
-| `source page projection` | A `wiki/sources/` page for an external source that supports durable wiki state. | Use as a source anchor and human-readable projection, not as the primary source itself. |
-| `promoted raw source` | External material preserved in `raw/`. | Use only when it is worth long-term rereading, legal to preserve, reusable, unstable externally, or core evidence. |
+| `cited external evidence` | External evidence explicitly cited in an answer or durable page. | Record provenance such as URL, endpoint, command, version, accessed_at, and query parameters. If cited by a durable synthesis page without a corresponding raw source, also create or update the source page projection. |
+| `source page projection` | A `wiki/sources/` page for an external source that needs a durable source anchor, usually because a synthesis page cites external-only evidence. | Use as a source anchor and human-readable projection, not as the primary source itself. |
+| `promoted raw source` | External material preserved in `raw/`. | Use only when it is worth long-term rereading, legal to preserve, reusable, unstable externally, or core evidence. Do not create a source page merely because a raw source was admitted. |
 | `durable synthesis` | Evidence compiled into analysis, entity, concept, or hub pages. | Preserve enough provenance to audit the claim later. |
 
 Promotion thresholds:
@@ -435,17 +439,18 @@ Promotion thresholds:
 - Promote `ephemeral lookup` to `cited external evidence` only
   when it supports an important claim, number, version difference, judgment,
   or decision.
-- Promote `cited external evidence` to `source page projection` whenever the
-  evidence supports durable wiki state, including cases where the source is
-  referenced directly and not preserved in `raw/`.
+- Promote `cited external evidence` to `source page projection` when a durable
+  synthesis page needs a reusable source anchor for evidence that is referenced
+  directly and not preserved in `raw/`.
 - Promote external source material to `promoted raw source` only
   when the user explicitly asks for or authorizes raw admission,
   the original text/data must be preserved for future rereading,
   the link/API is unstable, the source may disappear,
   or future synthesis depends on original details, and legal, privacy,
   and sensitivity checks allow preservation.
-  The source page remains a projection;
-  the original material is what gets preserved in `raw/`.
+  A source page is optional for raw-promoted evidence
+  and should normally be deferred until a durable synthesis page needs
+  that source anchor.
 - Never promote evidence merely because a tool returned it,
   a search hit appeared often, or it might be useful someday.
 
@@ -494,7 +499,7 @@ Create durable pages only when they materially support future synthesis.
 | Page type | When to create or update |
 | --- | --- |
 | `analysis` | A reusable answer, comparison, decision, playbook, or topic synthesis emerges. This is the primary compiled knowledge product. |
-| `source page` | A raw or external source becomes important enough to reuse, revisit, compare, reconcile, track conflicts, or maintain as support for durable synthesis. External sources that support durable wiki state require a source page projection even when they are not copied into `raw/`; ordinary one-off answer citations that are not written into wiki state do not trigger a source page. |
+| `source page` | A durable synthesis task needs a reusable source anchor, especially for external evidence that is cited directly and not preserved in `raw/`. A raw source may be cited directly by analyses; do not create a source page merely because raw was added. Ordinary one-off answer citations that are not written into wiki state do not trigger a source page. |
 | `entity page` | A named thing recurs across sources or questions and carries durable relationships, events, claims, or direct query value. |
 | `concept page` | A reusable idea, mechanism, framework, argument, or pattern materially supports durable analyses. |
 | `hub` | A stable cluster of analyses needs an entry point, reading path, current-state summary, open questions, and maintenance boundary. |
@@ -511,8 +516,8 @@ Do not create:
 A source page should include what the source is, why it matters,
 upstream evidence/provenance, key claims used by the wiki, limits or conflicts,
 and whether raw was preserved.
-Do not create a source page for one-off fact checks, low-value pages,
-or background material that does not support durable synthesis.
+Do not create a source page for raw admission alone, one-off fact checks,
+low-value pages, or background material that does not support durable synthesis.
 Do not hand-maintain impacted-analysis or downstream-dependency sections;
 the source page's forward body provenance
 and ordinary related-page links are enough
@@ -527,8 +532,10 @@ When ingesting a source or evidence set:
    uncertainty, and open questions.
 3. Decide whether the evidence should remain ephemeral, be cited,
    become a source page projection, or be proposed for raw promotion.
-   Any external evidence that supports durable wiki state must get a source page
-   projection even if it is not preserved in `raw/`.
+   Raw admission by itself stops at `raw/` unless the current task also creates
+   or updates durable synthesis that needs a source anchor.
+   External evidence cited by durable synthesis without a corresponding raw
+   source must get a source page projection.
    Any new or external material admitted to `raw/` requires explicit user
    request or authorization plus legal, privacy, and sensitivity checks.
 4. Update existing analyses first
