@@ -67,6 +67,26 @@ runtime；checkpointers、stores、interrupts 与 fault tolerance
 
 这四者不是同一类产品，但也不是互不相干；它们是在同一个多步状态化编排问题空间里，沿着不同控制抽象和持久化策略分化出来的。
 
+### 学术文献补充发现
+
+DeepXiv 检索到的 arXiv 文献没有推翻上述判断，反而支持一个更细的结论：agent
+workflow 已经成为相对独立的研究子家族，但其内部仍分成多种控制语义。
+
+| 研究线 | 代表论文 | 对本页结论的增量 |
+| --- | --- | --- |
+| 综述/分类 | Agent Workflow Survey | 将 agent workflow 按 planning、tool use、memory、multi-agent、flow、representation、protocol 等维度比较，说明“workflow”在 agent 领域本身也不是单一抽象。 |
+| 状态机控制 | StateFlow | 将 process control 建模为 state transitions，将 sub-task solving 放在 state actions 内，强化“控制流”和“工具/LLM 执行”应分层理解。 |
+| 确定性图引擎 | GraphBit | 用 typed DAG 与执行引擎控制 routing、state transitions 和 tool invocation，说明 agent workflow 研究也在追求可复现、可审计的显式图执行。 |
+| 服务端图管理 | GraphFlow | 把 workflow 表示为共享 operation graph，并从中动态生成 task-specific workflow，同时优化 KV cache/state reuse；这说明 workflow 在 agent serving 中也承担系统性能职责。 |
+| 学习式编排 | FlowSteer | 把 workflow orchestration 形式化为 policy 生成和编辑 workflow graph 的问题，说明 agent workflow 还可以是可学习、可优化的对象，而不只是手写流程图。 |
+
+因此，MAF/LangGraph 所在的 agent/workflow runtime 子家族还可以继续拆成：
+手写显式图、状态机/有限状态转导器、执行引擎控制的 typed DAG、服务端 operation
+graph，以及基于强化学习或搜索的 workflow 生成器。
+这进一步说明：和 Temporal/Airflow 比较时，不能只问“有没有 workflow”，还要问
+workflow 是运行时保证、调度图、agent
+状态图、服务端优化结构，还是被学习出来的编排策略。
+
 ## 影响
 
 - Temporal 更适合“必须稳定重放、且副作用要被显式隔离”的场景。
@@ -74,6 +94,8 @@ runtime；checkpointers、stores、interrupts 与 fault tolerance
 - Microsoft Agent Framework 更适合在其 agent 生态里做显式 workflow/agent
   编排，并接受 API surface 成熟度不完全齐整。
 - LangGraph 更适合把 agent 运行时做得更细、更状态化，但不把自己包装成调度系统。
+- arXiv 文献提示：如果讨论的是 agent
+  workflow，还需要额外区分“显式控制图”和“可学习/可优化的 workflow 生成策略”。
 
 ## 证据与限制
 
@@ -100,6 +122,11 @@ runtime；checkpointers、stores、interrupts 与 fault tolerance
 | wiki | [LangGraph Persistence 文档](../sources/langgraph-persistence-docs.md) | checkpointers 与 stores 的持久化分层。 |
 | wiki | [LangGraph Interrupts 文档](../sources/langgraph-interrupts-docs.md) | interrupt/resume/HITL 的暂停与恢复语义。 |
 | wiki | [LangGraph Fault Tolerance 文档](../sources/langgraph-fault-tolerance-docs.md) | retries、timeouts、error handlers 的 fault tolerance 语义。 |
+| wiki | [Agent Workflow Survey 论文](../sources/arxiv-agent-workflow-survey-2508-01186.md) | agent workflow 综述、能力/架构分类和 workflow management 维度。 |
+| wiki | [StateFlow 论文](../sources/arxiv-stateflow-2403-11322.md) | state-driven workflow、状态转移与 action 分层。 |
+| wiki | [GraphBit 论文](../sources/arxiv-graphbit-2605-13848.md) | engine-orchestrated typed DAG 和 deterministic routing。 |
+| wiki | [GraphFlow 论文](../sources/arxiv-graphflow-2605-22566.md) | operation graph、task-adaptive workflow generation 与 KV state management。 |
+| wiki | [FlowSteer 论文](../sources/arxiv-flowsteer-2602-01664.md) | workflow graph policy、executable canvas 和 RL-based orchestration。 |
 
 ### 支撑的主张
 
@@ -111,3 +138,6 @@ runtime；checkpointers、stores、interrupts 与 fault tolerance
 | Airflow 仍是 DAG/task graph-centric；dynamic task mapping、asset scheduling 与 common.ai 扩展了 agentic 用法。 | [Airflow DAG 文档](../sources/apache-airflow-dags-docs.md)、[Airflow Dynamic Task Mapping 文档](../sources/apache-airflow-dynamic-task-mapping-docs.md)、[Airflow Asset Scheduling 文档](../sources/apache-airflow-asset-scheduling-docs.md)、[Airflow Common AI Provider 博客](../sources/apache-airflow-common-ai-provider-blog.md)、[Airflow Agentic Workloads 博客](../sources/apache-airflow-agentic-workloads-blog.md) | common.ai provider 是快速演进的增强层，不应当成 Airflow 核心语义已整体转向 agent runtime。 |
 | Microsoft Agent Framework 同时暴露 graph 与 functional 两类 workflow surface，且公开文档对成熟度给出混合信号。 | [Microsoft Agent Framework Overview 文档](../sources/microsoft-agent-framework-overview-docs.md)、[Microsoft Agent Framework Workflows 概览](../sources/microsoft-agent-framework-workflows-overview-docs.md)、[Microsoft Agent Framework Functional Workflows 文档](../sources/microsoft-agent-framework-functional-workflows-docs.md)、[Microsoft Agent Framework WorkflowBuilder 文档](../sources/microsoft-agent-framework-workflow-builder-docs.md)、[Microsoft Agent Framework Durable Extension 文档](../sources/microsoft-agent-framework-durable-extension-docs.md) | functional API 明确 experimental，不能按统一 GA 处理。 |
 | LangGraph 是低层 orchestration runtime；持久化依赖 checkpointers/stores，无法配置 persistence 时不应假定可恢复。 | [LangGraph Overview 文档](../sources/langgraph-overview-docs.md)、[LangGraph Persistence 文档](../sources/langgraph-persistence-docs.md)、[LangGraph Interrupts 文档](../sources/langgraph-interrupts-docs.md)、[LangGraph Fault Tolerance 文档](../sources/langgraph-fault-tolerance-docs.md) | durability 是配置后的能力，不是无条件默认。 |
+| agent workflow 文献支持“agent/workflow runtime 是一个内部复杂的子家族”，而不是单一 execution semantics。 | [Agent Workflow Survey 论文](../sources/arxiv-agent-workflow-survey-2508-01186.md)、[StateFlow 论文](../sources/arxiv-stateflow-2403-11322.md)、[GraphBit 论文](../sources/arxiv-graphbit-2605-13848.md)、[GraphFlow 论文](../sources/arxiv-graphflow-2605-22566.md)、[FlowSteer 论文](../sources/arxiv-flowsteer-2602-01664.md) | arXiv 论文包含预印本和系统论文，结论应作为研究趋势和概念补充，而不是产品成熟度证明。 |
+| StateFlow 和 GraphBit 都强化了“控制流与 LLM/tool 执行应分层”的判断。 | [StateFlow 论文](../sources/arxiv-stateflow-2403-11322.md)、[GraphBit 论文](../sources/arxiv-graphbit-2605-13848.md) | 它们不是 Temporal/Airflow/MAF/LangGraph 官方文档，只能作为外部研究证据。 |
+| GraphFlow 和 FlowSteer 说明 workflow 还可能是 serving optimization 或 learning/optimization target。 | [GraphFlow 论文](../sources/arxiv-graphflow-2605-22566.md)、[FlowSteer 论文](../sources/arxiv-flowsteer-2602-01664.md) | 这些论文关注 agent workflow 子问题，不应外推到所有 workflow engine。 |
