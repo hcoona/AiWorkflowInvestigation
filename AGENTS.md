@@ -109,8 +109,7 @@ When creating commits in this repository,
 use Conventional Commits with an explicit scope,
 for example `feat(wiki): Add Source Projection Guard`.
 The subject after the type and scope must use APA-style title case.
-Include a body that explains the meaningful change,
-why it was made,
+Include a body that explains the meaningful change, why it was made,
 and any validation or follow-up that future agents should know.
 
 Declare at least one repository validation task.

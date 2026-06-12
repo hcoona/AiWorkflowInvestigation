@@ -55,6 +55,7 @@ This repository uses [hk](https://hk.jdx.dev/) through mise.
 The hk `pre-commit`, `check`, and `fix` hooks run the same validation steps,
 including `check-wiki`, which executes the existing `mise run wiki-check`
 validation task.
+Markdown linting and formatting are handled by `rumdl` through hk.
 The `.gitattributes` file is generated from `gitattributes.pkl`;
 hooks also check that indexed files are covered by its explicit text
 or binary pattern lists.

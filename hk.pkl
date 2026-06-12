@@ -4,21 +4,15 @@ hooks {
     ["pre-commit"] {
         fix = false
         steps {
-            ["oxfmt"] {
+            ["rumdl"] {
                 glob = List(
-                    "*.json",
-                    "**/*.json",
-                    "*.jsonc",
-                    "**/*.jsonc",
-                    "*.json5",
-                    "**/*.json5",
                     "*.md",
                     "**/*.md",
                     "*.mdx",
                     "**/*.mdx",
                 )
-                check = "mise exec -- oxfmt --check --no-error-on-unmatched-pattern {{files}}"
-                fix = "mise exec -- oxfmt --no-error-on-unmatched-pattern {{files}}"
+                check = "mise exec -- rumdl check {{files}}"
+                fix = "mise exec -- rumdl fmt {{files}}"
             }
             ["typos"] {
                 check = "mise exec -- typos {{files}}"
@@ -39,21 +33,15 @@ hooks {
     ["check"] {
         fix = false
         steps {
-            ["oxfmt"] {
+            ["rumdl"] {
                 glob = List(
-                    "*.json",
-                    "**/*.json",
-                    "*.jsonc",
-                    "**/*.jsonc",
-                    "*.json5",
-                    "**/*.json5",
                     "*.md",
                     "**/*.md",
                     "*.mdx",
                     "**/*.mdx",
                 )
-                check = "mise exec -- oxfmt --check --no-error-on-unmatched-pattern {{files}}"
-                fix = "mise exec -- oxfmt --no-error-on-unmatched-pattern {{files}}"
+                check = "mise exec -- rumdl check {{files}}"
+                fix = "mise exec -- rumdl fmt {{files}}"
             }
             ["typos"] {
                 check = "mise exec -- typos {{files}}"
@@ -74,21 +62,15 @@ hooks {
     ["fix"] {
         fix = true
         steps {
-            ["oxfmt"] {
+            ["rumdl"] {
                 glob = List(
-                    "*.json",
-                    "**/*.json",
-                    "*.jsonc",
-                    "**/*.jsonc",
-                    "*.json5",
-                    "**/*.json5",
                     "*.md",
                     "**/*.md",
                     "*.mdx",
                     "**/*.mdx",
                 )
-                check = "mise exec -- oxfmt --check --no-error-on-unmatched-pattern {{files}}"
-                fix = "mise exec -- oxfmt --no-error-on-unmatched-pattern {{files}}"
+                check = "mise exec -- rumdl check {{files}}"
+                fix = "mise exec -- rumdl fmt {{files}}"
             }
             ["typos"] {
                 check = "mise exec -- typos {{files}}"
