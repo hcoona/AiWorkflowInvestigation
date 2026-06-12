@@ -1,11 +1,13 @@
 [tool_alias]
 oxfmt = "github:oxc-project/oxc"
+rumdl = "github:rvben/rumdl"
 typos = "github:crate-ci/typos"
 
 [tools]
 hk = "1.48.0"
 python = "3.12"
 typos = "1.47.2"
+rumdl = "0.2.14"
 
 [tools.oxfmt]
 version = "apps_v1.69.0"

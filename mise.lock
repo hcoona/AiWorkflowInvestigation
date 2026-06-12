@@ -47,6 +47,64 @@ url = "https://github.com/oxc-project/oxc/releases/download/apps_v1.69.0/oxfmt-x
 url_api = "https://api.github.com/repos/oxc-project/oxc/releases/assets/441824232"
 provenance = "github-attestations"
 
+[[tools.oxfmt]]
+version = "apps_v1.69.0"
+backend = "github:oxc-project/oxc"
+
+[tools.oxfmt.options]
+asset_pattern = "oxfmt-aarch64-unknown-linux-gnu.tar.gz"
+
+[tools.oxfmt."platforms.linux-arm64"]
+checksum = "sha256:61f8942d52469dc7683e1bcd7a4a1acda2b79db91b2dda2fc30ea5cbb63d2cef"
+url = "https://github.com/oxc-project/oxc/releases/download/apps_v1.69.0/oxfmt-aarch64-unknown-linux-gnu.tar.gz"
+url_api = "https://api.github.com/repos/oxc-project/oxc/releases/assets/441824197"
+provenance = "github-attestations"
+
+[tools.oxfmt."platforms.linux-arm64-musl"]
+checksum = "sha256:61f8942d52469dc7683e1bcd7a4a1acda2b79db91b2dda2fc30ea5cbb63d2cef"
+url = "https://github.com/oxc-project/oxc/releases/download/apps_v1.69.0/oxfmt-aarch64-unknown-linux-gnu.tar.gz"
+url_api = "https://api.github.com/repos/oxc-project/oxc/releases/assets/441824197"
+provenance = "github-attestations"
+
+[[tools.oxfmt]]
+version = "apps_v1.69.0"
+backend = "github:oxc-project/oxc"
+
+[tools.oxfmt.options]
+asset_pattern = "oxfmt-aarch64-apple-darwin.tar.gz"
+
+[tools.oxfmt."platforms.macos-arm64"]
+checksum = "sha256:ffa8c082a6e39a040f3b06f14c5ac9998e199ebeb748155979f74fd354992db5"
+url = "https://github.com/oxc-project/oxc/releases/download/apps_v1.69.0/oxfmt-aarch64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/oxc-project/oxc/releases/assets/441824196"
+provenance = "github-attestations"
+
+[[tools.oxfmt]]
+version = "apps_v1.69.0"
+backend = "github:oxc-project/oxc"
+
+[tools.oxfmt.options]
+asset_pattern = "oxfmt-x86_64-apple-darwin.tar.gz"
+
+[tools.oxfmt."platforms.macos-x64"]
+checksum = "sha256:80bf2c7e48f1d02dfe0cdbf510fc8c786df533448e8175fea58c4a6173e1752b"
+url = "https://github.com/oxc-project/oxc/releases/download/apps_v1.69.0/oxfmt-x86_64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/oxc-project/oxc/releases/assets/441824228"
+provenance = "github-attestations"
+
+[[tools.oxfmt]]
+version = "apps_v1.69.0"
+backend = "github:oxc-project/oxc"
+
+[tools.oxfmt.options]
+asset_pattern = "oxfmt-x86_64-pc-windows-msvc.zip"
+
+[tools.oxfmt."platforms.windows-x64"]
+checksum = "sha256:70381a422464bf13abd8d8210e0e0cdc2aedc96dfe0a4d76a732de547a3ea7a6"
+url = "https://github.com/oxc-project/oxc/releases/download/apps_v1.69.0/oxfmt-x86_64-pc-windows-msvc.zip"
+url_api = "https://api.github.com/repos/oxc-project/oxc/releases/assets/441824227"
+provenance = "github-attestations"
+
 [[tools.python]]
 version = "3.12.13"
 backend = "core:python"
@@ -84,6 +142,45 @@ provenance = "github-attestations"
 [tools.python."platforms.windows-x64"]
 checksum = "sha256:99dce0b23bf3c3b28d350cdd7bfe3cd3be51cc4f285faae7c0df110d106d1a8d"
 url = "https://github.com/astral-sh/python-build-standalone/releases/download/20260610/cpython-3.12.13+20260610-x86_64-pc-windows-msvc-install_only_stripped.tar.gz"
+provenance = "github-attestations"
+
+[[tools.rumdl]]
+version = "0.2.14"
+backend = "aqua:rvben/rumdl"
+
+[tools.rumdl."platforms.linux-arm64"]
+checksum = "sha256:e171620ce86e5f4b15f6e3615b40557f8da7b9c7b95a890db65e14be5c6965f9"
+url = "https://github.com/rvben/rumdl/releases/download/v0.2.14/rumdl-v0.2.14-aarch64-unknown-linux-musl.tar.gz"
+provenance = "github-attestations"
+
+[tools.rumdl."platforms.linux-arm64-musl"]
+checksum = "sha256:e171620ce86e5f4b15f6e3615b40557f8da7b9c7b95a890db65e14be5c6965f9"
+url = "https://github.com/rvben/rumdl/releases/download/v0.2.14/rumdl-v0.2.14-aarch64-unknown-linux-musl.tar.gz"
+provenance = "github-attestations"
+
+[tools.rumdl."platforms.linux-x64"]
+checksum = "sha256:bee90a54e79e78a28396428e2ebcd39e01c26e14bc411da5d29b5c8853b66d41"
+url = "https://github.com/rvben/rumdl/releases/download/v0.2.14/rumdl-v0.2.14-x86_64-unknown-linux-musl.tar.gz"
+provenance = "github-attestations"
+
+[tools.rumdl."platforms.linux-x64-musl"]
+checksum = "sha256:bee90a54e79e78a28396428e2ebcd39e01c26e14bc411da5d29b5c8853b66d41"
+url = "https://github.com/rvben/rumdl/releases/download/v0.2.14/rumdl-v0.2.14-x86_64-unknown-linux-musl.tar.gz"
+provenance = "github-attestations"
+
+[tools.rumdl."platforms.macos-arm64"]
+checksum = "sha256:c2d7d3f860bbf5989071275a3f97e09d11a751e8601688f839666f5246fafb3e"
+url = "https://github.com/rvben/rumdl/releases/download/v0.2.14/rumdl-v0.2.14-aarch64-apple-darwin.tar.gz"
+provenance = "github-attestations"
+
+[tools.rumdl."platforms.macos-x64"]
+checksum = "sha256:d4f8ef3934a085efd3d7f00f0ec70e0c09446c5d275478d1daab46681e0ab2c7"
+url = "https://github.com/rvben/rumdl/releases/download/v0.2.14/rumdl-v0.2.14-x86_64-apple-darwin.tar.gz"
+provenance = "github-attestations"
+
+[tools.rumdl."platforms.windows-x64"]
+checksum = "sha256:0a905f7e36782bf3627e6de9687c063b58c9ed48fc95e1fcf2867bf96ef26c16"
+url = "https://github.com/rvben/rumdl/releases/download/v0.2.14/rumdl-v0.2.14-x86_64-pc-windows-msvc.zip"
 provenance = "github-attestations"
 
 [[tools.typos]]
