@@ -31,7 +31,7 @@ evidence -> compile -> integrate -> query -> save durable answers -> reconcile
 ```
 
 For the current task, stop after the smallest necessary durable update,
-required validation, and required log entry are complete.
+required validation, and any required wiki log entry are complete.
 Do not run reconciliation unless requested
 or needed to resolve a concrete conflict exposed by the task.
 
@@ -296,7 +296,7 @@ immediately after the frontmatter because wiki page bodies are H1-free:
 
 When superseding a page, also update material incoming/outgoing links when safe,
 preserve the old evidence/provenance body content, point to the replacement,
-and write one durable log event if repository state changed.
+and write one durable log event if the wiki state changed.
 If a material link update is unsafe or not completed,
 record the unresolved link gap in the replacement pointer, the body provenance,
 or the durable log event.
@@ -639,6 +639,13 @@ and low-risk under the applicable `AGENTS.md`; otherwise ask first.
 
 Use the repository-declared append-only machine-readable log,
 such as `log.jsonl`, to record durable wiki evolution.
+The wiki log is scoped to the `wiki/` knowledge layer,
+not to the whole repository.
+Do not use it as a changelog for `AGENTS.md`, `raw/`, tooling, README files,
+hooks, dependency locks,
+or other repository maintenance unless the task also changes durable wiki state;
+even then, the log event records the wiki change,
+and `changed_paths` lists only paths under `wiki/`.
 
 Follow the repository log schema, path, timestamp convention, ID convention,
 and validation command.
@@ -646,11 +653,12 @@ Do not invent a log structure unless the task is to bootstrap logging.
 
 Log:
 
-- durable ingests;
-- saved queries;
+- durable ingests that create or update wiki pages, source projections,
+  templates, or wiki system files;
+- saved queries that are written into durable wiki pages;
 - new or changed analyses;
-- major page splits/merges/renames;
-- conflict or supersede decisions;
+- major wiki page splits/merges/renames;
+- wiki conflict or supersede decisions;
 - lint/reconciliation passes that changed wiki state;
 - hub boundary changes.
 
@@ -662,6 +670,8 @@ Do not log:
 - every tiny edit;
 - failed lookup paths unless they changed durable judgment;
 - answers that were not written into durable wiki state.
+- raw-only, tooling-only, documentation-only, hook-only, or instruction-only
+  repository changes.
 
 Log exactly once per task when the task changes durable wiki state.
 Do not log purely mechanical typo or format fixes
