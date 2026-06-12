@@ -24,6 +24,11 @@ hooks {
                 check = "mise exec -- typos {{files}}"
                 fix = "mise exec -- typos --write-changes {{files}}"
             }
+            ["check-gitattributes"] {
+                check = "mise run gitattributes-check"
+                fix = "mise run gitattributes-generate && mise run gitattributes-check"
+                exclusive = true
+            }
             ["check-wiki"] {
                 check = "mise run wiki-check"
                 fix = "mise run wiki-check"
@@ -54,6 +59,11 @@ hooks {
                 check = "mise exec -- typos {{files}}"
                 fix = "mise exec -- typos --write-changes {{files}}"
             }
+            ["check-gitattributes"] {
+                check = "mise run gitattributes-check"
+                fix = "mise run gitattributes-generate && mise run gitattributes-check"
+                exclusive = true
+            }
             ["check-wiki"] {
                 check = "mise run wiki-check"
                 fix = "mise run wiki-check"
@@ -83,6 +93,11 @@ hooks {
             ["typos"] {
                 check = "mise exec -- typos {{files}}"
                 fix = "mise exec -- typos --write-changes {{files}}"
+            }
+            ["check-gitattributes"] {
+                check = "mise run gitattributes-check"
+                fix = "mise run gitattributes-generate && mise run gitattributes-check"
+                exclusive = true
             }
             ["check-wiki"] {
                 check = "mise run wiki-check"

@@ -1,0 +1,15 @@
+# Generated from gitattributes.pkl; run `mise run gitattributes-generate` to update.
+# Keep line-ending normalization opt-in; do not force checkout EOL.
+* -text
+
+.gitattributes text
+.gitignore text
+LICENSE text
+*.gitkeep text
+*.json text
+*.jsonl text
+*.lock text
+*.md text
+*.pkl text
+*.py text
+*.toml text

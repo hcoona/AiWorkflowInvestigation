@@ -33,6 +33,7 @@ mise run wiki-check
 ## Git hooks
 
 This repository uses [hk](https://hk.jdx.dev/) through mise. The hk `pre-commit`, `check`, and `fix` hooks run the same validation steps, including `check-wiki`, which executes the existing `mise run wiki-check` validation task.
+The `.gitattributes` file is generated from `gitattributes.pkl`; hooks also check that indexed files are covered by its explicit text or binary pattern lists.
 
 Install project tools with:
 
@@ -62,6 +63,12 @@ Run checks and configured fixes against all files with:
 
 ```bash
 mise exec -- hk fix --all
+```
+
+Regenerate `.gitattributes` after changing `gitattributes.pkl` with:
+
+```bash
+mise run gitattributes-generate
 ```
 
 ## License

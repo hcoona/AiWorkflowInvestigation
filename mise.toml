@@ -5,6 +5,7 @@ typos = "github:crate-ci/typos"
 
 [tools]
 hk = "1.48.0"
+pkl = "0.31.1"
 python = "3.12"
 typos = "1.47.2"
 rumdl = "0.2.14"
@@ -27,3 +28,11 @@ HK_MISE = "1"
 [tasks.wiki-check]
 description = "Validate the LLM-Wiki schema, log, links, and page provenance"
 run = "python tools/wiki_check.py"
+
+[tasks.gitattributes-generate]
+description = "Generate .gitattributes from gitattributes.pkl"
+run = "python tools/gitattributes.py generate"
+
+[tasks.gitattributes-check]
+description = "Check .gitattributes generation and indexed file coverage"
+run = "python tools/gitattributes.py check"

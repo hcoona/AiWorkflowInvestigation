@@ -1,0 +1,24 @@
+// Source of truth for the generated .gitattributes file.
+
+header = List(
+  "Generated from gitattributes.pkl; run `mise run gitattributes-generate` to update.",
+  "Keep line-ending normalization opt-in; do not force checkout EOL.",
+)
+
+defaultAttributes = List("* -text")
+
+textPatterns = List(
+  ".gitattributes",
+  ".gitignore",
+  "LICENSE",
+  "*.gitkeep",
+  "*.json",
+  "*.jsonl",
+  "*.lock",
+  "*.md",
+  "*.pkl",
+  "*.py",
+  "*.toml",
+)
+
+binaryPatterns = List()

@@ -33,6 +33,7 @@ mise run wiki-check
 ## Git Hooks
 
 本仓库通过 mise 使用 [hk](https://hk.jdx.dev/)。hk 的 `pre-commit`、`check` 和 `fix` hooks 运行同一组校验步骤，其中包括执行现有 `mise run wiki-check` 校验任务的 `check-wiki` 步骤。
+`.gitattributes` 由 `gitattributes.pkl` 生成；hooks 还会检查 Git index 中的文件是否都被其中显式的文本或二进制规则覆盖。
 
 安装项目工具：
 
@@ -62,6 +63,12 @@ mise exec -- hk check --all
 
 ```bash
 mise exec -- hk fix --all
+```
+
+修改 `gitattributes.pkl` 后，使用以下命令重新生成 `.gitattributes`：
+
+```bash
+mise run gitattributes-generate
 ```
 
 ## 许可证
