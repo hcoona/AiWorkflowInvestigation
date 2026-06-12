@@ -1,0 +1,27 @@
+[tool_alias]
+oxfmt = "github:oxc-project/oxc"
+typos = "github:crate-ci/typos"
+
+[tools]
+hk = "1.48.0"
+python = "3.12"
+typos = "1.47.2"
+
+[tools.oxfmt]
+version = "apps_v1.69.0"
+rename_exe = "oxfmt"
+
+[tools.oxfmt.platforms]
+linux-x64 = { asset_pattern = "oxfmt-x86_64-unknown-linux-gnu.tar.gz" }
+linux-arm64 = { asset_pattern = "oxfmt-aarch64-unknown-linux-gnu.tar.gz" }
+macos-x64 = { asset_pattern = "oxfmt-x86_64-apple-darwin.tar.gz" }
+macos-arm64 = { asset_pattern = "oxfmt-aarch64-apple-darwin.tar.gz" }
+windows-x64 = { asset_pattern = "oxfmt-x86_64-pc-windows-msvc.zip" }
+windows-arm64 = { asset_pattern = "oxfmt-aarch64-pc-windows-msvc.zip" }
+
+[env]
+HK_MISE = "1"
+
+[tasks.wiki-check]
+description = "Validate the LLM-Wiki schema, log, links, and page provenance"
+run = "python tools/wiki_check.py"

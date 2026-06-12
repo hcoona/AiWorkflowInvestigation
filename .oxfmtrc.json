@@ -1,0 +1,5 @@
+{
+  "$schema": "https://raw.githubusercontent.com/oxc-project/oxc/refs/tags/apps_v1.69.0/npm/oxfmt/configuration_schema.json",
+  "ignorePatterns": ["**/*.jsonl"],
+  "proseWrap": "preserve"
+}

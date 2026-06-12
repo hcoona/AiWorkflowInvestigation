@@ -1,0 +1,94 @@
+amends "package://github.com/jdx/hk/releases/download/v1.48.0/hk@1.48.0#/Config.pkl"
+
+hooks {
+    ["pre-commit"] {
+        fix = false
+        steps {
+            ["oxfmt"] {
+                glob = List(
+                    "*.json",
+                    "**/*.json",
+                    "*.jsonc",
+                    "**/*.jsonc",
+                    "*.json5",
+                    "**/*.json5",
+                    "*.md",
+                    "**/*.md",
+                    "*.mdx",
+                    "**/*.mdx",
+                )
+                check = "mise exec -- oxfmt --check --no-error-on-unmatched-pattern {{files}}"
+                fix = "mise exec -- oxfmt --no-error-on-unmatched-pattern {{files}}"
+            }
+            ["typos"] {
+                check = "mise exec -- typos {{files}}"
+                fix = "mise exec -- typos --write-changes {{files}}"
+            }
+            ["check-wiki"] {
+                check = "mise run wiki-check"
+                fix = "mise run wiki-check"
+                exclusive = true
+            }
+        }
+    }
+    ["check"] {
+        fix = false
+        steps {
+            ["oxfmt"] {
+                glob = List(
+                    "*.json",
+                    "**/*.json",
+                    "*.jsonc",
+                    "**/*.jsonc",
+                    "*.json5",
+                    "**/*.json5",
+                    "*.md",
+                    "**/*.md",
+                    "*.mdx",
+                    "**/*.mdx",
+                )
+                check = "mise exec -- oxfmt --check --no-error-on-unmatched-pattern {{files}}"
+                fix = "mise exec -- oxfmt --no-error-on-unmatched-pattern {{files}}"
+            }
+            ["typos"] {
+                check = "mise exec -- typos {{files}}"
+                fix = "mise exec -- typos --write-changes {{files}}"
+            }
+            ["check-wiki"] {
+                check = "mise run wiki-check"
+                fix = "mise run wiki-check"
+                exclusive = true
+            }
+        }
+    }
+    ["fix"] {
+        fix = true
+        steps {
+            ["oxfmt"] {
+                glob = List(
+                    "*.json",
+                    "**/*.json",
+                    "*.jsonc",
+                    "**/*.jsonc",
+                    "*.json5",
+                    "**/*.json5",
+                    "*.md",
+                    "**/*.md",
+                    "*.mdx",
+                    "**/*.mdx",
+                )
+                check = "mise exec -- oxfmt --check --no-error-on-unmatched-pattern {{files}}"
+                fix = "mise exec -- oxfmt --no-error-on-unmatched-pattern {{files}}"
+            }
+            ["typos"] {
+                check = "mise exec -- typos {{files}}"
+                fix = "mise exec -- typos --write-changes {{files}}"
+            }
+            ["check-wiki"] {
+                check = "mise run wiki-check"
+                fix = "mise run wiki-check"
+                exclusive = true
+            }
+        }
+    }
+}
