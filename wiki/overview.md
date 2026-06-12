@@ -37,7 +37,7 @@ one-source-object-per-page 的 source projections。
 | user | 用户在 2026-06-11 针对粘贴的 "LLM-Wiki v2 Agent Instructions" 选择 "Integrate them into this repository"。 | 确立初始化请求和操作规则来源。 |
 | repo | [`AGENTS.md`](../AGENTS.md)、[`mise.toml`](../mise.toml)、[`hk.pkl`](../hk.pkl) 和 `wiki/log.jsonl`。 | 记录权威说明、校验入口、pre-commit 钩子和持久初始化事件。 |
 | wiki | [工作流概念比较](analyses/workflow-concepts-comparison.md) | 当前 active analysis 示例，展示分析页如何引用单来源 source projections。 |
-| wiki | [Temporal Workflows 文档](sources/temporal-workflows-docs.md)、[Airflow DAG 文档](sources/apache-airflow-dags-docs.md)、[Microsoft Agent Framework Overview 文档](sources/microsoft-agent-framework-overview-docs.md)、[LangGraph Overview 文档](sources/langgraph-overview-docs.md) | 当前 source projection 粒度示例；每页投影一个主要上游证据对象。 |
+| wiki | [Temporal Workflows 文档](sources/temporal/workflows-docs.md)、[Airflow DAG 文档](sources/apache-airflow/dags-docs.md)、[Microsoft Agent Framework Overview 文档](sources/microsoft-agent-framework/overview-docs.md)、[LangGraph Overview 文档](sources/langgraph/overview-docs.md) | 当前 source projection 粒度示例；每页投影一个主要上游证据对象。 |
 
 ### 支撑的主张
 

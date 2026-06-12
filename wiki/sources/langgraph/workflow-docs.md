@@ -18,10 +18,10 @@ tags:
 ---
 
 > [!WARNING] 已被取代
-> 本页已被 [LangGraph Overview 文档](langgraph-overview-docs.md)、
-> [LangGraph Persistence 文档](langgraph-persistence-docs.md)、
-> [LangGraph Interrupts 文档](langgraph-interrupts-docs.md) 和
-> [LangGraph Fault Tolerance 文档](langgraph-fault-tolerance-docs.md) 取代。
+> 本页已被 [LangGraph Overview 文档](overview-docs.md)、
+> [LangGraph Persistence 文档](persistence-docs.md)、
+> [LangGraph Interrupts 文档](interrupts-docs.md) 和
+> [LangGraph Fault Tolerance 文档](fault-tolerance-docs.md) 取代。
 > 原因：source page 应投影一个主要上游证据对象，不能把多个独立外链聚合为 n:
 > 1 证据锚点。 取代日期：2026-06-12。
 > 除修复该提示、链接或证据链外，不要继续更新本页。

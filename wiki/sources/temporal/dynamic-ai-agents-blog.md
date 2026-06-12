@@ -21,7 +21,7 @@ tags:
 本页只投影 Temporal 官方博客
 `Of Course You Can Build Dynamic AI Agents with Temporal`。
 它用于说明 Temporal 如何承载动态 agent 模式。 原始材料已保存到
-[`raw/01-temporal/2025-11-12-of-course-you-can-build-dynamic-ai-agents-with-temporal.md`](../../raw/01-temporal/2025-11-12-of-course-you-can-build-dynamic-ai-agents-with-temporal.md)；
+[`raw/01-temporal/2025-11-12-of-course-you-can-build-dynamic-ai-agents-with-temporal.md`](../../../raw/01-temporal/2025-11-12-of-course-you-can-build-dynamic-ai-agents-with-temporal.md)；
 本页使用该 raw 文件作为主证据。
 
 ## 可复用关键主张
@@ -42,7 +42,7 @@ tags:
 
 | 类型 | 引用 | 说明 |
 | --- | --- | --- |
-| raw | [`raw/01-temporal/2025-11-12-of-course-you-can-build-dynamic-ai-agents-with-temporal.md`](../../raw/01-temporal/2025-11-12-of-course-you-can-build-dynamic-ai-agents-with-temporal.md) | Temporal 官方动态 AI agent 博客正文原文。 |
+| raw | [`raw/01-temporal/2025-11-12-of-course-you-can-build-dynamic-ai-agents-with-temporal.md`](../../../raw/01-temporal/2025-11-12-of-course-you-can-build-dynamic-ai-agents-with-temporal.md) | Temporal 官方动态 AI agent 博客正文原文。 |
 
 ### 支撑的主张
 

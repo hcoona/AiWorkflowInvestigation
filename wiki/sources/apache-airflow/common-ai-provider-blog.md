@@ -21,7 +21,7 @@ tags:
 本页只投影 Apache Airflow 官方博客 `Introducing Common AI Provider`。
 它用于说明 Airflow common.ai provider 如何把 LLM/agent 能力放入 task 语义中。
 原始材料已保存到
-[`raw/02-apache-airflow/2026-04-14-common-ai-provider.md`](../../raw/02-apache-airflow/2026-04-14-common-ai-provider.md)；
+[`raw/02-apache-airflow/2026-04-14-common-ai-provider.md`](../../../raw/02-apache-airflow/2026-04-14-common-ai-provider.md)；
 本页使用该 raw 文件作为主证据。
 
 ## 可复用关键主张
@@ -40,7 +40,7 @@ tags:
 
 | 类型 | 引用 | 说明 |
 | --- | --- | --- |
-| raw | [`raw/02-apache-airflow/2026-04-14-common-ai-provider.md`](../../raw/02-apache-airflow/2026-04-14-common-ai-provider.md) | Apache Airflow Common AI Provider 官方博客正文原文。 |
+| raw | [`raw/02-apache-airflow/2026-04-14-common-ai-provider.md`](../../../raw/02-apache-airflow/2026-04-14-common-ai-provider.md) | Apache Airflow Common AI Provider 官方博客正文原文。 |
 
 ### 支撑的主张
 

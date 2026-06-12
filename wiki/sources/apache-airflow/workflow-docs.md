@@ -18,11 +18,11 @@ tags:
 ---
 
 > [!WARNING] 已被取代
-> 本页已被 [Airflow DAG 文档](apache-airflow-dags-docs.md)、
-> [Airflow Dynamic Task Mapping 文档](apache-airflow-dynamic-task-mapping-docs.md)、
-> [Airflow Asset Scheduling 文档](apache-airflow-asset-scheduling-docs.md)、
-> [Airflow Common AI Provider 博客](apache-airflow-common-ai-provider-blog.md)
-> 和 [Airflow Agentic Workloads 博客](apache-airflow-agentic-workloads-blog.md)
+> 本页已被 [Airflow DAG 文档](dags-docs.md)、
+> [Airflow Dynamic Task Mapping 文档](dynamic-task-mapping-docs.md)、
+> [Airflow Asset Scheduling 文档](asset-scheduling-docs.md)、
+> [Airflow Common AI Provider 博客](common-ai-provider-blog.md)
+> 和 [Airflow Agentic Workloads 博客](agentic-workloads-blog.md)
 > 取代。
 > 原因：source page 应投影一个主要上游证据对象，不能把多个独立外链聚合为 n:
 > 1 证据锚点。 取代日期：2026-06-12。

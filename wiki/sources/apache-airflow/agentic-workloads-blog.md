@@ -21,7 +21,7 @@ tags:
 本页只投影 Apache Airflow 官方博客 `Agentic Workloads with Airflow 3`。
 它用于说明 Airflow 如何用显式 task graph 表达 agentic fan-out/fan-in pipeline。
 原始材料已保存到
-[`raw/02-apache-airflow/2026-04-15-agentic-workloads-airflow-3.md`](../../raw/02-apache-airflow/2026-04-15-agentic-workloads-airflow-3.md)；
+[`raw/02-apache-airflow/2026-04-15-agentic-workloads-airflow-3.md`](../../../raw/02-apache-airflow/2026-04-15-agentic-workloads-airflow-3.md)；
 本页使用该 raw 文件作为主证据。
 
 ## 可复用关键主张
@@ -40,7 +40,7 @@ tags:
 
 | 类型 | 引用 | 说明 |
 | --- | --- | --- |
-| raw | [`raw/02-apache-airflow/2026-04-15-agentic-workloads-airflow-3.md`](../../raw/02-apache-airflow/2026-04-15-agentic-workloads-airflow-3.md) | Apache Airflow agentic workloads 官方博客正文原文。 |
+| raw | [`raw/02-apache-airflow/2026-04-15-agentic-workloads-airflow-3.md`](../../../raw/02-apache-airflow/2026-04-15-agentic-workloads-airflow-3.md) | Apache Airflow agentic workloads 官方博客正文原文。 |
 
 ### 支撑的主张
 

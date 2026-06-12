@@ -22,7 +22,7 @@ tags:
 `How to Build Deep Research Agents using Temporal and Braintrust`。
 它用于说明 deep research agent 作为长运行、多步 agent pipeline 的 Temporal
 应用模式。 原始材料已保存到
-[`raw/01-temporal/2026-06-03-how-to-build-deep-research-agents-using-temporal-and-braintrust.md`](../../raw/01-temporal/2026-06-03-how-to-build-deep-research-agents-using-temporal-and-braintrust.md)；
+[`raw/01-temporal/2026-06-03-how-to-build-deep-research-agents-using-temporal-and-braintrust.md`](../../../raw/01-temporal/2026-06-03-how-to-build-deep-research-agents-using-temporal-and-braintrust.md)；
 本页使用该 raw 文件作为主证据。
 
 ## 可复用关键主张
@@ -41,7 +41,7 @@ tags:
 
 | 类型 | 引用 | 说明 |
 | --- | --- | --- |
-| raw | [`raw/01-temporal/2026-06-03-how-to-build-deep-research-agents-using-temporal-and-braintrust.md`](../../raw/01-temporal/2026-06-03-how-to-build-deep-research-agents-using-temporal-and-braintrust.md) | Temporal 官方 deep research agent 博客正文原文。 |
+| raw | [`raw/01-temporal/2026-06-03-how-to-build-deep-research-agents-using-temporal-and-braintrust.md`](../../../raw/01-temporal/2026-06-03-how-to-build-deep-research-agents-using-temporal-and-braintrust.md) | Temporal 官方 deep research agent 博客正文原文。 |
 
 ### 支撑的主张
 

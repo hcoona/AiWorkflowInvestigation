@@ -18,11 +18,11 @@ tags:
 ---
 
 > [!WARNING] 已被取代
-> 本页已被 [Temporal Workflows 文档](temporal-workflows-docs.md)、
-> [Temporal Workflow 确定性约束文档](temporal-workflow-deterministic-constraints-docs.md)、
-> [Temporal Activities 文档](temporal-activities-docs.md)、
-> [Temporal 动态 AI Agent 博客](temporal-dynamic-ai-agents-blog.md) 和
-> [Temporal Deep Research Agent 博客](temporal-deep-research-agents-blog.md)
+> 本页已被 [Temporal Workflows 文档](workflows-docs.md)、
+> [Temporal Workflow 确定性约束文档](workflow-deterministic-constraints-docs.md)、
+> [Temporal Activities 文档](activities-docs.md)、
+> [Temporal 动态 AI Agent 博客](dynamic-ai-agents-blog.md) 和
+> [Temporal Deep Research Agent 博客](deep-research-agents-blog.md)
 > 取代。
 > 原因：source page 应投影一个主要上游证据对象，不能把多个独立外链聚合为 n:
 > 1 证据锚点。 取代日期：2026-06-12。
