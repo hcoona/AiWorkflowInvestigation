@@ -4,7 +4,7 @@ page_type: source
 title: "arXiv 2508.01186 Agent Workflow Survey"
 status: active
 created: 2026-06-12
-updated: 2026-06-12
+updated: 2026-06-13
 summary: "Agent workflow 综述论文的单来源投影。"
 maintenance:
   edit_policy: update
@@ -19,7 +19,9 @@ tags:
 ## 来源边界
 
 本页只投影 arXiv:2508.01186 `A Survey on Agent Workflow -- Status and Future`。
-原始材料未保存到 `raw/`；本页直接引用 arXiv PDF 作为主证据。
+原始材料已通过 DeepXiv 保存到
+[`raw/arxiv/2025-08-02-2508.01186-a-survey-on-agent-workflow-status-and-future.md`](../../../raw/arxiv/2025-08-02-2508.01186-a-survey-on-agent-workflow-status-and-future.md)；
+本页使用该 raw 文件作为主证据。
 
 ## 可复用关键主张
 
@@ -42,7 +44,7 @@ tags:
 
 | 类型 | 引用 | 说明 |
 | --- | --- | --- |
-| external | `https://arxiv.org/pdf/2508.01186` | arXiv:2508.01186；DeepXiv 访问时间 2026-06-12。 |
+| raw | [`raw/arxiv/2025-08-02-2508.01186-a-survey-on-agent-workflow-status-and-future.md`](../../../raw/arxiv/2025-08-02-2508.01186-a-survey-on-agent-workflow-status-and-future.md) | arXiv:2508.01186 的 DeepXiv raw Markdown 提取正文；访问时间 2026-06-13。 |
 
 ### 支撑的主张
 

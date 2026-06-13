@@ -1,6 +1,10 @@
 # Project-level rumdl configuration.
 # Keep this file minimal; add only repository-specific deviations from rumdl defaults.
 
+[global]
+exclude = ["raw/**"]
+force-exclude = true
+
 [MD013]
 reflow = true
 reflow-mode = "semantic-line-breaks"
