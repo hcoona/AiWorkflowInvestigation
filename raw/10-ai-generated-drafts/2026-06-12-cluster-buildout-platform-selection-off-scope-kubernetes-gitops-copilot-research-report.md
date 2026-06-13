@@ -1,20 +1,21 @@
 ---
 source_type: ai-generated-draft
-title: "Copilot research report: Cluster Buildout workflow platform selection"
+title: "Off-scope Copilot research report: Kubernetes/GitOps Cluster Buildout workflow platform selection"
 origin: "GitHub Copilot CLI research orchestration output"
 generator: "GitHub Copilot CLI"
 recorded: 2026-06-13
 language: zh-Hans
 topic: "AI workflow platform selection"
 authority: "non-authoritative"
-raw_admission_reason: "User requested preserving the AI-generated research report under raw AI drafts with explicit warning metadata."
+raw_admission_reason: "User requested preserving the AI-generated research report under raw AI drafts with explicit warning metadata; later review found it incorrectly scoped physical/bare-metal Cluster Buildout as Kubernetes/GitOps buildout."
 preservation_mode: ai-research-report
 full_text_preserved: true
-cleanup_note: "Moved from a session-scoped research artifact; only this frontmatter and warning were added."
+cleanup_note: "Moved from a session-scoped research artifact; later renamed and warning metadata updated to mark the draft as off-scope while preserving the generated report body."
+superseded_by: "raw/10-ai-generated-drafts/2026-06-13-cluster-buildout-platform-selection-bare-metal-research-report.md"
 ---
 
-> [!WARNING] 非权威 AI 调研报告
-> 本文件是 GitHub Copilot CLI 生成的调研报告，虽包含脚注和来源线索，但仍属于未经人工系统性复核的 AI 生成材料。不要直接把其中的产品能力、平台比较、选型结论或外部链接作为 wiki 结论证据；如需复用，必须重新核验一手来源，并在 `wiki/` 中建立明确的 claim-to-evidence 映射。
+> [!WARNING] 非权威且已知跑偏的 AI 调研报告
+> 本文件是 GitHub Copilot CLI 生成的旧调研报告，后来确认它把用户场景误读为 Kubernetes/GitOps buildout，而不是物理机/裸金属机器集群 buildout。保留本文件仅用于审计和对比，不要直接把其中的产品能力、平台比较、选型结论或外部链接作为 wiki 结论证据；如需复用，必须重新核验一手来源，并优先参考修订后的裸金属调研稿：`raw/10-ai-generated-drafts/2026-06-13-cluster-buildout-platform-selection-bare-metal-research-report.md`。
 
 # Cluster Buildout Workflow Platform Selection Research
 
