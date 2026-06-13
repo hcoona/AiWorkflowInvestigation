@@ -38,6 +38,9 @@ workflow”，但不直接解释“运行时如何执行、如何恢复，以及
 因此，不能因为四者都能承载 LLM/tool/agent workload，就把它们当成同类 agent
 runtime；也不能因为它们都有 workflow、graph、task 或 step
 等术语，就假定这些词语有相同语义。
+如果问题进一步聚焦到 agent framework 与传统 workflow 的边界， 应参见
+[Agent Orchestration 与传统 Workflow 的边界](agent-orchestration-vs-workflow.md)：
+该页把分界收敛为运行期是否把实质性过程控制权委托给受约束的 agent policy。
 
 因此，本页不使用单轴 taxonomy，而使用多轴诊断矩阵。
 每个类比都必须说明“只在哪一轴成立”： Airflow DAG、Microsoft Agent Framework
