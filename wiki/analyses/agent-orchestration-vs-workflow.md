@@ -31,20 +31,32 @@ multi-agent role 或 tool call，就等同于传统 workflow engine。
 
 ## 答案
 
-核心分界不是“有没有 LLM”“有没有 DAG”“是不是动态”“是不是多 agent”，而是：
+重新判断后，核心分界不是“有没有 LLM”“有没有 DAG”“是不是动态修改
+workflow”“是不是多 agent”，而是：
 
 > 运行期是否把实质性过程控制权委托给受约束的 agent policy。
 
-传统 Workflow 的控制中心是显式过程模型。
-步骤、依赖、条件、重试、补偿、人工审批、队列、调度和副作用边界主要在设计期定义。
-运行时可以有动态分支、人工任务、LLM 调用和工具调用，但解释器或 workflow engine
-仍按既定规则推进状态。
+“动态修改 workflow”本身不是分界线。
+传统 workflow 也可以具备很强的动态演进能力：
+消息驱动状态和路径变化、运行期工作集展开、定义版本升级、Run/thread
+边界状态交接、checkpoint fork、reset/replay、backfill/clear 到新版本等。
+这些能力不能因为产品术语不是“agent plan mutation”或“topology edit”
+就被判定为能力不同。
+
+更可靠的判断是 capability mapping：把各产品的术语先映射到同一抽象层级，
+再比较改变过程的是谁、改变什么对象、何时生效、是否保留历史、
+如何约束副作用、如何审计和恢复。
+传统 Workflow 的控制中心是 workflow engine 可解释的过程规范和运行状态；
+这些规范可以在设计期写好，也可以通过版本、消息、数据或外部输入演进，
+但一旦进入执行语义，就由 engine 按它的历史、调度、状态和恢复契约接管。
 
 Agent Orchestration 的控制中心是受约束的 agent policy。
 orchestrator 提供目标、上下文、工具、权限、状态、记忆、预算、停止条件、
 评价器和审计边界；agent
-根据观察结果在运行期选择或修改子目标、步骤、工具、协作者和恢复策略，
-并可根据反馈重规划。
+根据语义观察、工具反馈和任务目标在运行期生成、选择或修改子目标、步骤、
+工具、协作者和恢复策略，并可把 workflow/plan
+本身当成需要被生成、修订或替换的对象。
+这是一种更高层的过程控制/过程生成能力，但它可以运行在传统 workflow engine 之上。
 
 “过程控制权”不必一定改写整张全局流程图。
 只要 agent 的选择会实质改变执行路径、副作用、工具顺序、子任务分解、协作者选择、
@@ -56,10 +68,11 @@ orchestrator 提供目标、上下文、工具、权限、状态、记忆、预�
 
 | 层级 | 传统 Workflow | Agent Orchestration |
 | --- | --- | --- |
-| 控制规范 | 设计期显式定义步骤、依赖、条件和失败策略。 | 设计目标、约束、工具、权限、评价标准；路径可运行期生成或修正。 |
-| 执行解释器 | workflow engine 解释 DAG、状态机、workflow code 或 case plan。 | orchestrator 管理 agent 的观察、行动、反馈和重规划循环。 |
+| 控制规范 | engine 可解释的过程规范：DAG、workflow code、状态机、case plan、版本化定义或运行期生成后被纳入 engine 契约的工作集。 | 目标、约束、工具、权限、评价标准与过程生成策略；路径、工作集或恢复动作可由 agent policy 运行期生成或修正。 |
+| 执行解释器 | workflow engine 解释 DAG、状态机、workflow code、case plan、serialized definition 或 checkpoint/thread state。 | orchestrator 管理 agent 的观察、行动、反馈和重规划循环，并可把 workflow engine 当作 durable substrate。 |
 | 状态真源 | workflow history、metadata DB、case state、业务记录。 | conversation state、agent memory、tool results、task board、checkpoint 和外部观察共同影响行为。 |
-| 恢复语义 | retry、timeout、resume、replay、compensation。 | 除工程恢复外，还可能诊断失败、换工具、改计划、请求澄清或降级目标。 |
+| 动态演进 | 消息更新、task/workset expansion、definition versioning、run/thread boundary handoff、reset/replay/fork、backfill/clear 等受限操作。 | agent 根据任务语义决定是否生成新计划、调整步骤、替换工具、引入协作者或把状态交给新的 workflow/plan。 |
+| 恢复语义 | retry、timeout、resume、replay、compensation、reset、checkpoint fork 或新 run/thread 恢复。 | 除工程恢复外，还可能诊断失败、换工具、改计划、请求澄清或降级目标。 |
 | 副作用边界 | activity、operator、task 或 human task 通常是预定义副作用边界。 | tool call、API、文件、浏览器、代码执行等行动空间可由 agent 运行期选择，因此更依赖权限、预算、审批和沙箱。 |
 | 治理与审计 | 审计步骤、审批人、时间、输入输出、重试和状态转移。 | 还需审计 prompt、model/version、tool schema、tool choice、观察、handoff、memory 和评价结果。 |
 | 优化目标 | 稳定性、吞吐、SLA、成本、资源利用、可预测性。 | 任务成功率、适应性、推理质量、少人工干预、工具/记忆/协作结构质量。 |
@@ -96,6 +109,7 @@ agent orchestration。
 | --- | --- | --- |
 | 静态 workflow | 步骤和转移主要由设计期定义。 | 固定 ETL、固定审批、固定 DAG。 |
 | 动态或规则驱动 workflow | 运行期可分支、展开或路由，但分支规则被显式建模。 | Airflow Dynamic Task Mapping、BPMN gateway、规则引擎 case routing。 |
+| 演进型 workflow | workflow 可通过定义版本、run/thread 边界状态交接、checkpoint fork、reset/replay、clear/backfill 等机制演进，但这些操作仍由 engine 契约解释。 | Temporal Continue-As-New/Worker Versioning、Airflow DagVersion/DAG Bundles、LangGraph graph migration/time travel、MAF checkpoint restore。 |
 | LLM-routed workflow | LLM 在有限枚举路径中做分类或路由。 | 固定图里 LLM 选择预设 conditional edge；属于弱 agentic workflow。 |
 | single-agent tool orchestration | 单 agent 在约束内选择工具、顺序、恢复动作。 | 编码 agent 在 CI task 内自主修复；内层是 agent orchestration。 |
 | governed agent orchestration | agent 选择子目标、工具、协作者和恢复策略，并受权限、预算、停止条件和审计约束。 | 生产级 research/coding/support agent runtime。 |
@@ -104,10 +118,12 @@ agent orchestration。
 
 ### 双向收敛，但不是概念合并
 
-传统 workflow 确实在增加接近“动态修改 workflow”的能力。
-但更准确的说法是：传统 workflow engine 正在把 agentic planning、runtime
-expansion 和 LLM/tool payload 纳入受控执行边界；agent orchestration framework
-则在补 durability、checkpoint、queue、audit 和 policy 等 workflow-engine 能力。
+传统 workflow 不只是“接近”动态修改 workflow；
+它们已经在各自抽象层级上拥有一组可验证的 workflow 演进能力。
+重新判断后，问题不再是“传统 workflow 有没有动态修改能力”，答案是有；
+问题是这些修改能力由什么控制源触发，以及修改对象是在 engine
+契约内的状态、工作集、定义版本、run/thread 边界，还是由 agent policy
+作为高层过程策略主动生成和改写。
 
 这是一种双向收敛，而不是二者已经等同。
 Temporal 的动态 agent 示例说明，agent loop 可以被 durable workflow 承载；
@@ -117,16 +133,34 @@ Airflow 的 Dynamic Task Mapping 和 agentic workload 示例说明，scheduler
 放进可观察、可重试的 task graph；但这仍是 DAG/task 语义里的受控展开，不是 agent
 任意改写 DAG 定义。
 
-因此，“动态修改 workflow”可以作为边界的直觉入口，但需要再问修改发生在哪一层：
-如果是 workflow engine 按预定义规则展开任务、路由 case 或重试失败步骤，这是动态
-workflow；如果是 agent policy 根据观察重新生成或修订计划、插入步骤、换工具链、
-改变恢复策略并影响副作用边界，这才是 agent orchestration 的核心能力。
+因此，“动态修改 workflow”可以作为边界的直觉入口，
+但不能把产品术语是否一一对应当成能力差异的依据。
+`Workflow Execution`、`DagRun`、`thread`、`graph`、`checkpoint`、`DAG version`
+只是证据定位对象；真正要比较的是同一抽象层级上的能力：
+谁有权改变过程结构，改变的是控制规格、待执行工作集、状态中的计划、
+部署版本还是新 run/thread 的输入，
+改变何时生效，是否保留历史，是否仍受确定性、审计、权限和副作用边界约束。
 
-四个产品的第二轮 GPT-5.5 复查与对抗审查把结论再次收紧：如果把“动态修改
-workflow”宽泛理解为运行期状态、路径、任务实例、计划数据、部署定义或新 run/thread
-会变化，四者都有动态能力；
-如果严格理解为“直接改写已经记录的历史或同一个正在执行对象的拓扑”，
-当前一手证据都不支持。
+在这个判准下，如果 workflow engine 展开任务、路由 case、重试失败步骤、
+把状态交给新 run、让未来 run 使用新版本定义、或从 checkpoint fork 出新路径，
+它已经具备对应抽象层级的 workflow 演进/修改能力。
+只有当 agent policy 被授权把这些能力当作行动空间的一部分，
+根据观察重新生成或修订计划、插入步骤、换工具链、
+改变恢复策略并影响副作用边界时，才构成 agent orchestration
+这一更高抽象层级的核心能力。
+
+四个产品的第二轮 GPT-5.5 复查与对抗审查在这个新判准下应重新解释：
+Temporal、Airflow、MAF 和 LangGraph 都有 workflow 演进能力，只是能力落点不同。
+Temporal 主要落在 Event History、message/update、Continue-As-New、Reset 和
+worker/code versioning；Airflow 落在 DAG/bundle/DagVersion、scheduler-managed
+mapped tasks、DagRun reconciliation、clear/backfill；MAF 落在
+builder/build、functional control flow、checkpoint restore/migration 语境和
+durable hosting；LangGraph 落在 compiled graph
+内动态路由、checkpoint/time-travel fork、graph migration/recompile 和 Functional
+API 运行轨迹。
+这些都不能被术语差异抹掉。
+未被当前证据支持的是更强的命题：
+任一系统都允许不受其历史、状态、版本和恢复契约约束地任意改写正在执行对象的未来结构。
 
 这里需要避免另一个过度收紧：修改 workflow 本来就不应改变历史。
 以 Temporal 为例，Continue-As-New 正是把最新相关状态传给同一 execution chain
@@ -134,15 +168,17 @@ workflow”宽泛理解为运行期状态、路径、任务实例、计划数据
 Id，并拥有新的 Event History。
 这不是“原地改写当前 history”，但确实可以作为 Run 边界状态交接/升级点：旧 run
 保持可审计，新 run 承接状态并可在新代码或新计划语义下继续。
-因此更精确的限制不是“Temporal 不能更改 workflow”，而是“Temporal 不支持绕过 Event
-History/replay 约束去原地任意改写当前 execution 的定义或拓扑”。
+因此更精确的限制不是“Temporal 不能更改 workflow”，而是“Temporal 的修改能力
+必须映射到它的 Event History、run boundary、worker routing 和 replay
+抽象上判断；不能因为 Temporal 没有 DAG/topology 术语就说它没有等价的 workflow
+演进能力，也不能因为它有 Continue-As-New 就说它能无约束改写当前 execution”。
 
-| 产品 | 已确认的动态能力 | 不应误写成 |
+| 产品 | 重新映射后的 workflow 演进能力 | Agent Orchestration 判断 |
 | --- | --- | --- |
-| Temporal | Signals/Updates/async handlers 通过已部署 handler 改变当前 run 状态和后续路径；Continue-As-New 是显式、应用定义的 Run 边界状态交接/升级点；Reset 复制历史前缀并创建新 run；Patching/GetVersion 与 Worker Versioning/Build ID routing 支持受限代码演化和任务路由；官方 agent 示例把 agent loop 放进 deterministic workflow harness，并把 LLM/tool 调用放到 Activities。 | 原地改写当前 Workflow Execution 的 Event History 或已回放定义；绕过 deterministic replay 的 plan mutation；把 Continue-As-New、Reset、dynamic handler 或 worker routing 当成无约束自修改 workflow。 |
-| Apache Airflow | DAG file/bundle refresh、Serialized DAG、DagVersion 和 Dynamic DAG Generation 支持部署/解析期 workflow revision 和未来 DagRun topology change；Dynamic Task Mapping 在当前 DagRun 内受限展开 mapped TaskInstances；`DagRun.verify_integrity`、clear latest version 和 backfill 可形成受控 reconciliation；LLMBranchOperator/AgentOperator 是预定义路径内路由或 task 内 agent loop。 | 运行中 task/agent 任意原地改写当前 DagRun 的 DAG definition；把 versioned bundle、serialized DAG 刷新、mapped task expansion 或 `verify_integrity` 当成无约束 DAG 自修改。 |
-| Microsoft Agent Framework | `WorkflowBuilder`、declarative YAML/dict 和 Python/Functional workflow code 可创建新的 workflow definition/instance；Functional workflow 用原生控制流表达动态路径；handoff、group chat、Magentic 和 agent executor 支持 agent task replanning；checkpoints 支持暂停/恢复/迁移场景；Durable Extension 提供 durable hosting。 | 已运行 graph workflow 由 agent 任意插入/删除节点或边；把应用层重新 build/create workflow 写成官方运行中 graph migration；把 checkpoint 恢复写成自动 topology migration。 |
-| LangGraph | 编译图内支持 conditional edges、`Command.goto/update`、`Send`、subgraphs 和动态 fan-out；time travel/update_state/checkpoint fork 可修改 state 中的计划数据并改变后续路径；graph migrations/recompile 允许已有 thread 在新 graph definition 下受限恢复；Functional API 可由 Python 控制流生成运行轨迹/隐式执行图。 | 正在执行的同一个 compiled graph object 可由 agent 任意增删节点/边；把 state fork、Functional API trace graph、assistant config versioning 或 graph migration 写成原地 topology mutation。 |
+| Temporal | 消息驱动当前 run 状态/路径改变；Run 边界状态交接/升级；历史前缀重放式修复；worker/code version routing。这些是受 Event History、deterministic replay 和 worker routing 约束的 workflow 演进能力。 | Temporal 不是因为没有 DAG/topology 术语而缺少 workflow 修改能力；只有当 agent policy 被授权决定何时 signal/update、continue-as-new、选择新计划或触发外部 replacement 时，才是 agent orchestration 层。 |
+| Apache Airflow | 部署/解析期定义版本演进；未来 DagRun 使用新定义；当前 DagRun 内 scheduler-managed workset expansion；既有 DagRun 与当前 DAG 视图的受控 reconciliation。 | Airflow 的动态能力是 workflow-engine 能力，不应直接等同 agent plan mutation；只有当 agent 负责生成/选择 DAG、触发清理回填、决定后续工作集或改变恢复策略时，才上升到 agent orchestration。 |
+| Microsoft Agent Framework | 应用层 build/create 新 workflow definition/instance；functional control flow；agent task replanning；checkpoint 恢复/迁移语境；Durable Extension hosting。 | MAF 同时有 workflow 和 agent surfaces；判断要看当前改变由 builder/code/runtime contract 解释，还是由 agent policy 生成下一步过程。不能用“没有任意 graph migration”否定动态 workflow 能力。 |
+| LangGraph | compiled graph 内动态路由/动态并行；state/checkpoint fork 对未来路径的改变；受限 graph migration/recompile；Functional API 的运行轨迹生成。 | LangGraph 的 time travel 和 graph migration 是 workflow 演进能力；如果 agent 在状态中生成计划、决定工具和下一步，并通过这些机制改变未来路径，才是 agent orchestration 层。 |
 
 ### 边界案例
 
@@ -175,16 +211,22 @@ History/replay 约束去原地任意改写当前 execution 的定义或拓扑”
 
 ### 判别问题集
 
-1. 去掉 agent policy 后，系统是否仍能按同样过程推进？
-2. 下一步由谁决定：流程模型、规则、人，还是 agent policy？
-3. agent 是否能选择工具、顺序、子任务、协作者或终止条件？
-4. agent 的选择是否会改变执行路径、副作用或恢复策略？
-5. 所有分支是否已在设计期显式枚举？
-6. 失败后是 engine 按 retry policy 重试，还是 agent 观察失败并重规划？
-7. LLM 输出是数据，还是过程控制决策？
-8. graph/flow 是约束边界，还是主要控制源？
-9. durable execution 是主要控制逻辑，还是 agent loop 的执行保障？
-10. 审计对象只是 workflow transition，还是还包括 prompt、model、tool choice、
+1. 正在比较的是哪一层能力：控制规格、运行状态、待执行工作集、定义版本、
+   run/thread 边界、checkpoint fork，还是 agent policy 生成的计划？
+2. 改变过程的是谁：workflow engine 的规则、用户/API、部署系统、数据输入，
+   还是 agent policy？
+3. 改变何时生效：当前 step、当前 run 的后续路径、新 run/thread、未来 DagRun、
+   新 workflow instance，还是重新编译/部署后的 graph？
+4. 改变是否保留旧历史，还是会试图改写已经记录的 history/checkpoint/metadata？
+5. 改变后的执行是否仍受 engine 的确定性、调度、版本、权限和恢复契约约束？
+6. 去掉 agent policy 后，系统是否仍能按同样过程推进？
+7. agent 是否能选择工具、顺序、子任务、协作者或终止条件？
+8. agent 的选择是否会改变执行路径、副作用或恢复策略？
+9. 失败后是 engine 按 retry policy 重试，还是 agent 观察失败并重规划？
+10. LLM 输出是数据，还是过程控制决策？
+11. graph/flow 是约束边界，还是主要控制源？
+12. durable execution 是主要控制逻辑，还是 agent loop 的执行保障？
+13. 审计对象只是 workflow transition，还是还包括 prompt、model、tool choice、
     memory、handoff 和评价结果？
 
 ## 影响
@@ -194,8 +236,10 @@ arXiv:2508.01186 的 survey 可以作为 agent workflow / agent orchestration �
 taxonomy 的来源，但不能把其中多数 agent framework 直接当成传统 workflow engine
 比较。
 对 Temporal、Airflow、LangGraph、Microsoft Agent Framework 等系统的比较，
-应继续先分清 authoring/control representation surface、execution interpreter、
-state source、recovery semantics、side-effect boundary 和 governance/audit。
+应继续先做 capability mapping：分清 authoring/control representation
+surface、execution interpreter、state source、recovery semantics、side-effect
+boundary、governance/audit，以及该能力是 engine 契约内的 workflow 演进，还是
+agent policy 驱动的过程生成。
 
 后续写作中，应避免把“agent framework 的 flow”直接写成 workflow engine。
 更安全的写法是：agent framework 可能提供 workflow-like authoring surface；
@@ -225,9 +269,11 @@ state source、recovery semantics、side-effect boundary 和 governance/audit。
 
 | 主张 | 证据 | 限制 |
 | --- | --- | --- |
-| Agent Orchestration 与传统 Workflow 的核心分界是运行期是否把实质性过程控制权委托给受约束 agent policy。 | session 证据单元；[工作流概念比较](workflow-concepts-comparison.md)。 | 这是综合概念判准，不是某个厂商或论文的标准定义。 |
+| 动态修改 workflow 不是 Agent Orchestration 与传统 Workflow 的分界线；传统 workflow 也可以具备消息更新、运行期 workset expansion、定义版本演进、run/thread 边界状态交接、reset/replay/fork 等 workflow 演进能力。 | Temporal、Airflow、MAF、LangGraph 新增 source pages；两轮产品专项调研和审查；[工作流概念比较](workflow-concepts-comparison.md)。 | 这些能力必须按同一抽象层级比较，不能由术语是否对应推出能力是否存在。 |
+| Agent Orchestration 与传统 Workflow 的核心分界是运行期是否把高层过程控制/过程生成权委托给受约束 agent policy。 | session 证据单元；[工作流概念比较](workflow-concepts-comparison.md)。 | 这是综合概念判准，不是某个厂商或论文的标准定义；agent policy 可以运行在传统 workflow engine 之上。 |
 | LLM、DAG、动态分支、planner、多 agent role、tool call 都不是充分条件。 | session 证据单元；[arXiv 2508.01186 Agent Workflow Survey](../sources/arxiv/agent-workflow-survey-2508-01186.md)。 | 这些信号在具体系统中可能是强提示，但仍需看控制权、状态和恢复语义。 |
 | 传统 workflow 可以承载 agent，agent orchestrator 也可以具备 workflow 能力；二者应按观察边界拆开。 | Temporal、Airflow、LangGraph 和 Microsoft Agent Framework source pages；[工作流概念比较](workflow-concepts-comparison.md)。 | 混合系统会随部署方式变化，不能只按产品名分类。 |
-| 传统 workflow 正在增加动态/agentic 能力，但通常通过消息、状态交接、新 run/thread、部署版本、受控 task expansion 或应用层新定义来实现，而不是改写既有历史。 | Temporal、Airflow 新增 source pages；历史 session 证据单元；本轮产品专项调研和审查。 | 这是当前证据下的概括；不同厂商后续可能提供更强的 governed authoring 或 migration 能力。 |
-| 四个被审产品均支持某种 workflow 修改或演进能力，但当前一手证据不支持“直接改写已经记录的历史或同一个正在执行对象的拓扑”这个强结论。 | Temporal、Airflow、MAF、LangGraph 新增 source pages；两轮产品专项调研和审查；[Temporal Continue-As-New 文档](../sources/temporal/continue-as-new-docs.md)。 | 如果把“修改”限定为原地任意 topology mutation，结论是否定的；如果把“修改”扩展为 run-boundary state handoff、future-run DAG version、checkpoint fork、new workflow definition 或 graph migration，则结论是肯定的。 |
-| 更精细的谱系比简单二分更安全：静态 workflow、动态/规则 workflow、LLM-routed workflow、single-agent tool orchestration、governed/multi-agent/durable agent orchestration。 | session 证据单元。 | 谱系是本 wiki 的工作性分类，后续可随更多证据调整。 |
+| 传统 workflow 的动态/演进能力是真实能力，不应被降级为“只是术语不同”；它们通常通过消息、状态交接、新 run/thread、部署版本、受控 task expansion、checkpoint fork 或应用层新定义实现，而不是改写既有历史。 | Temporal、Airflow、MAF、LangGraph source pages；历史 session 证据单元；本轮产品专项调研和审查。 | 这是当前证据下的概括；不同厂商后续可能提供更强的 governed authoring 或 migration 能力。 |
+| 判断 Agent Orchestration 与传统 Workflow 的差异必须做 capability mapping：产品术语只是证据入口，不能因为对象名不同就推出能力不同。 | 用户于 2026-06-12T21:41:44-07:00 的纠正；本页产品矩阵和 source pages。 | 能力映射必须保持抽象层级一致，分别比较控制权、改变对象、生效时点、历史约束、审计/权限和副作用边界。 |
+| 四个被审产品均支持某种 workflow 修改或演进能力，但当前一手证据不支持“直接改写已经记录的历史或同一个正在执行对象的未来工作结构”这个强结论。 | Temporal、Airflow、MAF、LangGraph 新增 source pages；两轮产品专项调研和审查；[Temporal Continue-As-New 文档](../sources/temporal/continue-as-new-docs.md)。 | 如果把“修改”限定为原地任意 topology mutation，结论是否定的；如果把“修改”扩展为 run-boundary state handoff、future-run DAG version、checkpoint fork、new workflow definition 或 graph migration，则结论是肯定的。 |
+| 更精细的谱系比简单二分更安全：静态 workflow、动态/规则 workflow、演进型 workflow、LLM-routed workflow、single-agent tool orchestration、governed/multi-agent/durable agent orchestration。 | session 证据单元；本页谱系表。 | 谱系是本 wiki 的工作性分类，后续可随更多证据调整。 |
