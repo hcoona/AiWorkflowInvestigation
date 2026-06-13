@@ -5,7 +5,7 @@ title: "工作流时间与触发语义"
 status: active
 created: 2026-06-12
 updated: 2026-06-12
-summary: "区分工作流启动触发、内部持久等待、资产触发和人工暂停恢复等时间相关语义。"
+summary: "工作流系统中创建 run、内部等待、资产触发和人工恢复的时间相关触发概念。"
 maintenance:
   edit_policy: update
 validation:
@@ -13,35 +13,40 @@ validation:
 tags:
   - workflow
   - scheduling
-  - time
+  - knowledge-graph
 ---
 
 ## 定义
 
-工作流时间与触发语义描述时间、触发、等待和暂停恢复属于哪一层： 是创建一次 run
-的外部 schedule， 是 workflow execution 内部的持久 timer， 是 scheduler 对 task
-graph 的推进， 是 asset update 触发， 还是 graph/图节点级 interrupt/resume。
+工作流时间与触发语义是 workflow runtime 或 scheduler 中与时间、事件、资产更新、
+人工输入或延迟等待有关的触发概念。
+它描述某个运行实例何时被创建、何时继续等待中的控制流， 或何时重新进入暂停的
+graph/agent workflow。
 
-这个概念用于避免把所有“定时、等待、触发、暂停”混成同一种调度能力。
+它不是单一调度器能力。
+外部 Schedule、内部 Timer、asset trigger、start delay 和 interrupt/resume
+处在不同 runtime 层级。
 
-## 在分析中的用途
+## 关系
 
-[工作流概念比较](../analyses/workflow-concepts-comparison.md) 使用这个概念区分
-Airflow 和 Temporal 的常见混淆： Airflow timetable、schedule 和 asset trigger
-主要影响 DagRun 创建或触发； Temporal Schedule 是独立于 Workflow Execution
-的启动规则； Temporal Timer 是 Workflow Execution 内部的持久等待。
-LangGraph interrupt/resume 和 Microsoft Agent Framework HITL
-则更接近交互暂停/恢复语义， 不能直接写成 Airflow scheduler 或 Temporal Timer
-的等价物。
+| 关系 | 对象 | 说明 |
+| --- | --- | --- |
+| `creates` | workflow/DAG run | 外部 schedule 或 asset trigger 通常创建或触发新的 run。 |
+| `resumes` | [工作流恢复模型](workflow-recovery-model.md) | Timer、external event 或 HITL input 可能让等待中的控制流继续。 |
+| `implemented-by` | [Temporal](../entities/temporal.md) Timer | Temporal Timer 是 Workflow Execution 内部持久等待。 |
+| `implemented-by` | [Temporal](../entities/temporal.md) Schedule | Temporal Schedule 是外部启动 Workflow Execution 的规则。 |
+| `implemented-by` | [Apache Airflow](../entities/apache-airflow.md) timetable/schedule/asset trigger | Airflow 时间表和资产更新影响 DagRun 创建或触发。 |
+| `implemented-by` | [LangGraph](../entities/langgraph.md) interrupt/resume | LangGraph interrupt/resume 是图/图节点级暂停恢复语义。 |
+| `implemented-by` | [Microsoft Agent Framework](../entities/microsoft-agent-framework.md) HITL/external event | Durable Extension 可通过 checkpoint/resume 和 external event 承载等待。 |
 
-## 边界与非等价关系
+## 使用边界
 
-- Timer 不等于 Schedule：
-  一个通常是 execution 内部持久等待，另一个通常是外部启动规则。
-- run creation 不等于 task scheduling：
-  创建一次 workflow/DAG run 与推进 run 内部的 task set 是不同层级。
-- interrupt/resume 不等于时间调度；
-  它可以与等待有关，但核心是暂停控制流并接收外部输入。
+当问题关注“run 何时创建、等待何时恢复、人工输入如何触发继续”时引用本页。
+如果问题关注的是 scheduler 如何选择可运行 task， 应引用
+[工作流执行放置单元](workflow-execution-placement-unit.md) 或产品实体页中的
+scheduler/runtime 关系。
+
+不要把 Timer、Schedule、asset trigger 和 interrupt/resume 写成同义词。
 
 ## 证据与限制
 
@@ -49,18 +54,18 @@ LangGraph interrupt/resume 和 Microsoft Agent Framework HITL
 
 | 类型 | 引用 | 说明 |
 | --- | --- | --- |
-| wiki | [工作流概念比较](../analyses/workflow-concepts-comparison.md) | 将 Timer、Schedule、asset trigger、interrupt/resume 和 HITL 放在时间/调度轴比较。 |
-| wiki | [Temporal Timers and Start Delays 文档](../sources/temporal/timers-delays-docs.md) | Temporal Timer 的持久等待语义与 Start Delay 的一次性延迟启动语义。 |
-| wiki | [Temporal Schedule 文档](../sources/temporal/schedule-docs.md) | Temporal Schedule 作为外部启动 Workflow Execution 的规则。 |
-| wiki | [Airflow Scheduler 文档](../sources/apache-airflow/scheduler-docs.md) | Airflow scheduler loop、DagRun 创建和 TaskInstance 推进语义。 |
-| wiki | [Airflow Asset Scheduling 文档](../sources/apache-airflow/asset-scheduling-docs.md) | asset update 触发 DAG 的调度语义。 |
-| wiki | [LangGraph Interrupts 文档](../sources/langgraph/interrupts-docs.md) | graph/图节点级暂停与恢复语义。 |
-| wiki | [Microsoft Agent Framework Durable Extension 文档](../sources/microsoft-agent-framework/durable-extension-docs.md) | Durable Extension 的 HITL、checkpoint 和 resume 能力。 |
+| wiki | [工作流概念比较](../analyses/workflow-concepts-comparison.md) | 区分 Timer、Schedule、asset trigger、interrupt/resume 和 HITL。 |
+| wiki | [Temporal Timers and Start Delays 文档](../sources/temporal/timers-delays-docs.md) | Timer 和 Start Delay 的时间语义。 |
+| wiki | [Temporal Schedule 文档](../sources/temporal/schedule-docs.md) | Schedule 作为外部启动规则。 |
+| wiki | [Airflow Scheduler 文档](../sources/apache-airflow/scheduler-docs.md) | DagRun 创建和 TaskInstance 推进。 |
+| wiki | [Airflow Asset Scheduling 文档](../sources/apache-airflow/asset-scheduling-docs.md) | asset update 触发 DAG。 |
+| wiki | [LangGraph Interrupts 文档](../sources/langgraph/interrupts-docs.md) | graph/图节点级暂停恢复。 |
+| wiki | [Microsoft Agent Framework Durable Extension 文档](../sources/microsoft-agent-framework/durable-extension-docs.md) | HITL、checkpoint 和 resume 能力。 |
 
 ### 支撑的主张
 
 | 主张 | 证据 | 限制 |
 | --- | --- | --- |
-| 工作流系统中的时间语义至少要区分外部启动规则、execution 内部等待和 scheduler 对任务集合的推进。 | 工作流概念比较；Temporal Timer/Schedule 与 Airflow Scheduler source pages。 | 不同产品的术语和 API 可能继续演进。 |
-| Temporal Timer 与 Temporal Schedule 不是同一层语义。 | Temporal Timers and Start Delays 与 Schedule source pages。 | Start Delay 等一次性启动延迟也需与周期性 schedule 区分。 |
-| interrupt/resume 和 HITL 不应直接等同于时间调度器。 | LangGraph Interrupts、MAF Durable Extension 与工作流概念比较。 | 具体实现可能使用 timer、external event 或 checkpoint 机制承载等待。 |
+| 工作流时间与触发语义是独立概念节点，覆盖 run creation、内部等待和交互恢复等关系。 | 工作流概念比较；Temporal、Airflow、LangGraph 和 MAF source pages。 | 不同产品的术语可能使用 schedule、timer、trigger、event 等不同名称。 |
+| Timer、Schedule、asset trigger 和 interrupt/resume 不应直接等价。 | Temporal Timer/Schedule、Airflow Asset Scheduling、LangGraph Interrupts source pages。 | 某些实现可能在底层共享队列或 timer infrastructure，但语义层级不同。 |
+| run creation 与 run 内 task scheduling 是不同层级。 | Airflow Scheduler source page；工作流概念比较。 | 具体调度策略需要产品级配置证据。 |

@@ -18,30 +18,33 @@ tags:
 
 ## 定义
 
-工作流副作用边界描述外部 I/O、LLM/tool call、数据库/API 调用或人工交互
-应该在哪个 runtime 单元内执行，并如何被 retry、timeout、checkpoint 或幂等化。
-它把“控制流”与“图节点、Activity、task、executor 内部的 workload”分开。
+工作流副作用边界是 workflow runtime 中专门承载外部 I/O、LLM/tool call、
+数据库/API 调用或人工交互的执行单元边界。
+它的功能是把 replay-safe 或 scheduler-interpreted 控制流
+与不可随意重放的外部副作用分离。
 
-这个边界对 AI workflow 尤其重要： LLM/tool 调用很容易被写进任意节点或步骤，
-但这并不自动让所在系统具备 agent runtime、durable replay 或任务级副作用隔离。
+它不是“任何能运行代码的步骤”的同义词。
+只有当 runtime、框架或应用约定把 retry、timeout、checkpoint、幂等或补偿责任
+明确放在该边界上时，才应把它称为副作用边界。
 
-## 在分析中的用途
+## 关系
 
+| 关系 | 对象 | 说明 |
+| --- | --- | --- |
+| `part-of` | [工作流执行放置单元](workflow-execution-placement-unit.md) | 副作用边界通常也是某种可执行或可放置工作单元。 |
+| `constrains` | [工作流恢复模型](workflow-recovery-model.md) | 恢复模型需要知道哪些副作用不能被控制流重放直接重复执行。 |
+| `implemented-by` | [Temporal](../entities/temporal.md) Activity | Temporal 将非确定性 I/O 放入 Activity 等边界内。 |
+| `implemented-by` | [Apache Airflow](../entities/apache-airflow.md) task/operator | Airflow task/operator 是常见副作用和重试边界。 |
+| `implemented-by` | [Microsoft Agent Framework](../entities/microsoft-agent-framework.md) executor/agent/subworkflow | Durable Extension 下不同 executor 可映射到 Durable Task activity/entity/sub-orchestration。 |
+| `implemented-by` | [LangGraph](../entities/langgraph.md) 图节点/tool | LangGraph 图节点/tool 可承载 I/O，但其 fault tolerance 不自动等价于 Temporal Activity。 |
+
+## 使用边界
+
+引用本页时，问题应关心外部副作用在哪个执行单元内发生、 能否安全
+retry、是否要求幂等、以及恢复时会不会重复执行外部 I/O。
+如果问题只是在比较系统整体 runtime， 应优先回到
 [工作流概念比较](../analyses/workflow-concepts-comparison.md)
-使用这个概念避免把“能调用 LLM/tool”误判为“运行时语义相同”：
-
-- Temporal 把非确定性 I/O 放在 Activity 等边界内，
-  workflow code 保持 deterministic/replay-safe。
-- Airflow task/operator 是副作用和重试边界；
-  common.ai provider 让 LLM/agent workload 嵌入 task graph。
-- Microsoft Agent Framework core executor、step 或 agent 承担节点工作；
-  Durable Extension 下普通 executor、agent executor 和 subworkflow
-  可映射到 Durable Task activity/entity/sub-orchestration。
-- LangGraph 图节点/tool 承担 I/O；
-  图节点级 retry、timeout 和 error handler 不自动等价于 Temporal Activity
-  的副作用隔离或幂等语义。
-
-## 边界与非等价关系
+中的执行解释器分析，或链接 [工作流恢复模型](workflow-recovery-model.md)。
 
 - “能调用 LLM/tool”不等于“agent runtime”。
 - retry 能力不等于幂等保证；

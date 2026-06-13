@@ -513,7 +513,7 @@ Create durable pages only when they materially support future synthesis.
 | `analysis` | A reusable answer, comparison, decision, playbook, or topic synthesis emerges. This is the primary compiled knowledge product. |
 | `source page` | A durable synthesis task needs a reusable source anchor for one upstream evidence object, especially an external source that is cited directly and not preserved in `raw/`. A raw source may be cited directly by analyses; do not create a source page merely because raw was added. Ordinary one-off answer citations that are not written into wiki state do not trigger a source page. |
 | `entity page` | A named thing recurs across sources or questions and carries durable relationships, events, claims, or direct query value. |
-| `concept page` | A reusable idea, mechanism, framework, argument, or pattern materially supports durable analyses. |
+| `concept page` | A stable domain concept that can act as a knowledge-graph node: it has a concise definition, typed relationships to nearby concepts/entities, and independent query value. |
 | `hub` | A stable cluster of analyses needs an entry point, reading path, current-state summary, open questions, and maintenance boundary. |
 
 When compiling evidence into durable synthesis,
@@ -524,6 +524,17 @@ Create or update concept/entity pages in the same task
 when they have independent durable retrieval value across sources, analyses,
 or future questions; otherwise keep them inside the current synthesis page.
 Source-page-only projection does not trigger concept/entity pages by itself.
+
+KG-style concept pages are not analysis essays, comparison dimensions,
+argument bundles, or convenience groupings.
+If a candidate mainly answers a question, compares products, records a decision,
+or groups several concepts under one diagnostic frame,
+write or update an `analysis` page instead.
+If it mainly routes readers through a cluster, use a `hub`.
+If it is a named product, project, paper, API surface, or organization,
+use an `entity` page.
+Create a concept page only when the concept itself remains reusable
+after its originating analysis is forgotten.
 
 Do not create:
 
@@ -568,6 +579,10 @@ When ingesting a source or evidence set:
 5. For durable synthesis tasks, perform a concept/entity triage pass:
    identify reusable concepts and named entities in the evidence boundary,
    then decide create/update/defer under the Section 7 thresholds.
+   For concept candidates,
+   reject broad diagnostic axes or multi-concept bundles
+   unless they can be stated
+   as one stable domain concept with clear relationships.
 6. Create new pages only when they have independent durable retrieval value.
 7. Update hubs only when navigation or topic state changes.
 8. Record a log event only when durable wiki state changes.

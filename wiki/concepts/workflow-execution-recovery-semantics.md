@@ -2,12 +2,12 @@
 schema_version: 2
 page_type: concept
 title: "工作流执行与恢复语义"
-status: active
+status: superseded
 created: 2026-06-12
 updated: 2026-06-12
-summary: "比较工作流运行时如何解释控制表示、放置工作单元、持久化状态并从故障中恢复。"
+summary: "已被执行放置单元和恢复模型概念页取代，执行解释器与状态真源暂留在分析页。"
 maintenance:
-  edit_policy: update
+  edit_policy: supersede
 validation:
   body_contract: concept
 tags:
@@ -15,6 +15,12 @@ tags:
   - durability
   - recovery
 ---
+
+> [!WARNING] 已被取代
+> 本页已被 [工作流执行放置单元](workflow-execution-placement-unit.md) 和
+> [工作流恢复模型](workflow-recovery-model.md) 取代。
+> 原因：本页捆绑了多个可独立建模的 KG-style 概念节点。 取代日期：2026-06-12。
+> 除修复该提示、链接或证据链外，不要继续更新本页。
 
 ## 定义
 
