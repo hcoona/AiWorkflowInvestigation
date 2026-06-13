@@ -102,6 +102,38 @@ agent orchestration。
 | multi-agent orchestration | 多 agent 角色之间有 handoff、协作、冲突处理和评价机制。 | AutoGen/CrewAI/Swarm 风格系统，前提是角色不是固定脚本顺序。 |
 | durable agent orchestration | agent loop 由 durable workflow/runtime 承载，具备恢复、队列、审计和持久状态。 | Temporal 或 Durable Task 承载 agent loop；LangGraph/MAF 在特定 durable backend 下的混合形态。 |
 
+### 双向收敛，但不是概念合并
+
+传统 workflow 确实在增加接近“动态修改 workflow”的能力。
+但更准确的说法是：传统 workflow engine 正在把 agentic planning、runtime
+expansion 和 LLM/tool payload 纳入受控执行边界；agent orchestration framework
+则在补 durability、checkpoint、queue、audit 和 policy 等 workflow-engine 能力。
+
+这是一种双向收敛，而不是二者已经等同。
+Temporal 的动态 agent 示例说明，agent loop 可以被 durable workflow 承载；
+但非确定性的模型和工具调用仍要放在 Activity 或等价副作用边界中。
+Airflow 的 Dynamic Task Mapping 和 agentic workload 示例说明，scheduler
+可以按上游数据在运行期展开 task copies，并把 LLM/agent workload
+放进可观察、可重试的 task graph；但这仍是 DAG/task 语义里的受控展开，不是 agent
+任意改写 DAG 定义。
+
+因此，“动态修改 workflow”可以作为边界的直觉入口，但需要再问修改发生在哪一层：
+如果是 workflow engine 按预定义规则展开任务、路由 case 或重试失败步骤，这是动态
+workflow；如果是 agent policy 根据观察重新生成或修订计划、插入步骤、换工具链、
+改变恢复策略并影响副作用边界，这才是 agent orchestration 的核心能力。
+
+四个产品的 GPT-5.5 专项调研与对抗审查收敛为同一个结论：如果把“动态修改
+workflow”宽泛理解为运行期状态、路径、任务实例或计划数据会变化，
+四者都有动态能力；如果严格理解为“正在运行的 workflow/graph/DAG definition 或
+topology 可由 agent 任意增删节点/边并继续原地执行”，当前一手证据都不支持。
+
+| 产品 | 已确认的动态能力 | 不应误写成 |
+| --- | --- | --- |
+| Temporal | Signals/Updates 可改变运行中 Workflow Execution 的状态和后续路径；Child Workflows、Activities、dynamic handlers、Continue-As-New、patching 和 Worker Versioning 支持受控动态执行与代码演进；官方 agent 示例把 agent loop 放进 deterministic workflow harness，并把 LLM/tool 调用放到 Activities。 | 任意运行中改写 Workflow Definition；绕过 deterministic replay 的 plan mutation；把 dynamic handler 或 worker versioning 当成自修改 workflow。 |
+| Apache Airflow | Dynamic DAG Generation 在解析期生成 DAG；Dynamic Task Mapping 让 scheduler 基于上游输出创建 mapped TaskInstances；Branch/ShortCircuit/trigger rules/LLMBranchOperator 在预定义路径内路由；common.ai/agentic workload 把 LLM/agent 放进 task graph。 | 当前 DagRun 中由 task/agent 任意插入新 task 或 edge；把 DAG 文件刷新、serialized DAG 更新或 mapped task expansion 当成 runtime DAG topology mutation。 |
+| Microsoft Agent Framework | Graph `WorkflowBuilder` 支持条件边、fan-out/fan-in、superstep routing；Functional workflow 可用代码控制流；handoff、group chat、Magentic 和 agent executor 支持 agent task replanning；Durable Extension 提供 checkpoint/recovery/cross-worker hosting。 | 运行中由 agent 插入/删除 workflow 节点或边；把 declarative YAML 重新 build、新建 workflow 或 Durable Task hosting 当成当前 execution 原地改图。 |
+| LangGraph | `StateGraph` compile 后支持 conditional edges、`Command.goto/update`、`Send` dynamic fan-out、agent plan/tool loop、checkpoint、interrupt/resume、time travel、graph migration 和 Functional API runtime-generated task graph。 | 正在执行的 compiled graph 可由 agent 任意增删节点/边；把 dynamic routing、dynamic parallelism、state fork 或 recompile/migration 当成同一个 compiled object 的 topology mutation。 |
+
 ### 边界案例
 
 - **Temporal 中嵌 Agent**：
@@ -168,8 +200,15 @@ state source、recovery semantics、side-effect boundary 和 governance/audit。
 | --- | --- | --- |
 | wiki | [工作流概念比较](workflow-concepts-comparison.md) | 已有四系统比较，区分控制表示面、执行解释器、状态真源、恢复模型、副作用纪律和时间/调度模型。 |
 | wiki | [arXiv 2508.01186 Agent Workflow Survey](../sources/arxiv/agent-workflow-survey-2508-01186.md) | agent workflow 综述、三层框架、能力/架构双轴和 workflow modes。 |
+| wiki | [Temporal 动态 AI Agent 博客](../sources/temporal/dynamic-ai-agents-blog.md)、[Temporal Message Passing 文档](../sources/temporal/message-passing-docs.md)、[Temporal Workflow Versioning 文档](../sources/temporal/workflow-versioning-docs.md)、[Temporal Worker Versioning 文档](../sources/temporal/worker-versioning-docs.md) | 支撑 Temporal 的 durable agent loop、message-driven state change、受控 versioning 与 worker routing 边界。 |
+| wiki | [Airflow DAG File Processing 文档](../sources/apache-airflow/dagfile-processing-docs.md)、[Airflow Dynamic DAG Generation 文档](../sources/apache-airflow/dynamic-dag-generation-docs.md)、[Airflow Dynamic Task Mapping 文档](../sources/apache-airflow/dynamic-task-mapping-docs.md)、[Airflow Common AI LLMBranchOperator 文档](../sources/apache-airflow/common-ai-llm-branch-docs.md)、[Airflow Agentic Workloads 博客](../sources/apache-airflow/agentic-workloads-blog.md) | 支撑 Airflow 的解析期 DAG 生成、scheduler-managed runtime task expansion、LLM-routed branching 与 agentic workload hosting 边界。 |
+| wiki | [Microsoft Agent Framework WorkflowBuilder 文档](../sources/microsoft-agent-framework/workflow-builder-docs.md)、[Microsoft Agent Framework Python Workflow Runner 源码](../sources/microsoft-agent-framework/python-workflow-runner-source.md)、[Microsoft Agent Framework Durable Extension 文档](../sources/microsoft-agent-framework/durable-extension-docs.md) | 支撑 MAF graph workflow、checkpoint restore 兼容性与 Durable Task-backed hosting 边界。 |
+| wiki | [LangGraph Graph API 文档](../sources/langgraph/graph-api-docs.md)、[LangGraph StateGraph Compile 源码](../sources/langgraph/stategraph-compile-source.md)、[LangGraph Functional API 文档](../sources/langgraph/functional-api-docs.md)、[LangGraph Persistence 文档](../sources/langgraph/persistence-docs.md)、[LangGraph Agent Server 文档](../sources/langgraph/agent-server-docs.md) | 支撑 LangGraph compiled graph、dynamic routing/fan-out、checkpoint/state recovery、Functional API runtime-generated task graph 与部署边界。 |
 | wiki | [Temporal Workflows 文档](../sources/temporal/workflows-docs.md)、[Airflow Scheduler 文档](../sources/apache-airflow/scheduler-docs.md)、[LangGraph Graph API 文档](../sources/langgraph/graph-api-docs.md)、[Microsoft Agent Framework Durable Extension 文档](../sources/microsoft-agent-framework/durable-extension-docs.md) | 支撑传统 workflow engine、graph runtime 与 durable extension 的工程边界示例。 |
+| session | 过去 Copilot CLI session `1a589d1a-96de-4db1-9e0c-e715ed58a7a4` 中，用户请求深入区分 Temporal、Airflow、Microsoft Agent Framework 与 LangGraph 的 workflow 功能，并继续 arXiv research。 | 该历史调研把 Temporal/Airflow 与 MAF/LangGraph 的 workflow 语义拆成控制表示面、执行解释器、状态真源、恢复模型和副作用纪律，并把 agent workflow 文献进一步细分为状态机控制、确定性图引擎、服务端图管理和学习式 workflow 生成。 |
+| user | [`raw/00-human-original-input/2026-06-11-ai-workflow-initial-ideas.md`](../../raw/00-human-original-input/2026-06-11-ai-workflow-initial-ideas.md) | 用户原始问题已经包含 AI 生成 Workflow 计划、执行 Workflow 计划、动态判断执行情况并调整 Workflow 计划的方向。 |
 | session | 当前 Copilot CLI session `7dd4dcd2-136d-4756-af15-2a4dd9cb2765` 中，用户于 2026-06-12T20:25:52-07:00 请求 GPT-5.5 多 subagent 讨论；`g55-concept-modeler`、`g55-concept-critic`、`g55-engineering-taxonomy`、`g55-consensus`、`g55-devil-advocate` 输出。 | 多路 GPT-5.5 讨论收敛出“运行期实质过程控制权是否委托给受约束 agent policy”这一判准，并由反方代理细化出谱系而非二分法。 |
+| session | 当前 Copilot CLI session `7dd4dcd2-136d-4756-af15-2a4dd9cb2765` 中，用户于 2026-06-12T20:51:00-07:00 要求每产品 GPT-5.5 深挖和对抗审查；`g55-temporal-dynamic-research/review`、`g55-airflow-dynamic-research/review`、`g55-maf-dynamic-research/review`、`g55-langgraph-dynamic-research/review` 输出。 | 四个产品专项调研和审查均 PASS：四者都有受控动态能力，但未发现官方证据支持当前运行中的 definition/topology 被 agent 任意原地改写。 |
 
 ### 支撑的主张
 
@@ -178,4 +217,6 @@ state source、recovery semantics、side-effect boundary 和 governance/audit。
 | Agent Orchestration 与传统 Workflow 的核心分界是运行期是否把实质性过程控制权委托给受约束 agent policy。 | session 证据单元；[工作流概念比较](workflow-concepts-comparison.md)。 | 这是综合概念判准，不是某个厂商或论文的标准定义。 |
 | LLM、DAG、动态分支、planner、多 agent role、tool call 都不是充分条件。 | session 证据单元；[arXiv 2508.01186 Agent Workflow Survey](../sources/arxiv/agent-workflow-survey-2508-01186.md)。 | 这些信号在具体系统中可能是强提示，但仍需看控制权、状态和恢复语义。 |
 | 传统 workflow 可以承载 agent，agent orchestrator 也可以具备 workflow 能力；二者应按观察边界拆开。 | Temporal、Airflow、LangGraph 和 Microsoft Agent Framework source pages；[工作流概念比较](workflow-concepts-comparison.md)。 | 混合系统会随部署方式变化，不能只按产品名分类。 |
+| 传统 workflow 正在增加动态/agentic 能力，但通常是把 agent loop、runtime expansion 或 LLM/tool payload 放入受控执行边界，而不是无条件允许 agent 任意改写 workflow 定义。 | Temporal、Airflow 新增 source pages；历史 session 证据单元；本轮产品专项调研和审查。 | 这是当前证据下的概括；不同厂商后续可能提供更强的 runtime plan mutation 或 governed authoring 能力。 |
+| 四个被审产品均支持某种动态性，但当前一手证据不支持“运行中任意 topology/definition mutation”这个强结论。 | Temporal、Airflow、MAF、LangGraph 新增 source pages；本轮产品专项调研和审查。 | “任意”是强约束；如果把动态性放宽为路径选择、状态更新、任务实例展开或新 workflow 创建，则结论会不同。 |
 | 更精细的谱系比简单二分更安全：静态 workflow、动态/规则 workflow、LLM-routed workflow、single-agent tool orchestration、governed/multi-agent/durable agent orchestration。 | session 证据单元。 | 谱系是本 wiki 的工作性分类，后续可随更多证据调整。 |
