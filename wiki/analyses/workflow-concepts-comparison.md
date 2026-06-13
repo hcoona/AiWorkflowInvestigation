@@ -4,7 +4,7 @@ page_type: analysis
 title: "工作流概念比较：Temporal、Apache Airflow、Microsoft Agent Framework 与 LangGraph"
 status: active
 created: 2026-06-12
-updated: 2026-06-12
+updated: 2026-06-13
 summary: "以模式层比较四个多步编排系统的控制、恢复、动态性和时间语义。"
 maintenance:
   edit_policy: update
@@ -51,11 +51,15 @@ code-authored surface 上相似。
 [工作流执行放置单元](../concepts/workflow-execution-placement-unit.md)、
 [工作流恢复模型](../concepts/workflow-recovery-model.md)、
 [工作流副作用边界](../concepts/workflow-side-effect-boundary.md) 和
-[工作流时间与触发语义](../concepts/workflow-time-trigger-semantics.md)。
+[工作流时间与触发语义](../concepts/workflow-time-trigger-semantics.md)，
+以及更细粒度的 [图工作流 Super-step](../concepts/graph-workflow-super-step.md)。
 四个产品级实体入口是 [Temporal](../entities/temporal.md)、
 [Apache Airflow](../entities/apache-airflow.md)、
 [Microsoft Agent Framework](../entities/microsoft-agent-framework.md) 和
 [LangGraph](../entities/langgraph.md)。
+deterministic replay、Event History、TaskInstance、DagRun、checkpointer、
+Durable Task work item 和 Pregel task 暂不单独成页；
+当前证据更适合把它们作为产品实体、source projection 或既有概念的实现关系处理。
 
 ### 概念分层
 

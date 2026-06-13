@@ -22,8 +22,7 @@ tags:
 > [Temporal Workflow 确定性约束文档](workflow-deterministic-constraints-docs.md)、
 > [Temporal Activities 文档](activities-docs.md)、
 > [Temporal 动态 AI Agent 博客](dynamic-ai-agents-blog.md) 和
-> [Temporal Deep Research Agent 博客](deep-research-agents-blog.md)
-> 取代。
+> [Temporal Deep Research Agent 博客](deep-research-agents-blog.md) 取代。
 > 原因：source page 应投影一个主要上游证据对象，不能把多个独立外链聚合为 n:
 > 1 证据锚点。 取代日期：2026-06-12。
 > 除修复该提示、链接或证据链外，不要继续更新本页。

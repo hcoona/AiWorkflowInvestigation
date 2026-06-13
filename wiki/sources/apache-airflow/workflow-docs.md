@@ -21,9 +21,8 @@ tags:
 > 本页已被 [Airflow DAG 文档](dags-docs.md)、
 > [Airflow Dynamic Task Mapping 文档](dynamic-task-mapping-docs.md)、
 > [Airflow Asset Scheduling 文档](asset-scheduling-docs.md)、
-> [Airflow Common AI Provider 博客](common-ai-provider-blog.md)
-> 和 [Airflow Agentic Workloads 博客](agentic-workloads-blog.md)
-> 取代。
+> [Airflow Common AI Provider 博客](common-ai-provider-blog.md) 和
+> [Airflow Agentic Workloads 博客](agentic-workloads-blog.md) 取代。
 > 原因：source page 应投影一个主要上游证据对象，不能把多个独立外链聚合为 n:
 > 1 证据锚点。 取代日期：2026-06-12。
 > 除修复该提示、链接或证据链外，不要继续更新本页。

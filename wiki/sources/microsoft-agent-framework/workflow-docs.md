@@ -18,12 +18,10 @@ tags:
 ---
 
 > [!WARNING] 已被取代
-> 本页已被
-> [Microsoft Agent Framework Overview 文档](overview-docs.md)、
+> 本页已被 [Microsoft Agent Framework Overview 文档](overview-docs.md)、
 > [Microsoft Agent Framework Workflows 概览](workflows-overview-docs.md)、
 > [Microsoft Agent Framework Functional Workflows 文档](functional-workflows-docs.md)、
-> [Microsoft Agent Framework WorkflowBuilder 文档](workflow-builder-docs.md)
-> 和
+> [Microsoft Agent Framework WorkflowBuilder 文档](workflow-builder-docs.md) 和
 > [Microsoft Agent Framework Durable Extension 文档](durable-extension-docs.md)
 > 取代。
 > 原因：source page 应投影一个主要上游证据对象，不能把多个独立外链聚合为 n:
