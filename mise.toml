@@ -1,5 +1,5 @@
 [tool_alias]
-rumdl = "github:rvben/rumdl"
+rumdl = "aqua:rvben/rumdl"
 typos = "github:crate-ci/typos"
 
 [tools]
