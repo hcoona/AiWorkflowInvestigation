@@ -535,6 +535,12 @@ If it is a named product, project, paper, API surface, or organization,
 use an `entity` page.
 Create a concept page only when the concept itself remains reusable
 after its originating analysis is forgotten.
+Do not create concept pages for self-evident domain nouns merely
+because they appear.
+Prefer non-obvious recurring domain nouns whose meaning, boundaries,
+or relationships are likely to be misunderstood.
+Create pages for obvious domain nouns only when the user explicitly asks,
+or when their relationships or limits are not obvious in the current evidence.
 
 Do not create:
 
@@ -583,6 +589,8 @@ When ingesting a source or evidence set:
    reject broad diagnostic axes or multi-concept bundles
    unless they can be stated
    as one stable domain concept with clear relationships.
+   Also reject self-evident domain nouns unless the user explicitly asks
+   for them or their non-obvious relationships need durable explanation.
 6. Create new pages only when they have independent durable retrieval value.
 7. Update hubs only when navigation or topic state changes.
 8. Record a log event only when durable wiki state changes.
