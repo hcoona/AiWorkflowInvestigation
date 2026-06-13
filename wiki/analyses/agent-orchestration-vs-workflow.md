@@ -31,8 +31,26 @@ multi-agent role 或 tool call，就等同于传统 workflow engine。
 
 ## 答案
 
-重新判断后，核心分界不是“有没有 LLM”“有没有 DAG”“是不是动态修改
-workflow”“是不是多 agent”，而是：
+明确结论：在抽象能力层面，Agent Orchestration 和传统 Workflow
+没有不可跨越的本质区别。
+如果一个传统 workflow 产品允许 agent 在受治理的边界内生成、选择或修改
+workflow/plan，并把结果交给 engine 的历史、调度、版本、恢复和审计契约执行，
+它就在能力上覆盖了 agent orchestration 的核心区域。
+区别会退化为实现 substrate、first-class
+API、治理模型、可观测性、恢复语义和产品成熟度，而不是“agent orchestration vs
+workflow engine”的本体论差异。
+
+以当前已调研产品看，Temporal、Airflow、Microsoft Agent Framework 和 LangGraph
+基本都已经提供了构建这种形态所需的关键 primitives：
+消息/更新、运行期工作集展开、定义版本演进、Run/thread 边界状态交接、
+checkpoint/time-travel fork、reset/replay、graph migration/recompile、agent
+executor 或 agent workload hosting。
+但它们不一定都把“agent 动态改 workflow”包装成同一个 first-class 产品功能；
+差异主要在这些 primitives 如何组合、是否官方推荐、是否有治理和迁移保护、
+以及修改发生在 current run、新 run/thread、未来版本还是重新编译后的定义上。
+
+因此，核心分界不是“有没有 LLM”“有没有 DAG”“是不是动态修改 workflow”“是不是多
+agent”，而是：
 
 > 运行期是否把实质性过程控制权委托给受约束的 agent policy。
 
@@ -125,7 +143,10 @@ agent orchestration。
 契约内的状态、工作集、定义版本、run/thread 边界，还是由 agent policy
 作为高层过程策略主动生成和改写。
 
-这是一种双向收敛，而不是二者已经等同。
+这是一种双向收敛。
+它不是说所有产品实现已经完全等同；而是说一旦传统 workflow 产品把 agent-driven
+workflow generation/modification 纳入受治理能力面，“传统 workflow”和“agent
+orchestration”就不再有本质能力边界，只剩具体运行时契约和产品成熟度差异。
 Temporal 的动态 agent 示例说明，agent loop 可以被 durable workflow 承载；
 但非确定性的模型和工具调用仍要放在 Activity 或等价副作用边界中。
 Airflow 的 Dynamic Task Mapping 和 agentic workload 示例说明，scheduler
@@ -269,6 +290,8 @@ agent policy 驱动的过程生成。
 
 | 主张 | 证据 | 限制 |
 | --- | --- | --- |
+| 在抽象能力层面，Agent Orchestration 与传统 Workflow 没有不可跨越的本质区别；如果传统 workflow 产品支持 agent 在受治理边界内动态生成或修改 workflow/plan，并由 engine 契约执行，它就在能力上覆盖 agent orchestration 的核心区域。 | Temporal、Airflow、MAF、LangGraph 新增 source pages；两轮产品专项调研和审查；[工作流概念比较](workflow-concepts-comparison.md)。 | 这里说的是抽象能力等价，不是产品 API、运行时实现、推荐架构或成熟度完全相同。 |
+| 当前调研的 Temporal、Airflow、MAF 和 LangGraph 基本都已提供构建 agent 动态改 workflow 所需的关键 primitives，但 first-class 程度和治理保护不同。 | Temporal、Airflow、MAF、LangGraph 新增 source pages；两轮产品专项调研和审查。 | “基本支持”不应理解为都支持同一个无约束 live topology edit API；更准确地说，是可以通过各自的受限 workflow 演进机制组合出该能力。 |
 | 动态修改 workflow 不是 Agent Orchestration 与传统 Workflow 的分界线；传统 workflow 也可以具备消息更新、运行期 workset expansion、定义版本演进、run/thread 边界状态交接、reset/replay/fork 等 workflow 演进能力。 | Temporal、Airflow、MAF、LangGraph 新增 source pages；两轮产品专项调研和审查；[工作流概念比较](workflow-concepts-comparison.md)。 | 这些能力必须按同一抽象层级比较，不能由术语是否对应推出能力是否存在。 |
 | Agent Orchestration 与传统 Workflow 的核心分界是运行期是否把高层过程控制/过程生成权委托给受约束 agent policy。 | session 证据单元；[工作流概念比较](workflow-concepts-comparison.md)。 | 这是综合概念判准，不是某个厂商或论文的标准定义；agent policy 可以运行在传统 workflow engine 之上。 |
 | LLM、DAG、动态分支、planner、多 agent role、tool call 都不是充分条件。 | session 证据单元；[arXiv 2508.01186 Agent Workflow Survey](../sources/arxiv/agent-workflow-survey-2508-01186.md)。 | 这些信号在具体系统中可能是强提示，但仍需看控制权、状态和恢复语义。 |
