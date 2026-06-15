@@ -34,11 +34,11 @@ cleanup_note: "Generated as raw gap-analysis research only; primary-source claim
 
 ## 执行摘要
 
-LangGraph 不应被描述为“没有 durability”或“只是 agent library”。它有 thread-scoped checkpoint、persistent store、interrupt/resume、time travel/fork、node-level retry/timeout/error handler，以及 Agent Server 的 run-level queue worker / persistence / deployment 能力。对于 AI Agent 决策节点、HITL 问答、LLM 驱动的规划/诊断，它比 Temporal 更贴近问题表达。[^langgraph-persistence][^langgraph-interrupts][^langgraph-fault-tolerance][^langgraph-agent-server]
+LangGraph 不应被描述为“没有 durability”或“只是 agent library”。它有 thread-scoped checkpoint、persistent store、interrupt/resume、time travel/fork、node-level retry/timeout/error handler，以及 Agent Server 的 run-level queue worker / persistence / deployment 能力。对于复杂 LLM tool graph、agent state、prompt/tool tracing、checkpoint fork 和 interrupt-style HITL，它比 Temporal 更贴近 AI agent 的实现体验。[^langgraph-persistence][^langgraph-interrupts][^langgraph-fault-tolerance][^langgraph-agent-server]
 
 但在裸金属 Cluster Buildout 这个场景，Temporal 仍是更强的默认 process manager。原因不是 Temporal “更像 workflow”这个术语，而是它提供了 LangGraph 缺少或需要应用层重建的一组流程运行时原语：**Activity + Task Queue 的工作放置路由、Signal/Query/Update 的运行中对象交互、durable timer、Child Workflow 的独立生命周期、Activity heartbeat/checkpoint、Continue-As-New / Reset / Worker Versioning / Search Attributes**。这些能力正好对应裸金属 buildout 的长等待、特定机器执行、局部失败隔离、人工/供应商事件注入、运行中计划调整和生产事故恢复。[^temporal-activities][^temporal-taskqueue][^temporal-messages][^temporal-child-workflows][^temporal-heartbeat]
 
-推荐框架：**Temporal 做外层 durable process manager，LangGraph 做内层 AI decision / HITL / planning subroutine**。也就是说，把 LangGraph 放进 Temporal Activity 或某个 Agent task queue worker 中，让 LangGraph 负责智能规划和人机交互，让 Temporal 负责长期状态、外部事件、工作路由、timer、reset、版本和资源实体生命周期。
+更正后的推荐框架应是：**Temporal-only 是基线架构；LangGraph 只是某些 AI Activity 的可选实现细节**。AI 诊断、规划、人类通知、审批和追问并不必然需要 LangGraph；它们可以直接用 Temporal Workflow + Activity + Signal/Update 实现，其中 LLM/外部 AI 调用放在 Activity 中，结果由 Temporal 记录并由确定性 workflow 状态机消费。只有当团队确实需要 LangGraph 的 agent graph authoring、interrupt 风格、checkpoint fork、LangSmith/Studio tracing 或 LangChain 生态时，才应把 LangGraph 嵌入某些 Temporal Activity。
 
 ## 能力对照总表
 
@@ -48,7 +48,7 @@ LangGraph 不应被描述为“没有 durability”或“只是 agent library”
 | 外部物理副作用隔离 | Activity，结果写入 Event History，replay 不重跑已完成 Activity | Node / `@task`，checkpoint 保存 task 结果，普通节点需幂等 | LangGraph 可做但纪律更多靠应用层。 |
 | 固件/BMC/PXE 操作必须跑在特定机器 | Task Queue / Worker pool routing | Agent Server 主要是 run-level queue；无公开 per-node placement primitive | Temporal 明显更强。 |
 | 外部异步事件注入正在运行对象 | Signal / Update / Query | interrupt/resume、get_state/update_state；缺少 Temporal-style durable Signal/Update handler | Temporal 更强。 |
-| 人工审批/HITL | Signal/Update + Activity 通知 | `interrupt()` 是一等能力，体验好 | LangGraph 不弱，甚至更自然。 |
+| 人工审批/HITL | Signal/Update + Activity 通知 | `interrupt()` 是一等能力，体验好 | Temporal 已足够；LangGraph 只是 authoring 体验优势。 |
 | 内部持久 timer | Workflow timer / sleep 写入 Event History | 无同等内部 durable timer；需外部 scheduler + resume | Temporal 更强。 |
 | 局部失败：未受影响部分继续，受影响部分追赶 | Child Workflow per rack/node/component，独立 history/lifecycle | 多 thread + Store + 外部协调可实现；无父子生命周期原语 | Temporal 更贴合。 |
 | 长 activity 进度 checkpoint | Activity heartbeat details，worker crash 后 retry 可读取 | TimeoutPolicy idle heartbeat 重置进度时钟；不是服务端持久 checkpoint | Temporal 更强。 |
@@ -189,21 +189,21 @@ LangGraph 可通过 interrupt + resume、`update_state()`、time travel/fork 修
 - 如果“运行中调整”主要是向状态里写新指令/新参数，LangGraph 做得不错。
 - 如果“运行中调整”意味着长期在途 thread 要安全穿过 graph topology / node name / code path 变更，Temporal 的版本工具更成熟。
 
-## LangGraph 的真实优势
+## LangGraph 的条件性价值
 
-为了避免过度贬低 LangGraph，需要明确它在本场景中的优势：
+为了避免过度贬低 LangGraph，也要避免把它写成必要层。它在本场景中的价值主要是 **AI 节点实现体验**，不是 Temporal 缺失的流程能力：
 
-1. **AI Agent 原生表达更好**：StateGraph / agent node / tool calls / conditional routing 更适合 LLM 驱动决策链。
-2. **HITL 体验强**：`interrupt()` 把“流程停下等待人”作为一等控制流，和人类审批/问答/补充信息高度匹配。
-3. **Time travel / fork 适合分析与调试**：可从 checkpoint fork 新分支探索不同决策，不覆盖原始历史。
-4. **Checkpoint state 更直观**：对 agent 状态、messages、memory、tool results 的保存与恢复更贴近 AI workflow。
+1. **复杂 LLM agent graph 的 authoring 更自然**：StateGraph / agent node / tool calls / conditional routing 更适合表达多步 LLM 决策链。
+2. **interrupt-style HITL 更贴近 agent 对话体验**：`interrupt()` 把“图暂停、暴露问题、等待补充输入”作为一等控制流；但审批、通知、追问本身也可用 Temporal Signal/Update + Activity 实现。
+3. **Time travel / fork 适合 AI 分析与调试**：可从 checkpoint fork 新分支探索不同 prompt、tool result 或决策，不覆盖原始历史。
+4. **Checkpoint state 更贴近 agent 状态**：对 messages、memory、tool results 的保存与恢复比在普通 workflow state 中手写结构更方便。
 5. **LangSmith/Studio 生态**：对 agent tracing、prompt/tool 调试、人工介入有现成产品面。
 
-因此，LangGraph 不是“不可用”。它更适合作为 **AI orchestration / decision layer**，而不是承担整个物理 Buildout 的 durable process manager。
+因此，LangGraph 不是“不可用”，但也不是裸金属 Buildout 的必选层。更准确的定位是：**如果某个 Temporal Activity 内部确实需要复杂 agent graph、agent memory、prompt/tool tracing 或 checkpoint fork，LangGraph 可以作为该 Activity 的实现库；否则 Temporal-only 足以覆盖流程、AI 调用和 HITL。**
 
 ## 推荐架构
 
-### 推荐：Temporal 外壳 + LangGraph 内核
+### 基线：Temporal-only
 
 ```text
 Temporal ClusterBuildWorkflow
@@ -212,19 +212,21 @@ Temporal ClusterBuildWorkflow
   │   ├─ NodeBuildWorkflow(node-001)
   │   │   ├─ Temporal Activity: FlashFirmware
   │   │   ├─ Temporal Activity: InstallOS
-  │   │   ├─ Temporal Activity: RunLangGraphAgentForDiagnosis
+  │   │   ├─ Temporal Activity: RunAIDiagnosisOrPlanner
   │   │   └─ Temporal Update: InjectAdditionalValidationStep
   │   └─ NodeBuildWorkflow(node-002)
   ├─ HumanApprovalWorkflow
-  │   └─ Temporal Activity: RunLangGraphHITLAgent
+  │   ├─ Temporal Activity: NotifyOrAskHuman
+  │   └─ Temporal Signal/Update: ReceiveHumanDecision
   └─ ClusterValidationWorkflow
 ```
 
-在这个架构中：
+在基线架构中：
 
-- Temporal 负责长期流程、Task Queue 路由、resource entity child workflow、timer、external messages、reset、versioning。
-- LangGraph 作为 Activity 内部的 AI decision graph，负责 LLM 诊断、候选方案生成、人类问答、局部 plan refinement。
+- Temporal 负责长期流程、Task Queue 路由、resource entity child workflow、timer、external messages、human decision、reset、versioning。
+- LLM/外部 AI 调用是普通 Temporal Activity；Activity 返回候选诊断、计划建议或待确认问题，Temporal workflow 只消费结果并推进确定性状态机。
 - 外部 inventory/resource graph 仍是物理事实真源；Temporal 和 LangGraph 都不能替代它。
+- LangGraph 只在 `RunAIDiagnosisOrPlanner` 这类 Activity 内部需要复杂 agent graph / checkpoint fork / LangSmith tracing 时才引入；它不拥有最终流程状态、审批结果、计划版本、事件注入或物理副作用控制权。
 
 ### 如果坚持 LangGraph 作为主控，需要补的系统
 
@@ -251,7 +253,7 @@ Temporal ClusterBuildWorkflow
 6. Continue-As-New / Reset / Worker Versioning 等长运行生产运维工具。
 7. Search Attributes / Visibility / Task Queue worker health 等 workflow platform 可观测性。
 
-因此，**如果目标是可靠地驱动物理节点、机架、网络、固件、OS、驱动和集成验证的长期 buildout process，Temporal 应作为默认主 process manager；LangGraph 更适合作为嵌入其中的 AI Agent / HITL / planning 子系统。**
+因此，**如果目标是可靠地驱动物理节点、机架、网络、固件、OS、驱动和集成验证的长期 buildout process，Temporal 应作为默认且充分的主 process manager。LangGraph 不应作为默认推荐；只有当复杂 LLM agent graph、agent memory、interrupt-style 对话、checkpoint fork 或 LangSmith/Studio tracing 能显著降低 AI Activity 的实现成本时，才作为 Temporal Activity 内部的可选实现库引入。**
 
 ## 信心评估
 
@@ -264,6 +266,7 @@ Temporal ClusterBuildWorkflow
 | LangGraph 无 workflow-internal durable timer | 中高 | Cron/timeout/interrupt 可组合模拟，但不是等价原语。 |
 | LangGraph partial failure fork/split 可实现但工程量高 | 高 | 多 thread + Store + coordinator 可行，但缺少 Child Workflow 生命周期语义。 |
 | Temporal 仍需外部 resource graph、idempotent Activities、reconcile/compensation | 高 | Temporal 不回滚物理世界，这是必须保留的边界。 |
+| Temporal-only 足以覆盖本场景的 AI 调用和 HITL 基线需求；LangGraph 只是条件性 AI Activity 实现层 | 高 | AI 调用可放在 Temporal Activity，审批/追问可由 Signal/Update + Activity 通知实现；LangGraph 的差异主要是 agent authoring/debugging 体验。 |
 
 ## Footnotes
 
