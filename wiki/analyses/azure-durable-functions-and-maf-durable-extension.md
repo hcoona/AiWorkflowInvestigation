@@ -176,36 +176,48 @@ Azure Functions 应用运行面上； 但 Function App 是 hosting/deployment/tr
 在这个 hosting 选择下，业务作者仍建模 MAF graph workflow， 而不是改为手写底层
 orchestrator function。
 
-### MAF Graph 与 Function App 是否一一对应
+### MAF Graph 与 Function App 的 cardinality：先分清 replica 和 partition
 
 **MAF Azure Functions hosting 的开源实现已经能排除“一图一 Function
-App”的必然关系。**
+App”的必然关系，但这个结论只解决 host 可承载多个 workflows 的问题；
+它不能被误读成单个 graph 自动被拆成多个 Function Apps partition。**
 
 Function App 是 Azure Functions 的 host/deployment/config/package/identity
-边界； 实际伸缩粒度还取决于 hosting plan、trigger/scale group 和 runtime/backend
-配置； MAF graph workflow 是 authoring/modeling 边界。
-使用 MAF Durable Extension 时， 应用启动配置会把 graph workflows、ordinary
+边界；实际伸缩粒度还取决于 hosting plan、trigger/scale group 和 runtime/backend
+配置；MAF graph workflow 是 authoring/modeling 边界。
+使用 MAF Durable Extension 时，应用启动配置会把 graph workflows、ordinary
 executors、agents 和 subworkflows 注册成 Durable Task runtime handlers。
 源码证据显示，durable options 支持 additive 配置，多次调用会组合配置；在 base
-DurableTask worker registration path 中， 注册逻辑会遍历已配置
+DurableTask worker registration path 中，注册逻辑会遍历已配置
 workflows，并递归把 subworkflows 注册为 separate orchestrations。
-Azure Functions hosting 路径也有专门的 function metadata transformer： 它遍历
+Azure Functions hosting 路径也有专门的 function metadata transformer：它遍历
 `workflowOptions.Workflows`，为每个已配置 workflow 注册 orchestration trigger 和
 HTTP trigger，并为 executor 注册 activity/entity trigger metadata。
 
-因此，结论可以更明确：
+因此，cardinality 要按方向拆开说：
 
-- **一个 MAF Graph 不必然对应一个 Function App。**
-- **一个 Function App / host 的配置可以包含多个 durable workflows。**
-- **在 Azure Functions hosting 中，多个 workflows 会在同一 host 的 metadata
-  生成路径中分别得到 orchestration/HTTP trigger metadata；共享 executor 的
-  function metadata 还会去重。**
-- **在 base DurableTask worker registration path 中，subworkflow 还会成为
-  separate orchestration registration。**
+| 关系 | 当前结论 | 含义 |
+| --- | --- | --- |
+| Function App / host 配置 -> MAF durable workflows | **1:N** | 一个 host 配置可以包含多个 durable workflows；Azure Functions metadata transformer 会遍历 `workflowOptions.Workflows` 并为每个 workflow 生成 trigger metadata。 |
+| 同一个 MAF graph definition -> 多个 Function Apps / app instances | **1:N replica** | 可以把同一 graph definition 作为重复部署/副本放到多个 Function Apps 或 instances；这是 replica，不是把 graph 内部子图划给不同 Function Apps。 |
+| MAF graph 内部 subgraph / executor -> Function Apps | **没有自动 1:N partition 证据** | 当前证据支持 executor/subworkflow 被映射成 Durable Task activity/entity/sub-orchestration 等 runtime handlers；不支持“任意 executor 自动跨 Function Apps 分区”。 |
+| Function App / worker app -> Durable Task backend/task hub | **topology-dependent** | 多个 apps 可以连接 backend 并处理 work items，但要结合 task hub/backend、registration、identity、网络和 routing 配置验证。 |
+
+所以，“一个 MAF Graph 不必然对应一个 Function App”不是在说
+`Graph -> Function Apps` 天然是 partitioned 1:N。 更精确的说法是：
+
+- **Function App / host -> workflows 可以是 1:N。**
+- **同一 graph definition -> 多个 Function Apps 只能先理解为 replica /
+  重复部署。**
+- **graph 内部 subgraph/executor -> Function Apps 的 partition
+  不能从当前证据推出。**
+- **在 base DurableTask worker registration path 中，subworkflow 会成为 separate
+  orchestration registration，但 separate orchestration registration 也不等于
+  separate Function App partition。**
 
 但反过来，也不要在没有额外证据时声称“单个 MAF Graph 内部任意 executor
 可以无条件拆到多个 Function Apps 运行”。
-这种拆分需要额外验证 worker routing、 task hub/backend 配置、跨 app registration
+这种拆分需要额外验证 worker routing、task hub/backend 配置、跨 app registration
 和调度语义。
 多 Function Apps / worker apps 更安全的理解是部署拓扑选择：
 可以按服务边界、发布生命周期、权限/identity、伸缩、成本、网络隔离和 backend/task
@@ -323,7 +335,7 @@ Scheduler 可以让它们重放、 恢复和派发 work item，但不替业务�
 | wiki | [Microsoft Agent Framework Azure Functions Durable Workflow Metadata Transformer 源码](../sources/microsoft-agent-framework/azure-functions-durable-workflows-metadata-transformer-source.md) | MAF Azure Functions hosting 中为每个 configured durable workflow 生成 orchestration/HTTP trigger metadata，并为 executor 生成 activity/entity trigger metadata。 |
 | wiki | [Microsoft Agent Framework Durable Executor Dispatcher 源码](../sources/microsoft-agent-framework/durable-executor-dispatcher-source.md) | MAF executor 到 activity/entity/sub-orchestration/external-event 的细粒度映射。 |
 | wiki | [MAF Durable Function Apps 与 Temporal 的 Scale-out 边界](maf-durable-functions-vs-temporal-scale-out.md) | 多 graph、异构 workload 下 Function App hosting topology 与 Temporal Task Queue/Worker Process 模型的 scale-out 边界分析。 |
-| user | 用户在 2026-06-16 的连续提问：MAF Durable Extension 是否依赖 Azure Durable Functions、Durable Task Scheduler 是否只是 backend、workflow 本体到底是谁，继续追问 MAF Graph 与 Function App 的部署对应关系、Durable Task activity 是否是 Azure Functions 概念，以及 graph 多起来后 MAF Durable Function Apps 是否比 Temporal 更早遇到 scale-out 或资源利用效率瓶颈。 | 确定本页问题边界和读者困惑；不是第三方产品事实证据。 |
+| user | 用户在 2026-06-16 的连续提问：MAF Durable Extension 是否依赖 Azure Durable Functions、Durable Task Scheduler 是否只是 backend、workflow 本体到底是谁，继续追问 MAF Graph 与 Function App 的部署对应关系、Durable Task activity 是否是 Azure Functions 概念，以及 graph 多起来后 MAF Durable Function Apps 是否比 Temporal 更早遇到 scale-out 或资源利用效率瓶颈；随后指出 “MAF Azure Functions hosting 的开源实现已经能排除‘一图一 Function App’的必然关系” 一节仍未更新 replica/partition 表述。 | 确定本页问题边界和读者困惑；不是第三方产品事实证据。 |
 
 ### 支撑的主张
 
@@ -335,6 +347,6 @@ Scheduler 可以让它们重放、 恢复和派发 work item，但不替业务�
 | MAF Durable Extension 可使用 Azure Functions hosting，也可使用 self-hosted/BYOC worker；因此不能简单写成“就是 Azure Durable Functions”。 | MAF Durable Extension 文档；Durable Task Hosting Model；Durable Task SDKs Overview。 | self-hosted/BYOC 指 worker compute 自管；当前证据仍显示连接 Durable Task Scheduler managed backend，不等于完全离线或完全自带后端。 |
 | Azure Durable Functions 与 MAF Durable Extension 的关系应按 authoring/modeling、adapter/mapping、durable runtime、compute host、durable backend/storage 五层理解。 | 上方所有证据单元综合。 | 这是分析归纳，不是官方术语；用于避免把 hosting surface、workflow source 和 backend scheduler 混成同一层。 |
 | 用户的共性困惑来自把 authoring/modeling unit、durable runtime unit、compute/deployment unit 和 backend/storage unit 混成一一对应运行单元。 | 用户提问；上方所有证据单元综合。 | 这是对问题模式的分析归纳，用于组织解释结构；不是官方产品术语。 |
-| 一个 MAF Graph 不必然对应一个 Function App；MAF Azure Functions hosting 源码显示一个 host 的 metadata transformer 会遍历多个 configured durable workflows，并为每个 workflow 生成 trigger metadata。 | Azure Functions Durable Workflow Metadata Transformer 源码；Durable Workflow Registration 源码；MAF Durable Extension 文档。 | 这不证明单个 graph 内部 executor 可任意跨多个 Function Apps 拆分；部署拆分仍需验证 worker routing、task hub/backend 和注册配置。 |
+| MAF Graph 与 Function App 的 cardinality 必须区分 host-to-workflows、graph replica 和 graph partition：一个 host 配置可包含多个 durable workflows；同一 graph definition 跨多个 Function Apps 只能先理解为 replica；当前证据不支持 graph 内部 subgraph/executor 自动跨 Function Apps partition。 | Azure Functions Durable Workflow Metadata Transformer 源码；Durable Workflow Registration 源码；MAF Durable Extension 文档；用户对 replica/partition 表述的纠正。 | replica/partition 是本文的架构解释；实际跨 app 部署仍需验证 worker routing、task hub/backend、registration、identity 和网络配置。 |
 | Durable Task activity 不是 plain Azure Functions 的基础概念；它在 Durable Functions 中表现为 activity function，在 Durable Task 中是可调度 work item，在 MAF Durable Extension 中是 ordinary executor 的一种 runtime 映射。 | Azure Functions Overview；Azure Durable Functions Overview；Durable Task Orchestrations；Durable Workflow Registration 源码；Azure Functions Durable Workflow Metadata Transformer 源码；Durable Executor Dispatcher 源码；Durable Task Scheduler 文档。 | 该映射限于当前 graph workflow Durable Extension/.NET 证据；agent、subworkflow 和 request port 走专门路径。 |
 | 逻辑子图不自动决定 partition 或扩容；多 graph 场景下的资源利用效率取决于 runtime work item、dispatch boundary、host/scale group/resource-pool 和 backend/task hub 的拆分。 | Durable Task Scheduler 文档；Durable Executor Dispatcher 源码；Azure Functions Durable Workflow Metadata Transformer 源码；Azure Functions Scale and Hosting；MAF Durable Function Apps 与 Temporal 的 Scale-out 边界。 | 这是机制归纳；具体性能和成本仍需 benchmark、host plan、backend capacity 和部署拓扑验证。 |
