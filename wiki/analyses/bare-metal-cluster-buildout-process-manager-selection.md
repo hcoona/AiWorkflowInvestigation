@@ -86,7 +86,7 @@ Activity 是外部 I/O 和真实世界副作用的边界；
 Child Workflow 可以按 host、node、rack、fabric 或 validation domain
 把长期过程拆成资源实体相关的子执行。
 
-这正好匹配裸金属 buildout 的主过程管理问题：
+在 durable orchestration runtime 层，这较直接匹配裸金属 buildout 的主过程管理问题：
 
 - 一次 cluster buildout 可以是可寻址的长期 Workflow Execution。
 - 单节点、机架或 fabric 的处理可以通过 Child Workflow 隔离历史、等待、重试和局部失败。
@@ -96,6 +96,10 @@ Child Workflow 可以按 host、node、rack、fabric 或 validation domain
   进入运行中的过程对象。
 - 外部 inventory/resource graph 保存领域事实，Temporal 保存过程级状态、
   控制路径、事件入口和可审计执行历史。
+
+这不是说 Temporal 是裸金属资源事实真源：
+它仍需要 external inventory/resource graph、业务锁/审计、副作用纪律和 dashboard
+projection 配套。
 
 必须降调的点同样重要：
 Temporal Reset 不是物理回滚；
@@ -172,12 +176,25 @@ Airflow 更自然地持久化 DagRun、TaskInstance、mapped task、retry、defe
 这些状态可以很好表达“这张有限任务图执行到哪里”，
 但不应直接替代“这个物理集群资源图在多周内经历哪些局部失效、修复、追平和验收事实”。
 
-因此，如果一个方案声称“用 Airflow 做 process manager”，必须先回答：
-长期资源身份、领域事件解释、局部失败传播、追平条件、物理副作用补偿和审计真源
-到底由谁持有。
-如果答案是 external inventory/resource graph、domain state service 或另一套事件系统，
-那它们才是本文 scope 下的 process manager；
-Airflow 只是有限 DagRun 的 scheduler/executor。
+因此，如果一个方案声称“用 Airflow 做 process manager”，不能只用
+external inventory/resource graph 来回答。
+外部资源图保存领域事实、锁和审计是所有候选都需要的共性纪律；
+它本身不会否定 Airflow。
+真正要检验的是 process-level control path 在哪里：
+长期资源身份如何映射到 DagRun/TaskInstance 或外部对象，外部事件如何进入运行中过程，
+局部失败如何传播和追平，物理副作用补偿决策如何形成，过程审计真源由谁维护。
+
+若这些控制职责实际由另一个 domain process service 或事件系统持有，
+那它才是本文 scope 下的 process manager，Airflow 只是有限 DagRun 的
+scheduler/executor。
+若 Airflow 自己承担主 process manager，则必须正面解释其一手机制的限制：
+scheduler 基于 timetable 创建 DagRun、推进可调度 TaskInstance 并交给 executor；
+event-driven scheduling 更自然地触发 DagRun，而不是向任意运行中资源过程对象注入事件；
+deferrable operator 解决 task 等待和 worker slot 占用，但 deferred 后本地状态不会自动持久化；
+Dynamic Task Mapping 是 scheduler 基于上游数据创建 mapped task instances；
+DAG file processing、serialization、DAG bundle versioning 和 `DagRun.verify_integrity`
+提供部署/调度视图与既有 DagRun 的受控 reconciliation，
+不是运行中资源状态机的任意拓扑演进。
 这个区分是本文为了遵守 scope 必须保留的判断边界。
 
 若仍坚持让 Airflow 承担主 process manager 职责，架构上必须显式接受：
@@ -187,7 +204,8 @@ Airflow 只是有限 DagRun 的 scheduler/executor。
 3. Dynamic Task Mapping 负责有限集合展开，不负责长期拓扑演进；
 4. HITL、deferrable 和 event-driven scheduling 解决等待/触发/审批入口，
    不解决资源依赖传播、局部追平和物理副作用补偿；
-5. DAG 版本、在途 DagRun、clear/rerun/backfill 和 removed task 需要单独的迁移纪律。
+5. DAG 版本、在途 DagRun、backfill/reprocessing/catchup 和 removed task
+   需要单独的迁移纪律。
 
 ### LangGraph 作为主 process manager 的不匹配点
 
@@ -201,39 +219,64 @@ Agent Server 有 persistence database、task queue 和 queue worker；
 graph migrations 与 time travel 支持受约束的 checkpoint replay、fork
 和已有 thread 在新 graph definition 下恢复。
 
-但这些能力回答的是“如何运行和恢复一个 stateful agent graph/thread”，
-不是“如何长期管理一个真实物理集群 buildout 的资源状态机”。
-关键不匹配点在于：
+公平比较时，不能把所有 runtime 都必须遵守的纪律写成 LangGraph 独有缺陷。
+Temporal 的原生对象也是 Workflow Execution，而不是裸金属资源本身；
+Temporal Event History、Azure Durable Task storage、Airflow metadata DB
+和 LangGraph checkpoint/store 都不应替代 external inventory/resource graph；
+Temporal Activity retry、Durable activity retry 和 LangGraph fault tolerance
+也都不会让真实物理副作用自动幂等、可回滚或可补偿。
 
-1. **主对象不是裸金属资源过程。**
+因此，LangGraph 的关键问题不是“它的主对象不是裸金属资源”这一条本身，
+而是当前证据只证明它能运行和恢复 stateful agent graph/thread；
+若要作为裸金属 buildout 主 process manager，还必须额外证明这些 agent
+graph/thread 能稳定承载 cluster/node/rack/fabric 等资源身份、过程分区、
+领域事件解释、局部失败追平、过程审计和迁移纪律。
+在现有证据下，更准确的边界是：
+
+1. **Graph/thread 到资源过程的映射仍需证明。**
    LangGraph 的自然对象是 graph、thread、checkpoint、store、run 和 agent
    state。
-   裸金属 buildout 的主对象是 cluster/node/rack/fabric/BMC/firmware/OS/validation
-   等资源实体及其长期生命周期。
-2. **Checkpoint/store 不应替代 inventory/resource graph。**
-   LangGraph persistence 保存 graph execution state 和 long-term memory；
-   它不自动提供资源依赖、锁、物理事实、验收证据、审计查询和跨工具控制面归一化。
-3. **Interrupt/resume 是 HITL 控制语义，不是业务事件模型。**
-   它可以暂停 graph execution 等待外部输入；
-   但人类、供应商、设备、BMC、provisioning 系统和调度器事件仍需要业务 schema、
-   权限、去重、状态解释和审计。
-4. **Fault tolerance 是 graph/node execution 级能力。**
-   retries、timeouts 和 error handlers 不会让刷固件、改 BIOS、创建 RAID、
-   装 OS、重启、换线和验收这些真实副作用自动幂等或可补偿。
-5. **Time travel/fork 会重新执行后续节点。**
-   这对 LLM/API/interrupts 和外部工具调用有可复现性风险；
-   它不是物理世界回滚，也不是安全的 buildout 计划迁移机制。
-6. **Agent Server queue worker 不是裸金属过程调度模型。**
-   文档支撑的是 run-level queue worker 执行 graph code 并写 checkpoints；
-   不能据此推导出它提供节点、机架、fabric 维度的一等资源调度、局部失败隔离
-   或长期过程审计。
+   这不排除它建模 cluster/node/rack/fabric 生命周期；
+   但现有 source pages 尚未直接给出类似 Temporal Child Workflow 文档中按
+   host/Workflow ID 分区的官方模式，或与 Signals/Updates 同等明确的运行中业务消息入口。
+   若业务层以 `thread_id`、store、外部事件服务和审计模型补足这些映射，
+   应在 POC 中证明。
+2. **Checkpoint/store 只是 graph state/memory 持久化。**
+   这是一条共性边界纪律：所有候选都需要 external inventory/resource graph。
+   对 LangGraph 而言，checkpoint/store 只能证明 graph execution state 和
+   long-term memory 持久化；若方案把它当作资源事实库、锁库或审计真源，
+   才会落入不适合作为主 process manager 的问题。
+3. **Interrupt/resume 不能单独证明业务事件入口。**
+   `interrupt()` / resume 证明 LangGraph 适合暂停 graph thread 并接收人工输入；
+   但设备、供应商、BMC、provisioning 系统和调度器事件仍需要业务 schema、
+   鉴权、去重、状态解释和审计。
+   这不是 LangGraph 独有短板，而是说明不能仅凭 HITL pause/resume
+   推导出完整 buildout event model。
+4. **Fault tolerance 只覆盖 graph/node execution 层。**
+   retries、timeouts 和 error handlers 是有价值的执行恢复能力；
+   但裸金属主 process manager 还必须显式实现资源级失败隔离、真实状态
+   reconcile、幂等键、补偿和人工确认。
+   该要求同样约束 Temporal Activity 和 Durable activity。
+5. **Time travel/fork 是能力边界，不是物理回滚。**
+   LangGraph time travel/fork 可用于 checkpoint replay 或分支实验；
+   但后续节点会重新执行，这对 LLM/API/interrupts 和外部工具调用有可复现性风险。
+   它不能被写成物理世界回滚或安全 buildout 计划迁移机制；
+   这一点与本文对 Temporal Reset 的降调是同一类纪律。
+6. **Agent Server queue worker 只证明 run-level graph execution queue。**
+   文档支撑 queue worker 获取 run、执行 graph code 并写 checkpoints；
+   不能由此推出它提供 node/rack/fabric 级资源过程调度、局部失败隔离或长期业务审计。
+   Temporal 适配点也不是“worker 是裸金属调度器”，而是 Workflow、Activity、
+   Child Workflow、Signals/Updates 和 Timer 组合形成更直接的长期过程建模面。
 
 因此，如果方案声称“LangGraph 做主 process manager”，也必须先回答：
 长期资源身份、领域事件解释、局部失败传播、追平条件、物理副作用补偿和审计真源
 到底由谁持有。
-如果答案是 external inventory/resource graph、domain state service 或另一个
-durable orchestrator，那么它们才是本文 scope 下的 process manager；
-LangGraph 更合适的角色是 AI diagnosis、operator copilot、HITL decision
+如果 external inventory/resource graph 只保存领域事实、锁和审计，而 LangGraph
+graph/thread 持有过程控制路径、事件解释和恢复策略，不能仅因使用外部资源图否定
+LangGraph。
+若长期控制路径、领域事件解释、局部失败追平和补偿决策实际由另一个 domain
+process service 或 durable orchestrator 持有，那么后者才是本文 scope 下的 process
+manager；LangGraph 更合适的角色是 AI diagnosis、operator copilot、HITL decision
 support 或由主 process manager 调用的 agent automation adapter。
 
 ### 裸金属控制面不是普通 shell 命令
@@ -278,15 +321,15 @@ workflow runtime 管理的是过程和执行；
    不要把 Temporal UI 当作操作员产品界面；需要从 Temporal、inventory/resource graph
    和下层控制面投影业务状态。
 
-如果组织仍要求在方案中使用 Airflow，应在架构文档中把它标为被主 process manager
+如果组织仍要求在方案中使用 Airflow，且尚未证明 Airflow DagRun/TaskInstance
+与业务层共同承载主过程控制路径，应在架构文档中把它标为被主 process manager
 调用的 scheduler/executor/UI adapter，而不是把这个角色写成本文选型问题的答案。
-否则读者会把“Airflow 能承载若干 buildout 任务”误解成
-“Airflow 适合承载 buildout 的长期过程管理职责”。
+若 POC 证明 Airflow 方案可承担这些主过程职责，应按新的证据重评。
 
-如果组织要求在方案中使用 LangGraph，应把它标为 agent/HITL adapter，
+如果组织要求在方案中使用 LangGraph，且尚未证明 LangGraph graph/thread
+与业务层共同承载主过程控制路径，应先把它标为 agent/HITL adapter，
 并明确哪些事件和决策回写到主 process manager 与 external inventory/resource graph。
-否则读者会把“LangGraph 能运行长期 agent graph 并暂停等待人工输入”误解成
-“LangGraph 适合承载 buildout 的长期资源过程管理职责”。
+若 POC 证明 LangGraph 方案可承担这些主过程职责，应按新的证据重评。
 
 如果组织要求使用 Azure Durable Functions，应把它当作 Temporal 的 durable
 orchestration 近邻候选，而不是外围 adapter。
@@ -299,9 +342,9 @@ orchestration 近邻候选，而不是外围 adapter。
 以下条件出现时，应重新评估这个决策：
 
 - 决策 scope 从“主 process manager”缩小为“有限批次调度/执行/UI adapter”。
-- 组织明确接受另一个 external domain state service 才是真正 process manager，
+- 组织明确接受另一个 external domain process service 才是真正 process manager，
   Airflow 只承担被调用的 scheduler/executor。
-- 组织明确接受另一个 external domain state service 或 durable orchestrator
+- 组织明确接受另一个 external domain process service 或 durable orchestrator
   才是真正 process manager，LangGraph 只承担被调用的 agent/HITL adapter。
 - 组织已经标准化 Azure Functions / Durable Task，并且目标 buildout 网络、hosting plan、
   storage provider、语言 SDK、监控和成本约束不会削弱 process manager 目标。
@@ -310,8 +353,14 @@ orchestration 近邻候选，而不是外围 adapter。
 - 目标 buildout 场景被重新定义为短生命周期、批量验证或报表加工，
   而不是长期交互式资源状态机。
 - POC 显示 Temporal 的建模、可观测性或运维成本高于 Airflow + 外部状态机组合。
+- POC 显示 Airflow 方案在同等 external inventory/resource graph 和副作用纪律下，
+  能用 DagRun/TaskInstance、event scheduling、deferral、HITL、backfill/catchup
+  和 DAG version/reconciliation 纪律稳定承载长期过程控制路径。
 - POC 显示 Azure Durable Functions / Durable Task 在同等外部资源图和副作用纪律下，
   比 Temporal 更适合目标组织的 hosting、运维和生态约束。
+- POC 显示 LangGraph 方案在同等 external inventory/resource graph 和副作用纪律下，
+  能稳定解释长期资源身份、过程分区、领域事件、局部失败追平、过程审计和
+  graph/thread migration。
 
 ## POC 验证边界
 
@@ -327,7 +376,8 @@ orchestration 近邻候选，而不是外围 adapter。
   长期资源身份、外部事件、局部失败传播、追平条件和物理副作用补偿；
   只证明 Dynamic Task Mapping、HITL、deferrable 或 event scheduling 可运行，
   只能证明它适合作为执行/调度层。
-- Airflow 方案必须证明 DAG 代码变更、既有 DagRun、removed task、clear/rerun/backfill
+- Airflow 方案必须证明 DAG 代码变更、既有 DagRun、removed task、
+  backfill/reprocessing/catchup
   不会破坏 buildout 过程审计；否则该方案仍不是合格的主 process manager。
 - Azure Durable Functions 方案必须证明 orchestrator deterministic replay、durable
   timers、external events、entities、storage provider、hosting plan 和网络连通
@@ -367,12 +417,14 @@ orchestration 近邻候选，而不是外围 adapter。
 | wiki | [Durable Task Hosting Model 文档](../sources/azure-durable-functions/hosting-model-docs.md) | Durable Functions 与 standalone Durable Task SDKs 的 hosting model 差异。 |
 | wiki | [Azure Functions Scale and Hosting 文档](../sources/azure-functions/scale-hosting-docs.md) | Azure Functions hosting plans、scale、资源、网络/容器支持和成本边界。 |
 | wiki | [Airflow DAG 文档](../sources/apache-airflow/dags-docs.md) | DAG、task dependencies、DagRun 和控制流基础语义。 |
+| wiki | [Airflow Dag Run 文档](../sources/apache-airflow/dag-run-docs.md)、[Airflow Backfill 文档](../sources/apache-airflow/backfill-docs.md) | DagRun、catchup、backfill、reprocessing behavior 和历史区间 run 创建语义。 |
 | wiki | [Airflow Scheduler 文档](../sources/apache-airflow/scheduler-docs.md) | scheduler、metadata DB、DagRun 和 TaskInstance 推进语义。 |
 | wiki | [Airflow Dynamic Task Mapping 文档](../sources/apache-airflow/dynamic-task-mapping-docs.md) | runtime task fan-out 和 mapped task instances。 |
 | wiki | [Airflow Deferrable Operators 文档](../sources/apache-airflow/deferrable-operators-docs.md) | task/operator deferral、triggerer 等待和状态传递限制。 |
 | wiki | [Airflow Event-Driven Scheduling 文档](../sources/apache-airflow/event-scheduling-docs.md) | `BaseEventTrigger` 和 event-driven Dag scheduling 约束。 |
 | wiki | [Airflow HITL 文档](../sources/apache-airflow/hitl-docs.md) | 人工输入、审批、分支选择和通知能力。 |
 | wiki | [Airflow Task States 文档](../sources/apache-airflow/task-states-docs.md) | TaskInstance 状态、deferred、removed 和 heartbeat timeout 语义。 |
+| wiki | [Airflow DAG File Processing 文档](../sources/apache-airflow/dagfile-processing-docs.md)、[Airflow DAG Serialization 文档](../sources/apache-airflow/dag-serialization-docs.md)、[Airflow DAG Bundles 文档](../sources/apache-airflow/dag-bundles-docs.md)、[Airflow DagRun verify_integrity 源码](../sources/apache-airflow/dagrun-verify-integrity-source.md) | DAG 文件处理、serialized DAG 调度视图、bundle versioning 和既有 DagRun task instance reconciliation 边界。 |
 | wiki | [LangGraph Overview 文档](../sources/langgraph/overview-docs.md) | LangGraph long-running stateful agents/workflows 与 runtime 定位。 |
 | wiki | [LangGraph Persistence 文档](../sources/langgraph/persistence-docs.md) | checkpointers、stores、threads/thread_id 等持久化语义。 |
 | wiki | [LangGraph Interrupts 文档](../sources/langgraph/interrupts-docs.md) | `interrupt()`、resume 和 HITL 语义。 |
@@ -388,17 +440,17 @@ orchestration 近邻候选，而不是外围 adapter。
 | 主张 | 证据 | 限制 |
 | --- | --- | --- |
 | 裸金属 Cluster Buildout 是现有 workflow 通用比较页之外的独立决策边界。 | 用户输入；raw 草稿；工作流概念比较。 | raw 草稿不是技术事实证据；本页仍需由一手 source projections 支撑。 |
-| 平台选型应比较长期过程对象、状态真源、外部事件入口、等待模型、副作用边界、局部失败和流程演进，而不是只比较 task 执行能力。 | 工作流概念比较；Temporal 和 Airflow source pages。 | 这是本 wiki 的综合分析框架，不是厂商官方分类。 |
+| 平台选型应比较长期过程对象、状态真源、外部事件入口、等待模型、副作用边界、局部失败和流程演进，而不是只比较 task 执行能力。 | 工作流概念比较；Temporal、Azure Durable Functions / Durable Task、Airflow 和 LangGraph source pages。 | 这是本 wiki 的综合分析框架，不是厂商官方分类。 |
 | 新建主 buildout process manager 时，Temporal 的 durable Workflow Execution、message passing、Timer、Activity 和 Child Workflow 更贴近长期交互式资源过程管理。 | Temporal Workflows、Activities、Message Passing、Timers、Child Workflows source pages。 | Temporal 不保存全部领域事实，也不自动处理物理副作用幂等、补偿和业务 dashboard。 |
 | Temporal Reset、Continue-As-New 和 Worker Versioning 不能被写成物理回滚、任意计划迁移或自动升级。 | Temporal Reset、Continue-As-New、Worker Versioning source pages。 | 这些机制仍可作为受约束的恢复、历史截断和版本路由工具。 |
 | Azure Durable Functions / Durable Task 具备 durable orchestration、activity、timer、external event、entity、event sourcing、checkpoint/replay 和 instance identity 等与主 process manager 相邻的能力，因此应作为 Temporal 之外的 POC 候选，而不是按 Airflow/LangGraph 的外围角色直接排除。 | Azure Durable Functions Overview、Durable Task Orchestrations、Timers、External Events、Entities source pages。 | Durable Functions 的适配性仍取决于 hosting model、storage backend、语言 SDK、网络、监控和组织 Azure 生态约束。 |
 | Azure Durable Functions 不能脱离 Azure Functions hosting/runtime 与 storage provider 边界评价；在 AKS、VM 或 on-premises 等目标平台上，standalone Durable Task SDKs 可能才是对应 hosting model。 | Durable Task Hosting Model、Azure Functions Scale and Hosting、Durable Task Storage Providers source pages。 | 本页没有实测不同 hosting plan、storage provider 或网络环境下的性能和运维成本。 |
 | Durable orchestrator deterministic replay 要求真实设备 I/O、API 调用、文件/DB 操作等非确定性行为放在 activity 或外部边界，并由业务层处理幂等、读回、锁和补偿。 | Durable Task Code Constraints source page。 | Code Constraints source 支撑 replay 和非确定性边界；幂等、读回、锁和补偿是裸金属 buildout 场景下的架构要求。 |
 | Durable Task storage provider 和 durable entities 支撑 runtime state 与小块协调状态，但不能替代 external inventory/resource graph/audit store。 | Durable Task Storage Providers、Durable Task Entities source pages；裸金属工具链 source pages。 | 这是结合裸金属 buildout 场景作出的架构判断；具体数据模型需另行设计。 |
-| Airflow 的 Dynamic Task Mapping、Deferrable Operators、Event-Driven Scheduling、HITL 和 TaskInstance 状态只能证明它能承载有限 DAG 内的等待、触发、人工输入和 fan-out；这些能力不足以证明 Airflow 适合作为裸金属 buildout 的主 process manager。 | Airflow DAG、Scheduler、Dynamic Task Mapping、Deferrable Operators、Event-Driven Scheduling、HITL、Task States source pages。 | 如果另一个外部系统持有长期领域状态和追平逻辑，那么那个外部系统才是本文 scope 下的 process manager，Airflow 只是 scheduler/executor/UI adapter。 |
+| Airflow 的 Dynamic Task Mapping、Deferrable Operators、Event-Driven Scheduling、HITL、TaskInstance 状态、DagRun/catchup/backfill、DAG processing/serialization、bundle versioning 和 `DagRun.verify_integrity` 只能证明它能承载有限 DAG 内的等待、触发、人工输入、fan-out、历史区间重处理、部署版本和受控 DagRun reconciliation；这些能力不足以证明 Airflow 适合作为裸金属 buildout 的主 process manager。 | Airflow DAG、Dag Run、Backfill、Scheduler、Dynamic Task Mapping、Deferrable Operators、Event-Driven Scheduling、HITL、Task States、DAG File Processing、DAG Serialization、DAG Bundles、DagRun verify_integrity source pages。 | external inventory/resource graph 只是所有候选都需要的领域事实层；只有当另一个 domain process service 持有 process-level control path、事件解释、追平和补偿决策时，Airflow 才只是 scheduler/executor/UI adapter。 |
 | Airflow 的核心状态对象是 DagRun/TaskInstance/mapped task/deferred task 等 scheduler/task execution 状态，不应直接替代裸金属资源事实。 | Airflow DAG、Scheduler、Task States、Deferrable Operators source pages。 | Airflow 可以通过 task 读写外部领域状态；本页反对的是把 Airflow metadata DB 当领域真源。 |
-| LangGraph 的 persistence、interrupt/resume、fault tolerance、Agent Server、graph migrations 和 time travel 证明它能运行长期 stateful agent graph/thread，但不足以证明它适合作为裸金属 buildout 的主 process manager。 | LangGraph Overview、Persistence、Interrupts、Fault Tolerance、Agent Server、Graph Migrations、Time Travel source pages。 | 如果另一个外部系统持有长期领域状态和追平逻辑，那么那个外部系统才是本文 scope 下的 process manager，LangGraph 只是 agent/HITL adapter。 |
-| LangGraph checkpoint/store、interrupt/resume、time travel/fork 和 queue worker 不应被写成资源事实库、业务事件模型、物理回滚或资源级过程调度模型。 | LangGraph Persistence、Interrupts、Time Travel、Agent Server source pages。 | LangGraph 仍可作为 AI diagnosis、operator copilot、HITL decision support 或 agent automation layer。 |
+| LangGraph 的 persistence、interrupt/resume、fault tolerance、Agent Server、graph migrations 和 time travel 证明它能运行长期 stateful agent graph/thread；但若要作为裸金属 buildout 主 process manager，还必须额外证明资源身份映射、过程分区、领域事件解释、局部失败追平、过程审计和迁移纪律。 | LangGraph Overview、Persistence、Interrupts、Fault Tolerance、Agent Server、Graph Migrations、Time Travel source pages；Temporal Workflows、Message Passing、Child Workflows source pages。 | 不能仅以“主对象不是裸金属资源”否定 LangGraph，因为 Temporal 的原生对象也不是裸金属资源；差异在现有证据支撑的过程建模面是否足够直接。 |
+| LangGraph checkpoint/store、interrupt/resume、fault tolerance、time travel/fork 和 queue worker 不应被写成资源事实库、完整业务事件模型、物理回滚、副作用治理或资源级过程调度模型；这些是所有 runtime 都需遵守的共性边界纪律，LangGraph 的现有证据只支撑 graph/thread/run 层能力。 | LangGraph Persistence、Interrupts、Fault Tolerance、Time Travel、Agent Server source pages；Temporal Reset、Activities source pages；Durable Task Storage Providers、Code Constraints source pages。 | LangGraph 仍可作为 AI diagnosis、operator copilot、HITL decision support 或 agent automation layer；若方案额外实现主过程控制路径和领域状态层，应按新的 POC 证据重评。 |
 | external inventory/resource graph/audit store 应保存裸金属领域事实、依赖、锁和审计，而 Temporal、Azure Durable Functions、Airflow 或 LangGraph 保存过程执行、runtime 或 agent graph 语义。 | Temporal、Azure Durable Functions、Airflow、LangGraph source pages；裸金属工具链 source pages。 | 这是架构判断；具体数据模型、锁协议和审计 schema 需另行设计。 |
 | Redfish、MAAS、Ironic、Tinkerbell、Foreman、Cobbler、xCAT、Metal3 和 Slurm 不是无状态命令集合，而是协议、控制面、资源模型或调度系统，应被上层 process manager 协调和观察。 | DMTF Redfish、MAAS、Ironic、Tinkerbell、Foreman、Cobbler、xCAT、Metal3、Slurm source pages。 | 这些工具覆盖面、成熟度、项目状态和适用性不同；本页只用它们支撑“下层领域控制面”边界。 |
 | 本页判断仍需要 POC、运维和组织约束验证后才能变成采购或工程基线。 | 用户输入；raw 草稿边界；各 source pages 的限制。 | 当前没有实测数据、规模参数、团队经验、成本模型或 UI/运维成熟度评估。 |
