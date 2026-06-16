@@ -27,15 +27,17 @@ tags:
 长期运行、交互式事件、资源实体导向的局部状态、真实世界副作用、局部失败恢复、
 人工/供应商/AI Agent 介入，以及跨节点、机架、网络、固件、OS、集群资源管理和验收的追平。
 在这个抽象下，Temporal 更适合作为主过程管理地基；
-Airflow 更适合作为批处理、调度、执行入口、审批 UI、报表、周期性 reconcile
-和已有组织平台中的操作界面。
+Airflow 的有限 DAG 调度、批处理、审批入口或报表能力不能被写成同一 scope
+下的等价答案。
+如果长期领域状态、事件解释、局部失败追平和物理副作用补偿都由 Airflow
+外部系统负责，那么真正的 process manager 是那个外部系统，
+Airflow 只是它调用的执行或展示层。
 
 这个决策是条件性技术判断，不是最终采购结论。
 它不覆盖 POC、压测、运维成本、团队熟练度、目标版本许可、UI 成熟度、
 组织已有平台投资或供应商支持。
-如果 buildout 可以稳定切分为有限 DagRun、批量 fan-out/fan-in、验证、审批、
-报表和周期性 reconcile，并且长期领域状态已经由外部系统掌握，
-Airflow 可以是务实的调度层或操作界面。
+但在本文 scope 内，组织已有 Airflow 或 Airflow 能运行若干 buildout 子流程，
+都不能直接推出 Airflow 适合做主 process manager。
 
 ## 范围
 
@@ -95,19 +97,13 @@ Worker Versioning 是 worker/deployment routing 与 replay-safe 升级机制，
 Activity retry 不是 exactly-once。
 所有真实设备操作仍必须通过幂等键、状态读回、外部锁、补偿流程和人工确认保护。
 
-### Airflow 的合理定位
+### Airflow 作为主 process manager 的不匹配点
 
 Airflow 不能被简单排除为“不能等人、不能等事件、不能动态展开”。
 它有明确的 DAG/TaskInstance 调度模型，也有 Dynamic Task Mapping、deferrable
 operators、event-driven scheduling、HITL operators、TaskInstance 状态和 Airflow UI。
-这些能力非常适合 buildout 的外围和批处理部分：
-
-- 固件版本批量采集；
-- OS 安装后的批量验证；
-- 烧机、基准测试、Slurm job 验证的 fan-out/fan-in；
-- 周期性健康检查与 reconcile；
-- 报表和审计数据加工；
-- 已有 Airflow 组织中的审批入口或调度界面。
+这些能力需要被纳入判断，是为了避免把 Airflow 错判成“完全不能等待或响应事件”；
+但它们并没有把 Airflow 变成裸金属 buildout 的长期 process manager。
 
 Airflow 的关键限制不是“不能运行长等待 task”，而是主状态对象和恢复语义。
 Airflow 更自然地持久化 DagRun、TaskInstance、mapped task、retry、deferred
@@ -115,7 +111,15 @@ Airflow 更自然地持久化 DagRun、TaskInstance、mapped task、retry、defe
 这些状态可以很好表达“这张有限任务图执行到哪里”，
 但不应直接替代“这个物理集群资源图在多周内经历哪些局部失效、修复、追平和验收事实”。
 
-因此，如果 Airflow 承担主控，架构上应显式接受：
+因此，如果一个方案声称“用 Airflow 做 process manager”，必须先回答：
+长期资源身份、领域事件解释、局部失败传播、追平条件、物理副作用补偿和审计真源
+到底由谁持有。
+如果答案是 external inventory/resource graph、domain state service 或另一套事件系统，
+那它们才是本文 scope 下的 process manager；
+Airflow 只是有限 DagRun 的 scheduler/executor。
+这个区分是本文为了遵守 scope 必须保留的判断边界。
+
+若仍坚持让 Airflow 承担主 process manager 职责，架构上必须显式接受：
 
 1. external inventory/resource graph 是必需品，不是可选优化；
 2. Airflow metadata DB 不应成为裸金属领域事件源；
@@ -165,23 +169,22 @@ workflow runtime 管理的是过程和执行；
    不要把 Temporal UI 当作操作员产品界面；需要从 Temporal、inventory/resource graph
    和下层控制面投影业务状态。
 
-采用 Airflow 作为务实调度层时，应把它写成外围执行层，而不是长期领域状态机：
-
-1. DAG 从 external inventory/resource graph 读取当前工作集；
-2. Dynamic Task Mapping 展开有限批次；
-3. deferrable/HITL/event scheduling 承载等待、审批和触发入口；
-4. 任务完成后把事实写回外部领域状态；
-5. 周期性 reconcile 或事件触发 DagRun 负责追平，而不是把 TaskInstance 当资源真源。
+如果组织仍要求在方案中使用 Airflow，应在架构文档中把它标为被主 process manager
+调用的 scheduler/executor/UI adapter，而不是把这个角色写成本文选型问题的答案。
+否则读者会把“Airflow 能承载若干 buildout 任务”误解成
+“Airflow 适合承载 buildout 的长期过程管理职责”。
 
 ## 重新审视触发条件
 
 以下条件出现时，应重新评估这个决策：
 
-- 组织已有成熟 Airflow 平台，且 buildout 主体可以自然表达为有限批次 DAG。
-- 已有强 external inventory/resource graph 和事件总线，Airflow 只需调度执行和展示。
+- 决策 scope 从“主 process manager”缩小为“有限批次调度/执行/UI adapter”。
+- 组织明确接受另一个 external domain state service 才是真正 process manager，
+  Airflow 只承担被调用的 scheduler/executor。
 - 团队没有 Temporal 运维经验，且无法承担 workflow versioning、Activity 幂等和 dashboard
   projection 的建设成本。
-- 目标 buildout 场景缩小为短生命周期、批量验证或报表加工，而不是长期交互式资源状态机。
+- 目标 buildout 场景被重新定义为短生命周期、批量验证或报表加工，
+  而不是长期交互式资源状态机。
 - POC 显示 Temporal 的建模、可观测性或运维成本高于 Airflow + 外部状态机组合。
 
 ## POC 验证边界
@@ -194,11 +197,12 @@ workflow runtime 管理的是过程和执行；
   失败节点修复后可追平到集成门禁。
 - Temporal Reset 前后必须先 reconcile 外部 inventory 与真实设备状态，
   危险 Activity 不能无条件重放。
-- Airflow Dynamic Task Mapping 能从 external inventory 展开节点验证批次。
-- Airflow HITL、deferrable 和 event scheduling 能覆盖审批、外部等待和事件触发，
-  但领域事实仍回写 external inventory/resource graph。
-- Airflow 在 DAG 代码变更、既有 DagRun、removed task、clear/rerun/backfill
-  场景下能保持业务审计可解释。
+- 若有人主张 Airflow 可做主 process manager，POC 必须证明 Airflow 方案能解释
+  长期资源身份、外部事件、局部失败传播、追平条件和物理副作用补偿；
+  只证明 Dynamic Task Mapping、HITL、deferrable 或 event scheduling 可运行，
+  只能证明它适合作为执行/调度层。
+- Airflow 方案必须证明 DAG 代码变更、既有 DagRun、removed task、clear/rerun/backfill
+  不会破坏 buildout 过程审计；否则该方案仍不是合格的主 process manager。
 
 ## 证据与限制
 
@@ -235,7 +239,7 @@ workflow runtime 管理的是过程和执行；
 | 平台选型应比较长期过程对象、状态真源、外部事件入口、等待模型、副作用边界、局部失败和流程演进，而不是只比较 task 执行能力。 | 工作流概念比较；Temporal 和 Airflow source pages。 | 这是本 wiki 的综合分析框架，不是厂商官方分类。 |
 | 新建主 buildout process manager 时，Temporal 的 durable Workflow Execution、message passing、Timer、Activity 和 Child Workflow 更贴近长期交互式资源过程管理。 | Temporal Workflows、Activities、Message Passing、Timers、Child Workflows source pages。 | Temporal 不保存全部领域事实，也不自动处理物理副作用幂等、补偿和业务 dashboard。 |
 | Temporal Reset、Continue-As-New 和 Worker Versioning 不能被写成物理回滚、任意计划迁移或自动升级。 | Temporal Reset、Continue-As-New、Worker Versioning source pages。 | 这些机制仍可作为受约束的恢复、历史截断和版本路由工具。 |
-| Airflow 可承载大量 buildout 子流程，但更适合作为调度、执行、审批、UI/报表和周期 reconcile 层。 | Airflow DAG、Scheduler、Dynamic Task Mapping、Deferrable Operators、Event-Driven Scheduling、HITL、Task States source pages。 | 如果有强外部状态机和组织平台约束，Airflow 也可以成为务实主入口；但长期领域状态不应默认落在 metadata DB。 |
+| Airflow 的 Dynamic Task Mapping、Deferrable Operators、Event-Driven Scheduling、HITL 和 TaskInstance 状态只能证明它能承载有限 DAG 内的等待、触发、人工输入和 fan-out；这些能力不足以证明 Airflow 适合作为裸金属 buildout 的主 process manager。 | Airflow DAG、Scheduler、Dynamic Task Mapping、Deferrable Operators、Event-Driven Scheduling、HITL、Task States source pages。 | 如果另一个外部系统持有长期领域状态和追平逻辑，那么那个外部系统才是本文 scope 下的 process manager，Airflow 只是 scheduler/executor/UI adapter。 |
 | Airflow 的核心状态对象是 DagRun/TaskInstance/mapped task/deferred task 等 scheduler/task execution 状态，不应直接替代裸金属资源事实。 | Airflow DAG、Scheduler、Task States、Deferrable Operators source pages。 | Airflow 可以通过 task 读写外部领域状态；本页反对的是把 Airflow metadata DB 当领域真源。 |
 | external inventory/resource graph/audit store 应保存裸金属领域事实、依赖、锁和审计，而 Temporal/Airflow 保存过程执行语义。 | Temporal/Airflow source pages；裸金属工具链 source pages。 | 这是架构判断；具体数据模型、锁协议和审计 schema 需另行设计。 |
 | Redfish、MAAS、Ironic、Tinkerbell、Foreman、Cobbler、xCAT、Metal3 和 Slurm 不是无状态命令集合，而是协议、控制面、资源模型或调度系统，应被上层 process manager 协调和观察。 | DMTF Redfish、MAAS、Ironic、Tinkerbell、Foreman、Cobbler、xCAT、Metal3、Slurm source pages。 | 这些工具覆盖面、成熟度、项目状态和适用性不同；本页只用它们支撑“下层领域控制面”边界。 |
