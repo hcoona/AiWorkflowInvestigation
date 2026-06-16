@@ -1,0 +1,12 @@
+- name: Overview
+  href: index.md
+- name: 'Example: Console'
+  href: telemetry-with-console.md
+- name: 'Example: Application Insights'
+  href: telemetry-with-app-insights.md
+- name: 'Example: Aspire Dashboard'
+  href: telemetry-with-aspire-dashboard.md
+- name: 'Example: Microsoft Foundry Tracing'
+  href: telemetry-with-azure-ai-foundry-tracing.md
+- name: 'Advanced telemetry with Semantic Kernel'
+  href: telemetry-advanced.md

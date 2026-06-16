@@ -1,0 +1,7 @@
+{
+    "python.terminal.activateEnvironment": true,
+    "cSpell.words": [
+        "SKEXP"
+    ],
+    "FSharp.suggestGitignore": false
+}
