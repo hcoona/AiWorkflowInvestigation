@@ -1,0 +1,4 @@
+- name: How to ingest data into a Vector Store
+  href: vector-store-data-ingestion.md
+- name: How to build your own Vector Store connector
+  href: build-your-own-connector.md

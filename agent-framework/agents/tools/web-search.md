@@ -1,0 +1,108 @@
+---
+title: Web Search
+description: Learn how to use the Web Search tool with Agent Framework agents.
+zone_pivot_groups: programming-languages
+author: eavanvalkenburg
+ms.topic: reference
+ms.author: edvan
+ms.date: 02/09/2026
+ms.service: agent-framework
+---
+
+# Web Search
+
+Web Search allows agents to search the web for up-to-date information. This tool enables agents to answer questions about current events, find documentation, and access information beyond their training data.
+
+> [!NOTE]
+> Web Search availability depends on the underlying agent provider. See [Providers Overview](../providers/index.md) for provider-specific support.
+
+:::zone pivot="programming-language-csharp"
+
+The following example shows how to create an agent with the Web Search tool:
+
+```csharp
+using System;
+using Azure.AI.Projects;
+using Azure.Identity;
+using Microsoft.Agents.AI;
+using Microsoft.Extensions.AI;
+
+// Requires: dotnet add package Microsoft.Agents.AI.Foundry --prerelease
+var endpoint = Environment.GetEnvironmentVariable("AZURE_OPENAI_ENDPOINT")
+    ?? throw new InvalidOperationException("AZURE_OPENAI_ENDPOINT is not set.");
+var deploymentName = Environment.GetEnvironmentVariable("AZURE_OPENAI_DEPLOYMENT_NAME") ?? "gpt-4o-mini";
+
+// Create an agent with the web search (Bing grounding) tool
+AIAgent agent = new AIProjectClient(new Uri(endpoint), new DefaultAzureCredential())
+    .AsAIAgent(
+        model: deploymentName,
+        instructions: "You are a helpful assistant that can search the web for current information.",
+        tools: [new WebSearchToolDefinition()]);
+
+Console.WriteLine(await agent.RunAsync("What is the current weather in Seattle?"));
+```
+
+> [!WARNING]
+> `DefaultAzureCredential` is convenient for development but requires careful consideration in production. In production, consider using a specific credential (e.g., `ManagedIdentityCredential`) to avoid latency issues, unintended credential probing, and potential security risks from fallback mechanisms.
+
+:::zone-end
+
+:::zone pivot="programming-language-python"
+
+The following example shows how to create an agent with the Web Search tool:
+
+```python
+# Copyright (c) Microsoft. All rights reserved.
+
+import asyncio
+
+from agent_framework import Agent
+from agent_framework.openai import OpenAIChatClient
+
+"""
+OpenAI Responses Client with Web Search Example
+
+This sample demonstrates using get_web_search_tool() with OpenAI Responses Client
+for direct real-time information retrieval and current data access.
+"""
+
+
+async def main() -> None:
+    client = OpenAIChatClient()
+
+    # Create web search tool with location context
+    web_search_tool = client.get_web_search_tool(
+        user_location={"city": "Seattle", "region": "US"},
+    )
+
+    agent = Agent(
+        client=client,
+        instructions="You are a helpful assistant that can search the web for current information.",
+        tools=[web_search_tool],
+    )
+
+    message = "What is the current weather? Do not ask for my current location."
+    stream = False
+    print(f"User: {message}")
+
+    if stream:
+        print("Assistant: ", end="")
+        async for chunk in agent.run(message, stream=True):
+            if chunk.text:
+                print(chunk.text, end="")
+        print("")
+    else:
+        response = await agent.run(message)
+        print(f"Assistant: {response}")
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+
+:::zone-end
+
+## Next steps
+
+> [!div class="nextstepaction"]
+> [Hosted MCP Tools](./hosted-mcp-tools.md)

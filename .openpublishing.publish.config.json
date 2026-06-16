@@ -1,0 +1,90 @@
+{
+  "docsets_to_publish": [
+    {
+      "docset_name": "agent-framework",
+      "build_source_folder": "agent-framework",
+      "build_output_subfolder": "agent-framework",
+      "locale": "en-us",
+      "monikers": [],
+      "open_to_public_contributors": true,
+      "type_mapping": {
+        "Conceptual": "Content"
+      },
+      "build_entry_point": "docs",
+      "xref_query_tags": [
+        "/dotnet"
+      ]
+    },
+    {
+      "docset_name": "semantic-kernel",
+      "build_source_folder": "semantic-kernel",
+      "build_output_subfolder": "semantic-kernel",
+      "locale": "en-us",
+      "monikers": [],
+      "moniker_ranges": [],
+      "open_to_public_contributors": false,
+      "type_mapping": {
+        "ZonePivotGroups": "Toc",
+        "Conceptual": "Content"
+      },
+      "build_entry_point": "docs",
+      "template_folder": "_themes",
+      "xref_query_tags": [
+        "/dotnet"
+      ]
+    }
+  ],
+  "notification_subscribers": [
+    "sopand@microsoft.com"
+  ],
+  "sync_notification_subscribers": [
+    "sopand@microsoft.com"
+  ],
+  "branches_to_filter": [],
+  "git_repository_url_open_to_public_contributors": "https://github.com/MicrosoftDocs/semantic-kernel-docs",
+  "git_repository_branch_open_to_public_contributors": "main",
+  "need_preview_pull_request": true,
+  "dependent_repositories": [
+    {
+      "path_to_root": "_themes",
+      "url": "https://github.com/Microsoft/templates.docs.msft",
+      "branch": "main",
+      "branch_mapping": {}
+    },
+    {
+      "path_to_root": "_themes.pdf",
+      "url": "https://github.com/Microsoft/templates.docs.msft.pdf",
+      "branch": "main",
+      "branch_mapping": {}
+    },
+    {
+      "path_to_root": "semantic-kernel-samples",
+      "url": "https://github.com/microsoft/semantic-kernel",
+      "branch": "main",
+      "branch_mapping": {}
+    },
+    {
+      "path_to_root": "semantic-kernel-samples-java",
+      "url": "https://github.com/microsoft/semantic-kernel-java",
+      "branch": "docs-java-1.2.0",
+      "branch_mapping": {}
+    },
+    {
+      "path_to_root": "agent-framework-code",
+      "url": "https://github.com/microsoft/agent-framework",
+      "branch": "main",
+      "branch_mapping": {}
+    }
+  ],
+  "branch_target_mapping": {
+    "live": [
+      "Publish",
+      "Pdf"
+    ]
+  },
+  "targets": {
+    "pdf": {
+      "template_folder": "_themes.pdf"
+    }
+  }
+}
