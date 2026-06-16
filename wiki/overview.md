@@ -31,9 +31,11 @@ tags:
 [裸金属 Cluster Buildout 的 Process Manager 平台选型](analyses/bare-metal-cluster-buildout-process-manager-selection.md)
 和
 [Azure Functions 与 ASP.NET Core REST API 的边界](analyses/azure-functions-vs-aspnet-core-rest-api.md)，
+以及
+[Azure Durable Functions 与 MAF Durable Extension 的关系](analyses/azure-durable-functions-and-maf-durable-extension.md)，
 并已将这些分析引用的外部证据拆成 one-source-object-per-page 的 source
 projections。
-该分析现在也回补了 KG-style 概念页和产品级实体页，
+workflow 相关分析现在也回补了 KG-style 概念页和产品级实体页，
 用于承载跨问题复用的概念节点与系统身份。
 
 ## 证据与限制
@@ -48,6 +50,7 @@ projections。
 | wiki | [Agent Orchestration 与传统 Workflow 的边界](analyses/agent-orchestration-vs-workflow.md) | 当前 active analysis 示例，记录 agent orchestration 与传统 workflow 的控制权边界。 |
 | wiki | [裸金属 Cluster Buildout 的 Process Manager 平台选型](analyses/bare-metal-cluster-buildout-process-manager-selection.md) | 当前 active analysis 示例，记录裸金属 buildout 场景中 Temporal、Azure Durable Functions、Airflow 与 LangGraph 的主 process manager 选型边界。 |
 | wiki | [Azure Functions 与 ASP.NET Core REST API 的边界](analyses/azure-functions-vs-aspnet-core-rest-api.md) | 当前 active analysis 示例，记录 Azure Functions HTTP trigger 与 ASP.NET Core REST API 在 HTTP 入口和应用模型上的边界。 |
+| wiki | [Azure Durable Functions 与 MAF Durable Extension 的关系](analyses/azure-durable-functions-and-maf-durable-extension.md) | 当前 active analysis 示例，记录 Azure Durable Functions、Durable Task Scheduler 与 MAF Durable Extension 的分层关系。 |
 | wiki | [工作流控制表示面](concepts/workflow-control-representation-surface.md)、[工作流执行放置单元](concepts/workflow-execution-placement-unit.md)、[工作流恢复模型](concepts/workflow-recovery-model.md)、[工作流副作用边界](concepts/workflow-side-effect-boundary.md)、[工作流时间与触发语义](concepts/workflow-time-trigger-semantics.md)、[图工作流 Super-step](concepts/graph-workflow-super-step.md) | 当前 KG-style concept page 示例，展示 analysis 中可复用概念节点的拆分边界。 |
 | wiki | [Temporal](entities/temporal.md)、[Apache Airflow](entities/apache-airflow.md)、[Microsoft Agent Framework](entities/microsoft-agent-framework.md)、[LangGraph](entities/langgraph.md) | 当前 entity page 示例，展示产品级实体页的检索边界。 |
 | wiki | [Temporal Workflows 文档](sources/temporal/workflows-docs.md)、[Airflow DAG 文档](sources/apache-airflow/dags-docs.md)、[Microsoft Agent Framework Overview 文档](sources/microsoft-agent-framework/overview-docs.md)、[LangGraph Overview 文档](sources/langgraph/overview-docs.md) | 当前 source projection 粒度示例；每页投影一个主要上游证据对象。 |
@@ -63,3 +66,4 @@ projections。
 | 当前 workflow synthesis 已回补 KG-style 概念页和产品级实体页，并将图工作流 Super-step 作为非显然领域名词单独成页。 | 上方 concept/entity page 示例；[工作流概念比较](analyses/workflow-concepts-comparison.md)。 | 组件级实体、执行解释器、状态真源、deterministic replay 等更细粒度候选仍按独立检索价值 deferred。 |
 | 裸金属 buildout 选型分析将 AI 调研草稿降权为线索，技术事实由 Temporal、Azure Durable Functions、Airflow、LangGraph 和裸金属控制面的一手 source projections 支撑。 | [裸金属 Cluster Buildout 的 Process Manager 平台选型](analyses/bare-metal-cluster-buildout-process-manager-selection.md)；上方裸金属 buildout source projection 示例。 | 本页不重复该分析的决策内容；具体条件、限制和 POC 边界见分析页。 |
 | Azure Functions 与 ASP.NET Core REST API 的边界分析将 HTTP trigger 视为薄入口/事件触发模型，将 ASP.NET Core 视为完整 Web API 应用模型。 | [Azure Functions 与 ASP.NET Core REST API 的边界](analyses/azure-functions-vs-aspnet-core-rest-api.md)。 | 本页只作为入口导航；具体证据和限制见分析页。 |
+| Azure Durable Functions 与 MAF Durable Extension 的关系分析将 MAF workflow 视为作者/业务语义层本体，将 Durable Task orchestration 视为运行时持久化映射，并把 Durable Task Scheduler 限定为 backend。 | [Azure Durable Functions 与 MAF Durable Extension 的关系](analyses/azure-durable-functions-and-maf-durable-extension.md)。 | 本页只作为入口导航；具体证据和限制见分析页。 |
