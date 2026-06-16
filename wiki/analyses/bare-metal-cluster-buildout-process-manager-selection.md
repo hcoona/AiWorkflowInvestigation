@@ -5,7 +5,7 @@ title: "裸金属 Cluster Buildout 的 Process Manager 平台选型"
 status: active
 created: 2026-06-16
 updated: 2026-06-16
-summary: "比较 Temporal、Azure Durable Functions、Apache Airflow 与 LangGraph 承载裸金属 Cluster Buildout 主过程管理职责的边界。"
+summary: "比较 Temporal、Azure Durable Functions、Microsoft Agent Framework Durable Workflow Extension、Apache Airflow 与 LangGraph 承载裸金属 Cluster Buildout 主过程管理职责的边界。"
 maintenance:
   edit_policy: update
 validation:
@@ -16,6 +16,8 @@ tags:
   - platform-selection
   - temporal
   - azure-durable-functions
+  - microsoft-agent-framework
+  - durable-extension
   - airflow
   - langgraph
 ---
@@ -23,28 +25,30 @@ tags:
 ## 决策
 
 如果目标是新建裸金属 Cluster Buildout 的主 process manager，
-默认优先评估 Temporal；Azure Durable Functions / Durable Task 是相邻的 durable
-orchestration 候选，但必须连同 Azure Functions hosting/runtime、storage backend、
-语言和运维约束一起评估；Apache Airflow 与 LangGraph 不应被写成同一 scope
-下的主 process manager 等价方案。
+默认优先评估 Temporal；Azure Durable Functions / Durable Task 与 Microsoft Agent
+Framework Durable Workflow Extension 是相邻的 durable orchestration 候选，
+但必须连同 hosting/runtime、storage backend、语言、框架 surface 和运维约束一起评估；
+Apache Airflow 与 LangGraph 不应被写成同一 scope 下的主 process manager 等价方案。
 
 这里的核心抽象不是“谁能跑更多 task”，而是一次 buildout 是否需要承载：
 长期运行、交互式事件、资源实体导向的局部状态、真实世界副作用、局部失败恢复、
 人工/供应商/AI Agent 介入，以及跨节点、机架、网络、固件、OS、集群资源管理和验收的追平。
 在这个抽象下，Temporal 更适合作为主过程管理地基；
-Azure Durable Functions 有足够接近的 durable orchestration 语义，值得进入 POC；
+Azure Durable Functions 与 Microsoft Agent Framework Durable Workflow Extension
+有足够接近的 durable orchestration 语义，值得进入 POC；
 Airflow 的有限 DAG 调度、批处理、审批入口或报表能力，LangGraph 的 stateful
 agent graph、HITL 和 checkpoint 能力，都不能被写成同一 scope 下的等价答案。
-如果长期领域状态、事件解释、局部失败追平和物理副作用补偿都由 Airflow 或
-LangGraph 外部系统负责，那么真正的 process manager 是那个外部系统，
-Airflow 或 LangGraph 只是它调用的执行、展示或 agent adapter。
+如果长期领域状态、事件解释、局部失败追平和物理副作用补偿
+都由这些框架之外的系统负责，
+那么真正的 process manager 是那个外部系统，
+这些框架只是它调用的执行、展示或 agent adapter。
 
 这个决策是条件性技术判断，不是最终采购结论。
 它不覆盖 POC、压测、运维成本、团队熟练度、目标版本许可、UI 成熟度、
-组织已有平台投资或供应商支持。
+组织已有平台投资、框架版本成熟度或供应商支持。
 但在本文 scope 内，组织已有 Airflow 或 Airflow 能运行若干 buildout 子流程，
-或组织已有 LangGraph/agent platform 能处理若干人工与 AI 子流程，
-都不能直接推出它们适合做主 process manager。
+组织已有 LangGraph/agent platform 能处理若干人工与 AI 子流程，
+或组织已有 Microsoft Agent Framework，都不能直接推出它们适合做主 process manager。
 
 ## 范围
 
@@ -56,8 +60,8 @@ Airflow 或 LangGraph 只是它调用的执行、展示或 agent adapter。
 普通 ETL DAG 或单次 CI/CD pipeline。
 Metal3、Ironic、MAAS、Tinkerbell、Foreman、Cobbler、xCAT、Slurm 和 Redfish
 可以成为 buildout 的下层或相邻控制面，但本页只讨论 Temporal、Azure Durable
-Functions、Airflow 和 LangGraph
-是否适合承载上层长期过程管理职责。
+Functions / Durable Task、Microsoft Agent Framework Durable Workflow Extension、
+Airflow 和 LangGraph 是否适合承载上层长期过程管理职责。
 
 ## 理由
 
@@ -80,7 +84,8 @@ Functions、Airflow 和 LangGraph
 
 这引出一个共同边界：external inventory/resource graph/audit store
 是由裸金属领域事实驱动的必备事实层和架构组件，
-不是 Airflow、LangGraph、Temporal 或 Azure Durable Functions 某一方的专属限制。
+不是 Airflow、LangGraph、Temporal、Azure Durable Functions
+或 Microsoft Agent Framework 某一方的专属限制。
 workflow runtime 管理的是过程和执行；
 裸金属工具链管理的是硬件、安装、资源池、作业和生命周期事实。
 选型真正要比较的是：在这个事实层之外，哪个 runtime 能更少扭曲地承载
@@ -182,6 +187,80 @@ control path、领域事件解释、局部失败追平策略、副作用补偿�
 dashboard projection，那么那套系统仍承担本文定义的 process manager
 核心职责，Durable Functions 只承担被调用的 orchestration runtime。
 
+### Microsoft Agent Framework Durable Workflow Extension 的候选定位
+
+Microsoft Agent Framework Durable Workflow Extension 也不能因为名字里有
+Agent Framework 就直接放进 LangGraph 一类的 agent adapter。
+现有文档和源码投影证明，它把 graph-based Agent Framework workflows
+接入 Durable Task-backed execution：
+`ConfigureDurableWorkflows` 会配置 durable graph workflows 并注册
+orchestrations、activities 和 agent entities；
+dispatcher 会把普通 executor 调成 Durable Task activity，
+把 subworkflow 调成 sub-orchestration，
+把 agent executor 走 Durable Entity，
+并把 request port 映射为 external event 等待。
+Durable Extension 文档还声明它支持 Azure Functions 与 self-hosted worker
+两种 hosting model，并可在多个 stateless worker processes/hosts 之间
+checkpoint 和 recover graph workflows。
+这使它拥有真实的 durable orchestration 证据，
+不是只靠普通 in-process graph checkpoint 承载长期过程。
+
+因此，合理定位是：
+Microsoft Agent Framework Durable Workflow Extension 是介于 Azure Durable
+Functions / standalone Durable Task SDKs 与 LangGraph 之间的 POC 候选。
+它比 LangGraph 更直接地继承 Durable Task 的 orchestration、activity、
+entity、sub-orchestration 和 external event 路径；
+也比直接使用 Durable Task 更强调 agent/workflow graph、executor、
+multi-agent 和 HITL 集成。
+如果组织已经把 Microsoft Agent Framework 作为 agent/workflow 编排面，
+并希望 agent、人工交互和 durable orchestration 在同一框架中表达，
+它值得进入 POC。
+
+但本文仍不把它提升为默认优先项，原因不是“它不能持久化”，
+而是它引入了额外的框架 surface 和证据边界：
+
+1. **必须确认讨论的是 Durable Extension-backed graph workflow。**
+   Microsoft Agent Framework 有多个 workflow surface。
+   Durable Extension 文档和源码投影支撑的是 graph-based workflows
+   经 Durable Task infrastructure checkpoint/recover 的路径；
+   不能把 standard checkpoint storage、functional workflow surface
+   或未启用 Durable Extension 的 core workflow 直接等同为同一能力。
+2. **核心过程对象变成 graph workflow / superstep / executor binding。**
+   这不等于缺陷，但会改变建模面。
+   例如一个 graph workflow 可以包含 `DiscoverNodes`、并行 `ProvisionNode`
+   executors 和 `OperatorApproval` agent executor；
+   Durable Extension 可以在 superstep 边界 checkpoint，
+   把 `ProvisionNode` 调成 activities，把子流程调成 sub-orchestrations。
+   这个例子证明它能承载 durable graph execution。
+   但两周后新增 rack、替换节点或 switch port 修复时，
+   方案仍要证明 host/node/rack/fabric 的长期身份如何映射到 orchestration
+   instance、subworkflow、entity 或外部资源图，
+   事件从哪里进入运行中过程，以及局部追平由谁决策。
+3. **checkpoint 不等于任意拓扑迁移。**
+   Microsoft Agent Framework checkpoint 文档说明 checkpoint 捕获 executor state、
+   pending messages、pending requests/responses 和 shared states，
+   可用于恢复、暂停和迁移场景；
+   state 文档同时说明 built workflow 没有 public API 可修改。
+   因此 graph 定义、executor 拆分、边关系和在途 checkpoint 的兼容性
+   仍需要迁移纪律，不能写成自动适配长期资源拓扑演进。
+4. **Durable Task backend 是能力来源，也是运维边界。**
+   Durable Task Scheduler 可以 dispatch orchestrator、activity 和 entity work items，
+   并在 scheduler 中管理 durable state；
+   应用通过 worker/host 与它交互。
+   这让 MAF Durable Extension 比普通 agent graph 更接近主 process manager，
+   但也要求 POC 证明 chosen hosting、worker scaling、network、storage、
+   package/pre-release 状态、监控和恢复体验满足裸金属控制面要求。
+
+所以，对 Microsoft Agent Framework Durable Workflow Extension 的结论应是：
+它不是 Airflow/LangGraph 式外围候选，也不是天然优先于 Temporal 的默认主选。
+如果它自己承载 process-level control path，
+并且 POC 证明 graph workflow、Durable Task orchestration、external events、
+entities/sub-orchestrations 和 external inventory/resource graph
+之间的职责边界清楚，它可以成为 Temporal 之外的强候选；
+如果主过程状态和事件解释实际放在另一个 service 中，
+那另一个 service 才是 process manager，
+Microsoft Agent Framework 只是 agent/HITL/workflow adapter。
+
 ### Airflow 作为主 process manager 的不匹配点
 
 Airflow 不能被简单排除为“不能等人、不能等事件、不能动态展开”。
@@ -268,8 +347,9 @@ graph migrations 与 time travel 支持受约束的 checkpoint replay、fork
 
 公平比较时，不能把所有 runtime 都必须遵守的纪律写成 LangGraph 独有缺陷。
 Temporal 的原生对象也是 Workflow Execution，而不是裸金属资源本身；
-Temporal Event History、Azure Durable Task storage、Airflow metadata DB
-和 LangGraph checkpoint/store 都不应替代 external inventory/resource graph；
+Temporal Event History、Azure Durable Task storage、Microsoft Agent Framework
+Durable Extension checkpoint/backend state、Airflow metadata DB 和 LangGraph
+checkpoint/store 都不应替代 external inventory/resource graph；
 Temporal Activity retry、Durable activity retry 和 LangGraph fault tolerance
 也都不会让真实物理副作用自动幂等、可回滚或可补偿。
 
@@ -359,6 +439,14 @@ orchestration 近邻候选，而不是外围 adapter。
 冷启动/常驻实例、语言 SDK、orchestrator replay discipline、业务 dashboard
 和 external inventory/resource graph 的责任边界。
 
+如果组织要求使用 Microsoft Agent Framework Durable Workflow Extension，
+应先确认它是否承担主过程控制路径。
+若承担，应把它当作 Durable Task-backed graph workflow POC 候选，
+并显式写清 Durable Extension 是否覆盖目标 workflow surface、chosen hosting/backend、
+executor/activity/entity/sub-orchestration/external-event 映射、checkpoint 兼容性、
+agent/HITL 边界和 external inventory/resource graph 的责任边界。
+若不承担，它应被标为 agent/HITL/workflow adapter，而不是主 process manager。
+
 ## 重新审视触发条件
 
 以下条件出现时，应重新评估这个决策：
@@ -370,6 +458,9 @@ orchestration 近邻候选，而不是外围 adapter。
   才是真正 process manager，LangGraph 只承担被调用的 agent/HITL adapter。
 - 组织已经标准化 Azure Functions / Durable Task，并且目标 buildout 网络、hosting plan、
   storage provider、语言 SDK、监控和成本约束不会削弱 process manager 目标。
+- 组织已经标准化 Microsoft Agent Framework Durable Extension / Durable Task，
+  并且目标 workflow surface、hosting/backend、worker scaling、checkpoint 兼容性、
+  package 状态和 agent/HITL 集成约束不会削弱 process manager 目标。
 - 团队没有 Temporal 运维经验，且无法承担 workflow versioning、Activity 幂等和 dashboard
   projection 的建设成本。
 - 目标 buildout 场景被重新定义为短生命周期、批量验证或报表加工，
@@ -380,6 +471,9 @@ orchestration 近邻候选，而不是外围 adapter。
   和 DAG version/reconciliation 纪律稳定承载长期过程控制路径。
 - POC 显示 Azure Durable Functions / Durable Task 在同等外部资源图和副作用纪律下，
   比 Temporal 更适合目标组织的 hosting、运维和生态约束。
+- POC 显示 Microsoft Agent Framework Durable Workflow Extension 在同等外部资源图和副作用纪律下，
+  能用 graph workflow、Durable Task-backed orchestration、activity/entity/sub-orchestration、
+  external event 和 checkpoint/recover 稳定承载长期过程控制路径。
 - POC 显示 LangGraph 方案在同等 external inventory/resource graph 和副作用纪律下，
   能稳定解释长期资源身份、过程分区、领域事件、局部失败追平、过程审计和
   graph/thread migration。
@@ -407,6 +501,16 @@ orchestration 近邻候选，而不是外围 adapter。
 - Azure Durable Functions 方案必须把 Durable Functions 与 standalone Durable Task SDKs
   的 hosting model 选择写清楚；如果部署目标是 AKS、VM 或 on-premises，
   不能用 Azure Functions 触发器和内置 HTTP management APIs 偷换 standalone SDK 的能力。
+- Microsoft Agent Framework Durable Workflow Extension 方案必须证明目标流程实际运行在
+  Durable Extension-backed graph workflow 上，而不是只使用 standard checkpoints
+  或未启用 Durable Extension 的 workflow surface。
+- Microsoft Agent Framework Durable Workflow Extension 方案必须证明 graph workflow
+  能稳定表达长期资源身份、运行中事件入口、局部失败追平、物理副作用边界和过程审计；
+  只证明 executor/agent graph、checkpoint 或 HITL 可运行，只能证明它适合作为
+  agent/HITL/workflow adapter。
+- Microsoft Agent Framework Durable Workflow Extension 方案必须测试 chosen hosting/backend、
+  stateless worker failover、Durable Task activity/entity/sub-orchestration dispatch、
+  external event 等待、checkpoint 恢复和 graph definition/checkpoint 兼容性。
 - 若有人主张 LangGraph 可做主 process manager，POC 必须证明 LangGraph 方案能解释
   长期资源身份、领域事件、局部失败传播、追平条件、物理副作用补偿、过程审计
   和 graph/thread migration；只证明 persistence、interrupt/resume、fault tolerance
@@ -438,6 +542,11 @@ orchestration 近邻候选，而不是外围 adapter。
 | wiki | [Durable Task Storage Providers 文档](../sources/azure-durable-functions/storage-providers-docs.md) | Durable Task runtime state backend 和 storage provider 边界。 |
 | wiki | [Durable Task Hosting Model 文档](../sources/azure-durable-functions/hosting-model-docs.md) | Durable Functions 与 standalone Durable Task SDKs 的 hosting model 差异。 |
 | wiki | [Azure Functions Scale and Hosting 文档](../sources/azure-functions/scale-hosting-docs.md) | Azure Functions hosting plans、scale、资源、网络/容器支持和成本边界。 |
+| wiki | [Microsoft Agent Framework Durable Extension 文档](../sources/microsoft-agent-framework/durable-extension-docs.md) | Durable Task-backed execution、checkpoint/recover、HITL、Azure Functions 与 self-hosted hosting 边界。 |
+| wiki | [Microsoft Agent Framework Durable Workflow Registration 源码](../sources/microsoft-agent-framework/durable-workflow-registration-source.md)、[Microsoft Agent Framework Durable Executor Dispatcher 源码](../sources/microsoft-agent-framework/durable-executor-dispatcher-source.md) | Durable graph workflows 到 orchestrations/activities/entities/sub-orchestrations/external events 的注册与 dispatch 映射。 |
+| wiki | [Microsoft Agent Framework Workflows 概览](../sources/microsoft-agent-framework/workflows-overview-docs.md)、[Microsoft Agent Framework WorkflowBuilder 文档](../sources/microsoft-agent-framework/workflow-builder-docs.md) | Agent Framework workflows、graph workflow、executors、edges 和 superstep execution surface。 |
+| wiki | [Microsoft Agent Framework Workflow Checkpoints 文档](../sources/microsoft-agent-framework/checkpoints-docs.md)、[Microsoft Agent Framework Workflow State 文档](../sources/microsoft-agent-framework/state-docs.md) | Checkpoint 捕获范围、恢复/迁移语境、workflow state 与 built workflow immutability。 |
+| wiki | [Durable Task Scheduler 文档](../sources/microsoft-durable-task/scheduler-docs.md) | Durable Task Scheduler dispatch orchestrator/activity/entity work items 并管理 durable state 的后端边界。 |
 | wiki | [Airflow DAG 文档](../sources/apache-airflow/dags-docs.md) | DAG、task dependencies、DagRun 和控制流基础语义。 |
 | wiki | [Airflow Dag Run 文档](../sources/apache-airflow/dag-run-docs.md)、[Airflow Backfill 文档](../sources/apache-airflow/backfill-docs.md) | DagRun、catchup、backfill、reprocessing behavior 和历史区间 run 创建语义。 |
 | wiki | [Airflow Scheduler 文档](../sources/apache-airflow/scheduler-docs.md) | scheduler、metadata DB、DagRun 和 TaskInstance 推进语义。 |
@@ -462,17 +571,19 @@ orchestration 近邻候选，而不是外围 adapter。
 | 主张 | 证据 | 限制 |
 | --- | --- | --- |
 | 裸金属 Cluster Buildout 是现有 workflow 通用比较页之外的独立决策边界。 | 用户输入；raw 草稿；工作流概念比较。 | raw 草稿不是技术事实证据；本页仍需由一手 source projections 支撑。 |
-| 平台选型应比较长期过程对象、状态真源、外部事件入口、等待模型、副作用边界、局部失败和流程演进，而不是只比较 task 执行能力。 | 工作流概念比较；Temporal、Azure Durable Functions / Durable Task、Airflow 和 LangGraph source pages。 | 这是本 wiki 的综合分析框架，不是厂商官方分类。 |
+| 平台选型应比较长期过程对象、状态真源、外部事件入口、等待模型、副作用边界、局部失败和流程演进，而不是只比较 task 执行能力。 | 工作流概念比较；Temporal、Azure Durable Functions / Durable Task、Microsoft Agent Framework Durable Extension、Airflow 和 LangGraph source pages。 | 这是本 wiki 的综合分析框架，不是厂商官方分类。 |
 | 新建主 buildout process manager 时，在前述领域事实层之外，Temporal 的 durable Workflow Execution、message passing、Timer、Activity 和 Child Workflow 更贴近长期交互式资源过程管理。 | Temporal Workflows、Activities、Message Passing、Timers、Child Workflows source pages。 | Temporal 不保存全部领域事实，也不自动处理物理副作用幂等、补偿和业务 dashboard。 |
 | Temporal Reset、Continue-As-New 和 Worker Versioning 不能被写成物理回滚、任意计划迁移或自动升级。 | Temporal Reset、Continue-As-New、Worker Versioning source pages。 | 这些机制仍可作为受约束的恢复、历史截断和版本路由工具。 |
 | Azure Durable Functions / Durable Task 具备 durable orchestration、activity、timer、external event、entity、event sourcing、checkpoint/replay 和 instance identity 等与主 process manager 相邻的能力，因此应作为 Temporal 之外的 POC 候选，而不是按 Airflow/LangGraph 的外围角色直接排除。 | Azure Durable Functions Overview、Durable Task Orchestrations、Timers、External Events、Entities source pages。 | Durable Functions 的适配性仍取决于 hosting model、storage backend、语言 SDK、网络、监控和组织 Azure 生态约束。 |
 | Azure Durable Functions 不能脱离 Azure Functions hosting/runtime 与 storage provider 边界评价；在 AKS、VM 或 on-premises 等目标平台上，standalone Durable Task SDKs 可能才是对应 hosting model。 | Durable Task Hosting Model、Azure Functions Scale and Hosting、Durable Task Storage Providers source pages。 | 本页没有实测不同 hosting plan、storage provider 或网络环境下的性能和运维成本。 |
 | Durable orchestrator deterministic replay 要求真实设备 I/O、API 调用、文件/DB 操作等非确定性行为放在 activity 或外部边界，并由业务层处理幂等、读回、锁和补偿。 | Durable Task Code Constraints source page。 | Code Constraints source 支撑 replay 和非确定性边界；幂等、读回、锁和补偿是裸金属 buildout 场景下的架构要求。 |
 | Durable Task storage provider 和 durable entities 支撑 runtime state 与小块协调状态，但不能替代 external inventory/resource graph/audit store。 | Durable Task Storage Providers、Durable Task Entities source pages；裸金属工具链 source pages。 | 这是结合裸金属 buildout 场景作出的架构判断；具体数据模型需另行设计。 |
+| Microsoft Agent Framework Durable Workflow Extension 具备 Durable Task-backed graph workflow、checkpoint/recover、activity/entity/sub-orchestration/external event dispatch 和多 host/stateless worker 恢复证据，因此应作为 Durable Task 相邻的 POC 候选，而不是按普通 agent graph 或 Airflow/LangGraph 外围角色直接排除。 | Microsoft Agent Framework Durable Extension、Durable Workflow Registration、Durable Executor Dispatcher、Durable Task Scheduler source pages。 | 这些证据支撑的是 Durable Extension-backed graph workflow；不能自动外推到 standard checkpoints、functional workflow surface 或未启用 Durable Extension 的 core workflow。 |
+| Microsoft Agent Framework Durable Workflow Extension 作为主 process manager 时必须证明 graph workflow/superstep/executor binding 能稳定承载资源身份、运行中事件、局部追平、过程审计和迁移纪律；checkpoint、workflow state 与 built workflow immutability 不能被写成任意 topology migration。 | Microsoft Agent Framework Workflows Overview、WorkflowBuilder、Workflow Checkpoints、Workflow State source pages；Temporal Child Workflows、Message Passing、Continue-As-New、Worker Versioning source pages。 | MAF 仍可能是强 POC 候选；本页限制的是把 agent/workflow graph surface 未经证明地等同于裸金属长期资源过程模型。 |
 | Airflow 的 Dynamic Task Mapping、Deferrable Operators、Event-Driven Scheduling、HITL、TaskInstance 状态、DagRun/catchup/backfill、DAG processing/serialization、bundle versioning 和 `DagRun.verify_integrity` 能证明它有等待、触发、人工输入、fan-out、历史区间重处理、部署版本和受控 DagRun reconciliation 能力；但这些机制围绕 DAG/DagRun/TaskInstance/schedule/data interval，作为裸金属主 process manager 时比 Temporal Workflow/Child Workflow/Signals/Updates/Run 边界更容易把长期资源过程压扁成调度图重处理问题。 | Airflow DAG、Dag Run、Backfill、Scheduler、Dynamic Task Mapping、Deferrable Operators、Event-Driven Scheduling、HITL、Task States、DAG File Processing、DAG Serialization、DAG Bundles、DagRun verify_integrity source pages；Temporal Child Workflows、Message Passing、Reset、Continue-As-New、Worker Versioning source pages。 | Temporal 也需要迁移、副作用和外部事实层纪律；本页判断的是在现有限制下哪个 runtime 的过程建模面更自然。 |
 | Airflow 的核心状态对象是 DagRun/TaskInstance/mapped task/deferred task 等 scheduler/task execution 状态，不应直接替代裸金属资源事实。 | Airflow DAG、Scheduler、Task States、Deferrable Operators source pages。 | Airflow 可以通过 task 读写外部领域状态；本页反对的是把 Airflow metadata DB 当领域真源。 |
 | LangGraph 的 persistence、interrupt/resume、fault tolerance、Agent Server、graph migrations 和 time travel 证明它能运行长期 stateful agent graph/thread；但若要作为裸金属 buildout 主 process manager，还必须额外证明资源身份映射、过程分区、领域事件解释、局部失败追平、过程审计和迁移纪律。 | LangGraph Overview、Persistence、Interrupts、Fault Tolerance、Agent Server、Graph Migrations、Time Travel source pages；Temporal Workflows、Message Passing、Child Workflows source pages。 | 不能仅以“主对象不是裸金属资源”否定 LangGraph，因为 Temporal 的原生对象也不是裸金属资源；差异在现有证据支撑的过程建模面是否足够直接。 |
 | LangGraph checkpoint/store、interrupt/resume、fault tolerance、time travel/fork 和 queue worker 不应被写成资源事实库、完整业务事件模型、物理回滚、副作用治理或资源级过程调度模型；这些是所有 runtime 都需遵守的共性边界纪律，LangGraph 的现有证据只支撑 graph/thread/run 层能力。 | LangGraph Persistence、Interrupts、Fault Tolerance、Time Travel、Agent Server source pages；Temporal Reset、Activities source pages；Durable Task Storage Providers、Code Constraints source pages。 | LangGraph 仍可作为 AI diagnosis、operator copilot、HITL decision support 或 agent automation layer；若方案额外实现主过程控制路径和领域状态层，应按新的 POC 证据重评。 |
-| external inventory/resource graph/audit store 是由裸金属领域事实驱动的必备事实层和架构组件，不是任何单个候选的专属限制；Temporal、Azure Durable Functions、Airflow 或 LangGraph 更适合保存过程执行、runtime 或 agent graph 语义。 | Temporal、Azure Durable Functions、Airflow、LangGraph source pages；裸金属工具链 source pages。 | 具体数据模型、锁协议和审计 schema 需另行设计；使用外部事实层本身不能证明某个候选不适合作为主 process manager。 |
+| external inventory/resource graph/audit store 是由裸金属领域事实驱动的必备事实层和架构组件，不是任何单个候选的专属限制；Temporal、Azure Durable Functions、Microsoft Agent Framework Durable Extension、Airflow 或 LangGraph 更适合保存过程执行、runtime 或 agent/workflow graph 语义。 | Temporal、Azure Durable Functions、Microsoft Agent Framework、Airflow、LangGraph source pages；裸金属工具链 source pages。 | 具体数据模型、锁协议和审计 schema 需另行设计；使用外部事实层本身不能证明某个候选不适合作为主 process manager。 |
 | Redfish、MAAS、Ironic、Tinkerbell、Foreman、Cobbler、xCAT、Metal3 和 Slurm 不是无状态命令集合，而是协议、控制面、资源模型或调度系统，应被上层 process manager 协调和观察。 | DMTF Redfish、MAAS、Ironic、Tinkerbell、Foreman、Cobbler、xCAT、Metal3、Slurm source pages。 | 这些工具覆盖面、成熟度、项目状态和适用性不同；本页只用它们支撑“下层领域控制面”边界。 |
 | 本页判断仍需要 POC、运维和组织约束验证后才能变成采购或工程基线。 | 用户输入；raw 草稿边界；各 source pages 的限制。 | 当前没有实测数据、规模参数、团队经验、成本模型或 UI/运维成熟度评估。 |
