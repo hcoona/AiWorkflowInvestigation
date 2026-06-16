@@ -94,6 +94,8 @@ def read_text(path: Path, errors: list[str]) -> str:
 def durable_wiki_pages() -> list[Path]:
     pages: list[Path] = []
     for path in sorted((ROOT / "wiki").rglob("*.md")):
+        if path.name == "AGENTS.md":
+            continue
         parts = path.relative_to(ROOT / "wiki").parts
         if parts[0].startswith("_"):
             continue
