@@ -4,7 +4,7 @@ page_type: source
 title: "Microsoft Agent Framework Durable Extension 文档"
 status: active
 created: 2026-06-12
-updated: 2026-06-12
+updated: 2026-06-16
 summary: "Microsoft Agent Framework Durable Extension 文档的单来源投影。"
 maintenance:
   edit_policy: update
@@ -32,6 +32,8 @@ orchestrations 与 workflows。
 - 它是 hosting/integration layer，不是替代所有 workflow surface 的核心 API。
 - Durable Extension 支持 Azure Functions 与 bring-your-own-compute/self-hosted
   两种 hosting model。
+- Bring-your-own-compute/self-hosted 模型中，host process 会启动 Durable Task
+  worker，并连接 Durable Task Scheduler backend。
 - Durable Extension 文档声明它可跨 multiple stateless worker processes/hosts
   scale， 并可 checkpoint graph-based Agent Framework workflows。
 - durable Agent Framework workflows 不同于 standard workflow checkpoint
@@ -45,6 +47,8 @@ orchestrations 与 workflows。
 - Durable Extension 的宿主和包状态需要随具体部署目标复核。
 - 安装示例中的 `--pre` / `--prerelease` 是包分发状态信号；
   不能单独推导整个 Agent Framework 或全部 workflow API 的 GA 状态。
+- Self-hosted 表示自管 worker process、service、container 或 Kubernetes
+  环境，不表示自带生产级 durable backend。
 - 本页说明官方文档宣称的 hosting 与 durability 边界；
   executor 到 activity/entity/sub-orchestration 的细粒度映射由独立源码投影支撑。
 - 本页不证明 functional workflow surface 自动使用同一 Durable Extension
@@ -56,7 +60,7 @@ orchestrations 与 workflows。
 
 | 类型 | 引用 | 说明 |
 | --- | --- | --- |
-| external | `https://learn.microsoft.com/en-us/agent-framework/integrations/durable-extension` | Microsoft Agent Framework Durable Extension 文档；访问时间 2026-06-12。 |
+| external | `https://learn.microsoft.com/en-us/agent-framework/integrations/durable-extension` | Microsoft Agent Framework Durable Extension 文档；访问时间 2026-06-16。 |
 
 ### 支撑的主张
 
@@ -66,3 +70,4 @@ orchestrations 与 workflows。
 | 跨进程恢复语义需要明确是否使用 Durable Extension。 | 上方证据单元。 | 具体后端和宿主会影响可用性与稳定性。 |
 | Durable Extension 支持 Azure Functions 与 self-hosted worker 两种 hosting model，并声明可跨 multiple stateless worker processes/hosts scale。 | 上方证据单元。 | 细粒度 executor 映射需要结合源码投影，而不能仅从文档标题推断。 |
 | Durable Agent Framework graph-based workflows 与 standard workflow checkpoint storage 不同，前者在 Durable Task infrastructure 上 checkpoint/recover。 | 上方证据单元。 | 不能外推为未启用 Durable Extension 的 core workflow surface 或 functional workflow surface。 |
+| MAF self-hosted Durable Extension worker 仍连接 Durable Task Scheduler backend。 | 上方证据单元。 | 这支持自管 worker，不支持把 MAF Durable Extension 写成完全自带后端。 |

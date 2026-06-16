@@ -34,6 +34,8 @@ durable timers 和 error handling 的语义。
   维护 orchestration state，并在 `await` / `yield` 等位置 checkpoint 进度。
 - 当有响应消息或 timer 到期时，orchestrator 会从头 re-execute，
   并通过 execution history replay 已完成 activity 的结果。
+- Durable orchestrations 支持 sub-orchestrations，用于把工作拆分到子
+  orchestration instance 中。
 - Orchestrator function code 必须 deterministic。
 
 ## 限制与冲突
@@ -58,3 +60,4 @@ durable timers 和 error handling 的语义。
 | Durable orchestration 可表达可靠、长期、代码定义的 orchestration instance。 | 上方证据单元。 | 不等于自动适配所有裸金属 buildout 运维约束。 |
 | Durable Task 通过 event sourcing、execution history 和 replay 恢复 orchestrator local state。 | 上方证据单元。 | 本来源不覆盖真实外部副作用的幂等或补偿设计。 |
 | Durable orchestration instance ID 可映射外部应用实体。 | 上方证据单元。 | 这只支撑实例身份；本来源不覆盖外部应用实体的数据模型。 |
+| Durable orchestrations 支持 sub-orchestrations，可作为资源过程分区的候选建模锚点。 | 上方证据单元。 | 本页没有单独展开 sub-orchestration ID、版本、监控和局部追平策略。 |
