@@ -27,6 +27,8 @@ scale-out 粒度或资源利用效率问题？
 不评价 MAF workflow 表达力、 Azure Durable Functions 可靠性、Temporal
 采购建议、云平台成本，或具体 benchmark。
 
+**常见误解澄清**：本文不是说"Durable Functions 的 activity 必须在启动 orchestration 的同一 host 上执行"。Durable Task Scheduler 支持跨 Function App dispatch work items（orchestrations、activities、entities）到 any connected worker。问题不是 dispatch 能力，而是 orchestration 代码无法主动选择 activity 的目标资源池，只能依靠 Function App 级别的被动过滤。
+
 ## 答案
 
 **方向性判断是：在多 graph、异构 workload、冷热不均或不同 SLA/依赖的场景下， MAF
@@ -64,7 +66,7 @@ Activity Task 的 server-side throttling。
 | --- | --- | --- | --- |
 | 作者/建模层 | MAF graph workflow、executor、agent、subworkflow。 | Workflow Definition、Activity Definition、Child Workflow。 | 这层决定业务结构，但不直接决定资源池。 |
 | runtime work item 层 | Durable Task orchestration、activity、entity、sub-orchestration、external event。 | Workflow Task、Activity Task、Child Workflow Execution。 | 这层决定可调度、可持久化和可恢复的单位。 |
-| dispatch/resource-pool 层 | Durable Task Scheduler dispatches work items 到 connected apps；Azure Functions host 承载 generated function metadata。 | Task Queue 被 Worker Entities/Processes 轮询，支持 load balancing、routing 和 throttling。 | 这是 MAF Functions 与 Temporal 最关键的差异轴。 |
+| dispatch/resource-pool 层 | Durable Task Scheduler dispatches work items 到 connected apps；**DTS 支持跨 Function App dispatch**，但 orchestration 代码**无法主动选择** activity 的目标资源池；WorkItemFilters 是按 function name 的**被动过滤**（worker 声明能处理什么），不是 workflow 级别的**主动路由**（orchestration 选择发往哪里）。 | Task Queue 被 Worker Entities/Processes 轮询；**每个 activity 可独立指定 taskQueue**，同一 workflow 的不同 activity 可去不同 Task Queues；支持 load balancing、routing 和 throttling。 | DTS 的 scale-out 粒度是 **Function App 级别**（多个 orchestration/activity 共享 host pool），Temporal 是 **Activity 级别**（orchestration 主动分流到不同 task queues/worker fleets）。 |
 | deployment/host 层 | Function App 是 deployment/config/package/identity 边界，可包含多个 durable workflows；实际 scale 粒度依赖 hosting plan 与 trigger/scale group。 | Worker Processes 在 Temporal Service 外部运行，可按 Task Queue/workload 组成 worker fleet。 | host 与 scale group 越粗，多 graph 异构负载下越容易资源浪费。 |
 
 这张表只比较抽象机制，不代表某个具体部署一定慢或一定贵。
@@ -162,14 +164,15 @@ recovery 和 MAF graph 建模之间的集成便利。
 | wiki | [Azure Functions Scale and Hosting 文档](../sources/azure-functions/scale-hosting-docs.md) | Azure Functions hosting option 会影响 function app 的 scale、资源、网络/容器支持和成本；实际 scale 粒度依赖 hosting plan 与 trigger/scale group。 |
 | wiki | [Durable Task Hosting Model 文档](../sources/azure-durable-functions/hosting-model-docs.md) | Durable Functions 与 standalone Durable Task SDKs 共享核心 durable execution capabilities，但 hosting/scaling/deployment 不同。 |
 | wiki | [Durable Task Scheduler 文档](../sources/microsoft-durable-task/scheduler-docs.md) | Scheduler dispatches orchestrator/activity/entity work items，connected apps 可并行处理 work items，并与 scheduler 独立伸缩。 |
+| raw | [Durable Functions WorkItemFilters Sample](../../raw/git/github.com/Azure/azure-functions-durable-extension/samples/workitem-filters/README.md) | DTS 支持跨 Function App dispatch work items（orchestrations、activities、entities）到 any connected worker；WorkItemFilters 让每个 app 声明能处理什么 function names，DTS 只 dispatch 匹配的 work items；这是**被动过滤**（worker 声明能处理什么），不是**主动路由**（orchestration 选择发往哪里）。 |
 | wiki | [Microsoft Agent Framework Durable Workflow Registration 源码](../sources/microsoft-agent-framework/durable-workflow-registration-source.md) | MAF Durable Extension 支持 additive 多 workflow 配置，注册 graph workflows、activities、agents 和 subworkflows。 |
 | wiki | [Microsoft Agent Framework Azure Functions Durable Workflow Metadata Transformer 源码](../sources/microsoft-agent-framework/azure-functions-durable-workflows-metadata-transformer-source.md) | Azure Functions hosting 路径遍历 configured durable workflows 并生成 per-workflow / per-executor metadata。 |
 | wiki | [Microsoft Agent Framework Durable Executor Dispatcher 源码](../sources/microsoft-agent-framework/durable-executor-dispatcher-source.md) | ordinary executor、agent、subworkflow、request port 到 activity/entity/sub-orchestration/external event 的运行时映射。 |
 | wiki | [Temporal Task Queues 文档](../sources/temporal/task-queues-docs.md) | Temporal Task Queue 的轻量、按需、load balancing、routing、throttling、worker polling 和 partitions 语义。 |
 | wiki | [Temporal Workers 文档](../sources/temporal/workers-docs.md) | Temporal Worker Entity/Process 与 Task Queue、Temporal Service 和外部 worker fleet 的关系。 |
 | wiki | [Temporal Child Workflows 文档](../sources/temporal/child-workflows-docs.md) | Child Workflow 是独立 Workflow Execution，有自己的 Event History，可用于大问题或资源实体拆分。 |
-| wiki | [Temporal Activities 文档](../sources/temporal/activities-docs.md) | Temporal Activity 是单一外部工作单元，适合承载副作用和可重试工作。 |
-| user | 用户在 2026-06-16 追问：“MAF Durable Function Apps 这种做法会比 Temporal 在 scale out 方面更早遇到瓶颈？比如说图多起来之后。或者说资源利用效率更低”。 | 确定本页问题边界和判断需求；不是第三方技术事实证据。 |
+| wiki | [Temporal Activities 文档](../sources/temporal/activities-docs.md) | Temporal Activity 是单一外部工作单元，适合承载副作用和可重试工作；**每个 activity 调用可独立指定 taskQueue**，同一 workflow 的不同 activity 可去不同 Task Queues。 |
+| user | 用户在 2026-06-16 追问："MAF Durable Function Apps 这种做法会比 Temporal 在 scale out 方面更早遇到瓶颈？比如说图多起来之后。或者说资源利用效率更低"。 | 确定本页问题边界和判断需求；不是第三方技术事实证据。 |
 
 ### 支撑的主张
 
