@@ -263,6 +263,30 @@ Temporal 的 Task Queue / Worker Process 模型则把 dispatch/resource-pool bou
 Extension 时，作者层是 MAF workflow，orchestration 是 extension
 生成和维护的运行时映射。
 
+### Direct Durable primitives 与 MAF surface
+
+这里的 Direct Durable primitives 不是“不用 MAF”的同义词，而是 Durable Functions /
+Durable Task 直接暴露的 durable runtime / control surface：
+orchestrator 中的 activity、sub-orchestration、durable timer、external event、
+entity call / signal / lock、`ContinueAsNew`、custom status、replay-safe time / GUID，
+以及 client 侧的 start、raise event、terminate、suspend、resume、query、purge、
+restart 等 instance management API。
+
+MAF Durable Extension 不会删除这些底层 runtime 能力。它把普通 executor 映射为
+Durable Task activity，把 RequestPort 映射为 custom status + external event，
+把 agent executor 映射到 Durable Entity-backed agent session，把 subworkflow 映射成
+sub-orchestration；durable agent context 还可以 schedule orchestration、query
+status 和 raise event。因此，“MAF graph workflow 承担主流程”不等于不能在同一方案中
+组合 direct durable primitives。
+
+边界在于：MAF graph authoring surface 不是 direct Durable primitives 的 strict
+superset。普通 executor 运行时拿到的是 MAF `IWorkflowContext`，不是任意
+`TaskOrchestrationContext`；更宽的 instance management、entity lock、`ContinueAsNew`
+或复杂 timeout / retry 需要通过 MAF 映射、durable agent/tool context、
+服务层 `DurableTaskClient`、自写 Durable orchestrator 或 hybrid composition 进入。
+因此应区分“direct Durable Task surface”、“MAF Durable graph surface” 和
+“MAF + direct Durable Task hybrid solution”。
+
 ## 术语映射
 
 | MAF / Azure 词 | 所属层 | 在本文中的含义 |
@@ -330,10 +354,12 @@ Scheduler 可以让它们重放、 恢复和派发 work item，但不替业务�
 | wiki | [Azure Functions Scale and Hosting 文档](../sources/azure-functions/scale-hosting-docs.md) | Azure Functions function app 的 hosting option、scale、资源和网络/容器支持边界；实际 scale 粒度依赖 plan 与 trigger/scale group。 |
 | wiki | [Durable Task SDKs Overview 文档](../sources/microsoft-durable-task/sdk-overview-docs.md) | Standalone Durable Task SDKs 可在 Azure Functions 之外运行 worker，但仍连接 Durable Task Scheduler managed backend。 |
 | wiki | [Durable Task Scheduler 文档](../sources/microsoft-durable-task/scheduler-docs.md) | Scheduler 作为 backend dispatch orchestrator/activity/entity work items，管理 durable state，并通过 gRPC 连接 apps。 |
+| raw | `raw/git/github.com/Azure/azure-functions-durable-extension/src/WebJobs.Extensions.DurableTask/ContextInterfaces/IDurableOrchestrationContext.cs:87-114,116-169,331-430,432-558`、`raw/git/github.com/Azure/azure-functions-durable-extension/src/WebJobs.Extensions.DurableTask/ContextInterfaces/IDurableOrchestrationClient.cs:117-338` | Azure Durable Functions direct orchestration/client primitives，包括 Continue-As-New、custom status、Durable HTTP、entity、sub-orchestration、timer、external event、entity lock、activity/retry、start/raise/manage/query/purge/restart。 |
 | wiki | [Microsoft Agent Framework Durable Extension 文档](../sources/microsoft-agent-framework/durable-extension-docs.md) | MAF Durable Extension 的 Durable Task-backed execution、Azure Functions/self-hosted hosting、checkpoint/recover、HITL 和 Scheduler backend 边界。 |
 | wiki | [Microsoft Agent Framework Durable Workflow Registration 源码](../sources/microsoft-agent-framework/durable-workflow-registration-source.md) | Durable Extension 将 graph workflows 注册为 orchestrations，将普通 executors 注册为 activities，并为 agent/subworkflow/request-port binding 使用专门 dispatch 路径。 |
 | wiki | [Microsoft Agent Framework Azure Functions Durable Workflow Metadata Transformer 源码](../sources/microsoft-agent-framework/azure-functions-durable-workflows-metadata-transformer-source.md) | MAF Azure Functions hosting 中为每个 configured durable workflow 生成 orchestration/HTTP trigger metadata，并为 executor 生成 activity/entity trigger metadata。 |
 | wiki | [Microsoft Agent Framework Durable Executor Dispatcher 源码](../sources/microsoft-agent-framework/durable-executor-dispatcher-source.md) | MAF executor 到 activity/entity/sub-orchestration/external-event 的细粒度映射。 |
+| raw | `raw/git/github.com/microsoft/agent-framework/dotnet/src/Microsoft.Agents.AI.DurableTask/ServiceCollectionExtensions.cs:32-90,92-145,230-273`、`raw/git/github.com/microsoft/agent-framework/dotnet/src/Microsoft.Agents.AI.DurableTask/Workflows/DurableExecutorDispatcher.cs:51-88,104-125,139-157,172-185`、`raw/git/github.com/microsoft/agent-framework/dotnet/src/Microsoft.Agents.AI.DurableTask/DurableAgentContext.cs:21-49,80-122`、`raw/git/github.com/microsoft/agent-framework/dotnet/src/Microsoft.Agents.AI.DurableTask/Workflows/DurableActivityExecutor.cs:28-56`、`raw/git/github.com/microsoft/agent-framework/dotnet/src/Microsoft.Agents.AI.DurableTask/Workflows/DurableWorkflowContext.cs:19-99` | MAF Durable Extension 的 additive configuration、graph executor 到 Durable Task primitives 的映射、durable agent context 对 schedule/status/raise event 的暴露，以及普通 executor 通过 `IWorkflowContext` 运行的边界。 |
 | wiki | [MAF Durable Function Apps 与 Temporal 的 Scale-out 边界](maf-durable-functions-vs-temporal-scale-out.md) | 多 graph、异构 workload 下 Function App hosting topology 与 Temporal Task Queue/Worker Process 模型的 scale-out 边界分析。 |
 | user | 用户在 2026-06-16 的连续提问：MAF Durable Extension 是否依赖 Azure Durable Functions、Durable Task Scheduler 是否只是 backend、workflow 本体到底是谁，继续追问 MAF Graph 与 Function App 的部署对应关系、Durable Task activity 是否是 Azure Functions 概念，以及 graph 多起来后 MAF Durable Function Apps 是否比 Temporal 更早遇到 scale-out 或资源利用效率瓶颈；随后指出 “MAF Azure Functions hosting 的开源实现已经能排除‘一图一 Function App’的必然关系” 一节仍未更新 replica/partition 表述。 | 确定本页问题边界和读者困惑；不是第三方产品事实证据。 |
 
@@ -343,6 +369,7 @@ Scheduler 可以让它们重放、 恢复和派发 work item，但不替业务�
 | --- | --- | --- |
 | 直接使用 Azure Durable Functions 时，作者面对的 workflow 语义主体是 orchestrator function。 | Azure Durable Functions Overview；Durable Task Orchestrations。 | 不覆盖所有语言 SDK 的语法细节；本页只讨论抽象层级。 |
 | 使用 MAF Durable Extension 时，作者和业务语义层的 workflow 语义主体是 MAF graph workflow，底层 Durable Task orchestration 是运行时映射。 | MAF Durable Extension 文档；Durable Workflow Registration 源码；Durable Executor Dispatcher 源码。 | 当前源码证据是 .NET 实现；functional workflow surface 和未来版本需另行取证。 |
+| Direct Durable primitives 是 Durable Functions / Durable Task 的直接 orchestrator/client/entity surface；MAF Durable Extension 可以组合这些底层能力，但 MAF graph surface 不是 direct primitives 的 strict superset。 | Azure Durable Functions direct context/client raw 源码；MAF ServiceCollectionExtensions、DurableExecutorDispatcher、DurableAgentContext、DurableActivityExecutor、DurableWorkflowContext raw 源码。 | 这是源码层边界判断；具体方案可以通过 custom orchestrator、service layer 或 durable agent/tool context 组合能力，但组合方案不等于普通 MAF graph node 自动拥有全部 direct API。 |
 | Durable Task Scheduler 不是 orchestrator 作者或业务流程解释器，而是 managed backend，负责 durable state 管理和 work item dispatch；history/message 持久化属于 Durable Task storage provider 边界。 | Durable Task Scheduler 文档；Durable Task Storage Providers；Durable Task SDKs Overview。 | Scheduler dashboard 可观察和管理 runtime instances，但不替代业务 dashboard 或领域事实库。 |
 | MAF Durable Extension 可使用 Azure Functions hosting，也可使用 self-hosted/BYOC worker；因此不能简单写成“就是 Azure Durable Functions”。 | MAF Durable Extension 文档；Durable Task Hosting Model；Durable Task SDKs Overview。 | self-hosted/BYOC 指 worker compute 自管；当前证据仍显示连接 Durable Task Scheduler managed backend，不等于完全离线或完全自带后端。 |
 | Azure Durable Functions 与 MAF Durable Extension 的关系应按 authoring/modeling、adapter/mapping、durable runtime、compute host、durable backend/storage 五层理解。 | 上方所有证据单元综合。 | 这是分析归纳，不是官方术语；用于避免把 hosting surface、workflow source 和 backend scheduler 混成同一层。 |
