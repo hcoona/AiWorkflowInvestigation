@@ -1,0 +1,17 @@
+{
+  "name": "durablejs",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "start": "func start",
+    "test": "echo \"No tests yet...\""
+  },
+  "dependencies": {
+    "durable-functions": "^3.1.0",
+    "p-limit": "^3.1.0"
+  },
+  "devDependencies": {},
+  "overrides": {
+    "validator": "13.15.22"
+  }
+}
