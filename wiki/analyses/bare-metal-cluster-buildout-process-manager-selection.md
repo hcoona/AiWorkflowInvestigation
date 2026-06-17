@@ -29,7 +29,11 @@ tags:
 
 **Azure Durable Functions（direct）** 在 orchestration instance、sub-orchestration、
 activity、external event、entity、history/replay 和 versioning 等 durable
-orchestration 基本面上与 Temporal 接近，**作为与 Temporal 同批的强候选对照。**
+orchestration 基本面上与 Temporal 接近，但缺少 Temporal `taskQueue` 那样的 activity
+级主动资源池路由能力。对裸金属 buildout 这种网络、凭据和依赖会按 node/rack/fabric
+动态分化的场景，Azure Durable Functions 应从"与 Temporal 同批强候选"降为
+**次级但仍强的有条件 POC 候选**：只有资源池拓扑可静态规划，或团队接受用多 Function
+App / WorkItemFilters / standalone workers 承担额外部署设计时，才进入主 baseline 对照。
 
 **Microsoft Agent Framework Durable Workflow Extension** 不应因"多一层 graph mapping"
 被默认降级。源码显示它是把 Agent Framework graph、executor、agent 和 RequestPort
@@ -54,7 +58,7 @@ adapter 或相邻 POC。**若长期领域状态、事件解释、局部追平和
 | 候选 | 建模定位 |
 | --- | --- |
 | Temporal | 核心资源过程建模的主 baseline；Workflow Execution、Child Workflow、Signal/Update、Event History、Continue-As-New 与场景同构度最高。 |
-| Azure Durable Functions（direct） | 与 Temporal 同批的 durable orchestration 强候选；orchestration instance、sub-orchestration、activity、external event、entity 与场景接近。 |
+| Azure Durable Functions（direct） | 次级但仍强的有条件 durable orchestration POC 候选；orchestration instance、sub-orchestration、activity、external event、entity 与场景接近，但 activity 级主动资源池路由弱于 Temporal。 |
 | Microsoft Agent Framework Durable Extension | Azure/Durable Task 路线内的 agent/graph/HITL 强 POC 或 hybrid 候选；只有当 graph/hybrid 亲自持有资源过程身份、事件解释、局部追平、补偿决策、副作用边界和审计事实线时，才进入主 process manager baseline。 |
 | Apache Airflow | 外围 DAG 调度、审批或相邻 POC；DAG/DagRun/TaskInstance 建模与长期资源过程同构度较低。 |
 | LangGraph | agent/HITL adapter 或相邻 POC；graph/thread/checkpoint 建模与长期资源过程控制路径同构度较低。 |
@@ -154,6 +158,7 @@ Temporal、Azure Durable Functions / Durable Task 与 MAF Durable Workflow Exten
 | --- | --- | --- | --- | --- |
 | 长期过程身份 / 分区 | Workflow Execution、Child Workflow；Child Workflow 可按 host/resource 使用 Workflow ID 并隔离 Event History。 | Orchestration instance ID 可映射外部实体；sub-orchestration 是 SDK feature；instance ID 可指定但 random ID 更利于负载分布。 | graph workflow 注册为 Durable Task orchestration；subworkflow 映射 sub-orchestration；resource identity 需穿过 graph/executor/Durable Task 映射或 hybrid 边界。 | Temporal 证据更直接；Azure 不弱但需验证 resource-derived ID 热点和 sub-orchestration 追平；MAF 不丢失 Durable Task 身份原语，但资源身份绑定需要 POC。 |
 | command/event entry | Signals 是异步消息；Updates 可验证、可追踪并返回结果，但仍不是完整 command gateway。 | external events 是 one-way async；instance management APIs 可 start/query/terminate/suspend/resume/purge，但同步 command result 需外层服务设计。 | request port 映射 external event；HITL 和 agent workflow 更一体，但 auth、timeout、dead-letter、审计仍需应用层。 | 若 buildout 命令需要同步校验和返回，Temporal 现有证据较强；Azure/MAF 不是不可行，而是 command service 边界更关键。 |
+| activity 资源池路由 | 每个 Activity / Child Workflow 可设置或继承 Task Queue；workflow 代码可按 activity 类型、资源、SLA、网络或凭据选择不同 worker fleet。 | DTS 可跨 Function App dispatch work items，WorkItemFilters 让 app 声明能处理的 function names；orchestration 不能按本次 activity 输入主动选择目标 Function App 或资源池。 | graph executor 最终仍落到 Durable Task work item 与 hosting topology；如果用 Azure Functions hosting，resource-pool routing 继承同类限制。 | 对网络/凭据/依赖异构的 buildout，Temporal 是运行时动态路由面；Azure/DTS 更像静态部署拓扑 + 被动过滤，应因此降级为有条件 POC，而不是同批主 baseline。 |
 | 长等待 / timers | Timer 是 Workflow Execution 内持久等待。 | Durable timers 支持等待；JS/Python/PowerShell Durable Functions 有六天限制，.NET/Java 支持任意长 timer；Durable Task SDK 语言状态需复核。 | 继承 Durable Task-backed 等待路径，但 graph/request port 的长期等待、timeout 和恢复仍需 PoC。 | 目标语言会改变排序；不能泛化为 Azure 不支持多周等待。 |
 | 版本、恢复、迁移 | Reset、Continue-As-New、Worker Versioning 边界较完整，但不是物理回滚或任意迁移。 | Orchestration versioning 是内建机制；instance 创建时绑定 version，worker/client 可做 version matching 和条件分支。 | checkpoint/recover 支撑 graph workflow；checkpoint 不承诺任意 topology migration；durable graph versioning 仍需目标版本实测。 | Azure versioning gap 已缩小；MAF 的 graph/executor/checkpoint 兼容性是不确定性核心。 |
 | hosting/backend | 需要验证 Temporal server/backend、worker placement、history growth 和运维成本。 | Durable Functions 与 standalone SDKs 共享核心能力；standalone workers 可在 Kubernetes/VM 等 compute 上运行，但 SDK 连接 Durable Task Scheduler managed backend。**注意**：Azure Functions hosting 在多 graph、异构 workload 场景下，Function App 粒度会影响资源池划分和依赖隔离（见 [MAF Durable Function Apps 与 Temporal 的 Scale-out 边界](maf-durable-functions-vs-temporal-scale-out.md)）；standalone Durable Task workers 可改善该问题。 | 支持 Azure Functions 与 BYOC/self-host worker；self-host worker 仍连接 Durable Task Scheduler backend；文档安装使用 `--pre` / `--prerelease`。 | 如果必须完全自托管或 air-gapped，Azure/MAF 的 Scheduler 依赖是关键风险；如果接受 Azure-connected backend，Azure/MAF 竞争力上升。**Hosting 选择影响 scale-out 粒度**：Azure Functions hosting 在多 graph 异构场景下更容易遇到资源池粒度问题；standalone Durable Task workers 可按 workload 独立部署。 |
@@ -161,10 +166,12 @@ Temporal、Azure Durable Functions / Durable Task 与 MAF Durable Workflow Exten
 
 因此，本文后续使用“baseline”时只表示 PoC 对照或 reference architecture，
 不是最终 winner。
-Temporal 的价值不只是证据完整或变量少，而是在核心资源过程建模上同构度最高；
-Azure Durable Task 必须作为同批强候选补齐对照；
+Temporal 的价值不只是证据完整或变量少，而是在核心资源过程建模和 activity
+resource-pool routing 上同构度最高；
+Azure Durable Task 仍必须作为 durable orchestration 候选补齐对照，但在
+需要运行时动态 activity 路由的目标场景中不应再写成与 Temporal 同批主 baseline；
 MAF 是否进入主 baseline 取决于 graph / hybrid 是否亲自承担主过程职责，
-而不是取决于“使用 MAF 是否天然削弱 Durable Task primitives”。
+而不是取决于"使用 MAF 是否天然削弱 Durable Task primitives"。
 
 ### Direct Durable primitives 与 MAF 的关系
 
@@ -214,9 +221,12 @@ composition 接入。对裸金属 buildout 的实际含义是：如果一等需�
 - **Temporal** 与场景同构度最高：Workflow Execution、Child Workflow、Signal/Update、
   Event History、Continue-As-New 直接对应资源过程身份、分区、事件入口、审计、历史治理。
 
-- **Azure Durable Functions（direct）** 与 Temporal 接近：orchestration instance、
-  sub-orchestration、activity、external event、event sourcing 覆盖相同建模维度；
-  差异在 command model（无 Update）、versioning 机制、hosting/backend 边界。
+- **Azure Durable Functions（direct）** 与 Temporal 在 durable orchestration
+  primitive 上接近：orchestration instance、sub-orchestration、activity、
+  external event、event sourcing 覆盖相同建模维度；但在 activity 级资源池路由上
+  不同批。Temporal 可在 workflow 中把不同 Activity 路由到不同 Task Queues；
+  DTS / Azure Functions 主要靠 Function App 级部署拓扑和 WorkItemFilters
+  被动隔离 function names。因此 Azure 在本场景应降为次级有条件 POC。
 
 - **MAF Durable Extension** 在资源状态机场景下建模扭曲较大：需穿过 graph node、
   executor、Durable Task primitives 多层映射；优势在 agent/HITL authoring；
