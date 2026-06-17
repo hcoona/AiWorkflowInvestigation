@@ -13,3 +13,5 @@ LICENSE text
 *.pkl text
 *.py text
 *.toml text
+
+raw/git/** -text

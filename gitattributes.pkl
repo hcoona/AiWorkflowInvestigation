@@ -21,4 +21,8 @@ textPatterns = List(
   "*.toml",
 )
 
+verbatimPatterns = List(
+  "raw/git/**",
+)
+
 binaryPatterns = List()

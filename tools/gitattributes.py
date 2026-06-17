@@ -51,6 +51,7 @@ def render(config: dict[str, Any]) -> str:
     header = string_list(config, "header")
     default_attributes = string_list(config, "defaultAttributes")
     text_patterns = string_list(config, "textPatterns")
+    verbatim_patterns = string_list(config, "verbatimPatterns")
     binary_patterns = string_list(config, "binaryPatterns")
 
     overlap = sorted(set(text_patterns).intersection(binary_patterns))
@@ -65,6 +66,9 @@ def render(config: dict[str, Any]) -> str:
     lines.extend(default_attributes)
     lines.append("")
     lines.extend(f"{pattern} text" for pattern in text_patterns)
+    if verbatim_patterns:
+        lines.append("")
+        lines.extend(f"{pattern} -text" for pattern in verbatim_patterns)
     if binary_patterns:
         lines.append("")
         lines.extend(f"{pattern} binary" for pattern in binary_patterns)
@@ -87,7 +91,11 @@ def listed_files() -> list[str]:
 
 
 def check_coverage(config: dict[str, Any]) -> bool:
-    patterns = string_list(config, "textPatterns") + string_list(config, "binaryPatterns")
+    patterns = (
+        string_list(config, "textPatterns")
+        + string_list(config, "verbatimPatterns")
+        + string_list(config, "binaryPatterns")
+    )
     uncovered = [path for path in listed_files() if not any(matches_pattern(path, pattern) for pattern in patterns)]
     if not uncovered:
         return True
