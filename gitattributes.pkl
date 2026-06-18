@@ -18,6 +18,7 @@ textPatterns = List(
   "*.md",
   "*.pkl",
   "*.py",
+  "*.tsv",
   "*.toml",
 )
 

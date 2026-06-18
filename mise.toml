@@ -23,3 +23,11 @@ run = "python tools/gitattributes.py generate"
 [tasks.gitattributes-check]
 description = "Check .gitattributes generation and indexed file coverage"
 run = "python tools/gitattributes.py check"
+
+[tasks.translation-agent-plugin-check]
+description = "Validate the enterprise translation team Copilot plugin"
+run = "python .agents/plugins/enterprise-translation-team/scripts/validate_package.py"
+
+[tasks.translation-agent-plugin-eval-dry-run]
+description = "Prepare a dry-run eval workspace for the enterprise translation team plugin"
+run = "python .agents/plugins/enterprise-translation-team/scripts/run_copilot_evals.py --mode dry-run"
