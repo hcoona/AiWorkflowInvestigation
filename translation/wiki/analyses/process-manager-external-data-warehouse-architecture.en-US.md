@@ -5,7 +5,7 @@ title: "Process Manager Architecture: Coordination-Command and Observation Sourc
 status: active
 created: 2026-06-17
 updated: 2026-06-17
-summary: "Analyzes the reconcile modeling boundaries for Temporal and the MAF Durable Extension when Event History is the coordination-command source-of-truth stream and the external operational data warehouse is the observed-state source of truth."
+summary: "Analyzes the reconcile modeling boundaries for Temporal and the MAF Durable Extension when Event History is the coordination-command source-of-truth stream and the external operational data warehouse anchors the observation source-of-truth stream."
 maintenance:
   edit_policy: update
 validation:
@@ -96,7 +96,7 @@ event interpretation, compensation, and coordination audit.
 | Source-of-truth stream | Subject | What it records | What it cannot prove | Design consequence |
 | --- | --- | --- | --- | --- |
 | Coordination-command source-of-truth stream | Temporal Event History / Durable Task history / MAF durable graph checkpoint | What the Workflow/orchestrator decided, which Activity/executor it scheduled, which returns it received, which timer/event it waited on, and which coordination phase it entered. | It cannot by itself prove that a machine is truly in the target state at this moment. | Use it as the basis for process recovery, command audit, idempotent operation correlation, and the desired/command side of the controller loop. |
-| Observation source-of-truth stream | External operational data warehouse | The machine state, time, source, version, confidence, and staleness boundaries observed by monitoring, probes, log aggregation, acceptance tasks, and operations systems. | It cannot by itself explain whether the workflow has already issued a command, whether an Activity completed, or whether a compensation was accepted by the orchestrator. | Use it as the observed-state source of truth for the physical world. Re-observe before and after every hazardous decision. |
+| Observation source-of-truth stream | External operational data warehouse | The machine state, time, source, version, confidence, and staleness boundaries observed by monitoring, probes, log aggregation, acceptance tasks, and operations systems. | It cannot by itself explain whether the workflow has already issued a command, whether an Activity completed, or whether a compensation was accepted by the orchestrator. | Use it as the source of truth for the physical world's observed state. Re-observe before and after every hazardous decision. |
 | Command-return stream | Activity/executor return value | The result, receipt, operation ID, and error type for this command submission, API call, script execution, or tool invocation. | `success` does not mean the final state has been reached. `failure` also does not necessarily mean physical state was unchanged. | A command Activity should return a receipt and correlatable evidence, rather than hard-coding the target state as fact. |
 | Alignment stream | Reconcile loop | The difference between desired and observed, the next delta, wait conditions, compensation, and human intervention. | A single read cannot eliminate monitoring staleness, external intervention, or hardware uncertainty. | Requires polling, event-triggered wakeup, staleness guard, idempotency key, and versioned decisions. |
 
@@ -446,18 +446,18 @@ and periodically compact history or change the Run/instance boundary.
 Items corrected by this update:
 
 1. `process-manager-external-data-warehouse-architecture.md` should no longer
-   say that "the external data warehouse is the only source of truth" or that
+   say that "the external operational data warehouse is the only source of truth" or that
    "resource state, resource history, and business audit are all primarily owned
-   by the external fact warehouse".
+   by the external operational data warehouse".
    The accurate statement is:
-   Event History/Durable history is the source-of-truth stream
-   for coordination commands and command returns;
-   the external operational data warehouse is the observed-state source-of-truth
+   Event History/Durable history is the coordination-command source-of-truth
+   stream;
+   the external operational data warehouse anchors the observation source-of-truth
    stream; the two source-of-truth streams must be aligned through a reconcile
    loop.
 2. The statement in the bare-metal selection page
-   that "if the external fact warehouse is the resource primary source-of-truth
-   stream, MAF does not need to store complete resource facts" should be
+   that "if the external operational data warehouse is the observed-state
+   baseline, MAF does not need to store complete resource facts" should be
    tightened to: if the external operational data warehouse is the
    **observed-state baseline**, neither MAF nor Temporal should treat Activity
    success as physical state; for graph/hybrid to become the primary process
@@ -468,8 +468,8 @@ Items corrected by this update:
    Activity/executor; Activity/executor success may only be recorded in command
    audit and must not directly advance physical state.
 4. MAF positioning only needs to be corrected from the old "must itself own the
-   resource source-of-truth stream" to "must itself own the coordination
-   source-of-truth stream and reconcile loop".
+   observation source-of-truth stream" to "must itself own the
+   coordination-command source-of-truth stream and reconcile loop".
    The observation-driven architecture makes MAF closer to Temporal in terms of
    state placement, but both must explicitly model reconcile, so there is no
    intrinsic advantage reversal in favor of MAF.
@@ -480,7 +480,7 @@ Items corrected by this update:
 
 | Type | Reference | Description |
 | --- | --- | --- |
-| user | User's clarification on 2026-06-17: “Event History 确实是执行的主线，但是具体 cluster buildout 的状态要以外部数据仓库为观察基准（没法直接观察机器情况，只能依赖运维数仓）”. | Establishes the dual source-of-truth streams: the coordination-command source-of-truth stream and the observed-state source-of-truth stream. |
+| user | User's clarification on 2026-06-17: “Event History 确实是执行的主线，但是具体 cluster buildout 的状态要以外部数据仓库为观察基准（没法直接观察机器情况，只能依赖运维数仓）”. | Establishes the dual source-of-truth streams: the coordination-command source-of-truth stream and the observation source-of-truth stream. |
 | wiki | [Process Manager Platform Selection for Bare-Metal Cluster Buildout](bare-metal-cluster-buildout-process-manager-selection.en-US.md) | Provides the corrected MAF baseline condition and bare-metal buildout scope. |
 | wiki | [Capability Boundaries Between Temporal and the MAF Durable Extension](../../../wiki/analyses/temporal-vs-maf-durable-extension.md) | Provides a mechanism comparison between the two across Event History, Task Queue, Signal/Update/Query, RequestPort, custom status, graph runner, and agent surface. |
 | wiki | [Temporal Workflows Documentation](../../../wiki/sources/temporal/workflows-docs.md), [Temporal Workflow Determinism Constraints Documentation](../../../wiki/sources/temporal/workflow-deterministic-constraints-docs.md), [Temporal Activities Documentation](../../../wiki/sources/temporal/activities-docs.md) | Supports Temporal workflow replay, deterministic workflow code, and Activity external I/O boundaries. |

@@ -1,0 +1,1310 @@
+{
+  "schema_version": "enterprise-termbase-v2",
+  "standard_basis": {
+    "primary": "TBX ISO 30042",
+    "export_targets": [
+      "TBX-Basic"
+    ],
+    "lossless_for_key_fields": true
+  },
+  "termbase_id": "process-manager-analysis-translation",
+  "source_locale": "zh-Hans",
+  "target_locale": "en-US",
+  "entries": [
+    {
+      "concept_id": "c-pm-0001",
+      "entry_id": "t-bare-metal-cluster-buildout-zh-en",
+      "status": "approved",
+      "scope": {
+        "level": "domain",
+        "project_id": "process-manager-analysis-translation",
+        "domain": "bare-metal-cluster-buildout-process-management"
+      },
+      "source": {
+        "term": "裸金属 Cluster Buildout",
+        "language": "zh-Hans",
+        "part_of_speech": "noun",
+        "term_type": "fullForm"
+      },
+      "target": {
+        "preferred": "bare-metal cluster buildout",
+        "language": "en-US",
+        "allowed_variants": [
+          "bare-metal buildout"
+        ]
+      },
+      "context": {
+        "definition": "The end-to-end buildout of a physical-machine cluster, including nodes, racks, networking, firmware, provisioning, acceptance, and integration validation.",
+        "usage_note": "Use for the overall scenario, not for a single provisioning step or a Kubernetes deployment analogy.",
+        "positive_examples": [
+          {
+            "source": "本页讨论物理机/裸金属机器集群的 buildout。",
+            "target": "This page discusses buildout for physical-machine / bare-metal clusters.",
+            "reason": "Matches the full scenario."
+          }
+        ],
+        "negative_examples": [
+          {
+            "source": "不要把问题改写成 Kubernetes cluster provisioning。",
+            "bad_target": "bare-metal cluster buildout",
+            "correct_guidance": "This is a narrower provisioning task, not the full buildout.",
+            "reason": "Scope mismatch."
+          }
+        ]
+      },
+      "provenance": {
+        "created_by": "translation-terminologist",
+        "created_at": "2026-06-18",
+        "evidence_refs": [
+          "wiki/analyses/bare-metal-cluster-buildout-process-manager-selection.md#范围",
+          "translation/wiki/analyses/bare-metal-cluster-buildout-process-manager-selection.en-US.md#Scope",
+          "wiki/analyses/process-manager-external-data-warehouse-architecture.md#问题",
+          "translation/wiki/analyses/process-manager-external-data-warehouse-architecture.en-US.md#Question"
+        ]
+      },
+      "maintenance": {
+        "revision": 1,
+        "owner": "terminology",
+        "reviewer": "translation-terminologist",
+        "approval_status": "approved",
+        "reliability": {
+          "code": 5,
+          "confidence": "high"
+        },
+        "last_reviewed_at": "2026-06-18"
+      }
+    },
+    {
+      "concept_id": "c-pm-0002",
+      "entry_id": "t-primary-process-manager-zh-en",
+      "status": "approved",
+      "scope": {
+        "level": "domain",
+        "project_id": "process-manager-analysis-translation",
+        "domain": "bare-metal-cluster-buildout-process-management"
+      },
+      "source": {
+        "term": "主 process manager",
+        "language": "zh-Hans",
+        "part_of_speech": "noun",
+        "term_type": "phrase"
+      },
+      "target": {
+        "preferred": "primary process manager",
+        "language": "en-US"
+      },
+      "context": {
+        "definition": "The system that owns long-running process identity, command interpretation, localized catch-up, compensation decisions, side-effect boundaries, and audit truth lines.",
+        "usage_note": "Use when describing the primary owner of the buildout process, not a worker, executor, or passive runtime.",
+        "positive_examples": [
+          {
+            "source": "Temporal 在核心资源过程建模维度上与场景同构度最高，应作为主 baseline。",
+            "target": "Temporal has the highest modeling fit with the scenario at the core resource-process modeling dimension and should be treated as the primary baseline.",
+            "reason": "Describes the role holder."
+          }
+        ],
+        "negative_examples": [
+          {
+            "source": "runtime 只是 scheduler、executor、workflow adapter。",
+            "bad_target": "primary process manager",
+            "correct_guidance": "This is only a runtime role, not the process owner.",
+            "reason": "Role mismatch."
+          }
+        ]
+      },
+      "provenance": {
+        "created_by": "translation-terminologist",
+        "created_at": "2026-06-18",
+        "evidence_refs": [
+          "wiki/analyses/bare-metal-cluster-buildout-process-manager-selection.md#决策",
+          "translation/wiki/analyses/bare-metal-cluster-buildout-process-manager-selection.en-US.md#Decision"
+        ]
+      },
+      "maintenance": {
+        "revision": 1,
+        "owner": "terminology",
+        "reviewer": "translation-terminologist",
+        "approval_status": "approved",
+        "reliability": {
+          "code": 5,
+          "confidence": "high"
+        },
+        "last_reviewed_at": "2026-06-18"
+      }
+    },
+    {
+      "concept_id": "c-pm-0003",
+      "entry_id": "t-external-operational-data-warehouse-zh-en",
+      "status": "approved",
+      "scope": {
+        "level": "domain",
+        "project_id": "process-manager-analysis-translation",
+        "domain": "bare-metal-cluster-buildout-process-management"
+      },
+      "source": {
+        "term": "外部运维数据仓库",
+        "language": "zh-Hans",
+        "part_of_speech": "noun",
+        "term_type": "fullForm"
+      },
+      "target": {
+        "preferred": "external operational data warehouse",
+        "language": "en-US"
+      },
+      "context": {
+        "definition": "An external store that aggregates monitoring, probes, logs, and operations-system results and serves as the observed-state baseline for physical assets.",
+        "usage_note": "Do not collapse this into a command ledger, lock service, or writable resource database.",
+        "positive_examples": [
+          {
+            "source": "外部运维数据仓库是物理状态的观察基准。",
+            "target": "The external operational data warehouse is the observation baseline for physical state.",
+            "reason": "Matches the clarified architecture."
+          }
+        ],
+        "negative_examples": [
+          {
+            "source": "它不自动等于 command ledger。",
+            "bad_target": "external operational data warehouse",
+            "correct_guidance": "This is not a writable command ledger.",
+            "reason": "Semantic mismatch."
+          }
+        ]
+      },
+      "provenance": {
+        "created_by": "translation-terminologist",
+        "created_at": "2026-06-18",
+        "evidence_refs": [
+          "wiki/analyses/process-manager-external-data-warehouse-architecture.md#问题",
+          "translation/wiki/analyses/process-manager-external-data-warehouse-architecture.en-US.md#Question"
+        ]
+      },
+      "maintenance": {
+        "revision": 1,
+        "owner": "terminology",
+        "reviewer": "translation-terminologist",
+        "approval_status": "approved",
+        "reliability": {
+          "code": 5,
+          "confidence": "high"
+        },
+        "last_reviewed_at": "2026-06-18"
+      }
+    },
+    {
+      "concept_id": "c-pm-0004",
+      "entry_id": "t-coordination-command-source-of-truth-stream-zh-en",
+      "status": "approved",
+      "scope": {
+        "level": "domain",
+        "project_id": "process-manager-analysis-translation",
+        "domain": "bare-metal-cluster-buildout-process-management"
+      },
+      "source": {
+        "term": "协调事实线",
+        "language": "zh-Hans",
+        "part_of_speech": "noun",
+        "term_type": "phrase"
+      },
+      "target": {
+        "preferred": "coordination-command source-of-truth stream",
+        "language": "en-US"
+      },
+      "context": {
+        "definition": "The event/history stream that records what the orchestrator decided, which commands it scheduled, and which returns it received.",
+        "usage_note": "Use for the command-and-coordination truth line, not for physical-world observations.",
+        "positive_examples": [
+          {
+            "source": "Event History 是协调命令事实线。",
+            "target": "Event History is the source of truth for coordination commands and command returns.",
+            "reason": "Directly names the stream."
+          }
+        ],
+        "negative_examples": [
+          {
+            "source": "它不能单独证明机器此刻真实处于目标状态。",
+            "bad_target": "coordination-command source-of-truth stream",
+            "correct_guidance": "This stream does not prove current physical state.",
+            "reason": "Do not confuse coordination facts with observed state."
+          }
+        ]
+      },
+      "provenance": {
+        "created_by": "translation-terminologist",
+        "created_at": "2026-06-18",
+        "evidence_refs": [
+          "wiki/analyses/process-manager-external-data-warehouse-architecture.md#答案",
+          "translation/wiki/analyses/process-manager-external-data-warehouse-architecture.en-US.md#Answer"
+        ]
+      },
+      "maintenance": {
+        "revision": 1,
+        "owner": "terminology",
+        "reviewer": "translation-terminologist",
+        "approval_status": "approved",
+        "reliability": {
+          "code": 5,
+          "confidence": "high"
+        },
+        "last_reviewed_at": "2026-06-18"
+      }
+    },
+    {
+      "concept_id": "c-pm-0005",
+      "entry_id": "t-observation-source-of-truth-stream-zh-en",
+      "status": "approved",
+      "scope": {
+        "level": "domain",
+        "project_id": "process-manager-analysis-translation",
+        "domain": "bare-metal-cluster-buildout-process-management"
+      },
+      "source": {
+        "term": "观察事实线",
+        "language": "zh-Hans",
+        "part_of_speech": "noun",
+        "term_type": "phrase"
+      },
+      "target": {
+        "preferred": "observation source-of-truth stream",
+        "language": "en-US"
+      },
+      "context": {
+        "definition": "The stream of monitoring, probe, log, and acceptance observations that serves as the source of truth for physical-world state.",
+        "usage_note": "Use for observed state only; do not use it for command audit or workflow history.",
+        "positive_examples": [
+          {
+            "source": "外部运维数据仓库是物理世界观察状态的 source of truth。",
+            "target": "The external operational data warehouse is the source of truth for the physical world's observed state.",
+            "reason": "Correct observation stream."
+          }
+        ],
+        "negative_examples": [
+          {
+            "source": "它不能单独说明 workflow 是否已经发过某命令。",
+            "bad_target": "observation source-of-truth stream",
+            "correct_guidance": "Observed state does not replace command history.",
+            "reason": "Wrong truth line."
+          }
+        ]
+      },
+      "provenance": {
+        "created_by": "translation-terminologist",
+        "created_at": "2026-06-18",
+        "evidence_refs": [
+          "wiki/analyses/process-manager-external-data-warehouse-architecture.md#答案",
+          "translation/wiki/analyses/process-manager-external-data-warehouse-architecture.en-US.md#Answer"
+        ]
+      },
+      "maintenance": {
+        "revision": 1,
+        "owner": "terminology",
+        "reviewer": "translation-terminologist",
+        "approval_status": "approved",
+        "reliability": {
+          "code": 5,
+          "confidence": "high"
+        },
+        "last_reviewed_at": "2026-06-18"
+      }
+    },
+    {
+      "concept_id": "c-pm-0006",
+      "entry_id": "t-reconcile-loop-zh-en",
+      "status": "approved",
+      "scope": {
+        "level": "domain",
+        "project_id": "process-manager-analysis-translation",
+        "domain": "bare-metal-cluster-buildout-process-management"
+      },
+      "source": {
+        "term": "reconcile loop",
+        "language": "zh-Hans",
+        "part_of_speech": "noun",
+        "term_type": "phrase"
+      },
+      "target": {
+        "preferred": "reconcile loop",
+        "language": "en-US"
+      },
+      "context": {
+        "definition": "A control loop that repeatedly observes, compares, commands, waits, and re-observes until desired and observed state align.",
+        "usage_note": "Use the expanded observe/compare/command/wait wording only when emphasizing the loop steps.",
+        "positive_examples": [
+          {
+            "source": "Workflow 或 graph 显式 observe → compare → command → wait → observe。",
+            "target": "Workflow or graph explicitly observe -> compare -> command -> wait -> observe.",
+            "reason": "Describes the loop precisely."
+          }
+        ],
+        "negative_examples": [
+          {
+            "source": "不要把它实现成忙等无限循环。",
+            "bad_target": "reconcile loop",
+            "correct_guidance": "This is a durable control loop, not a spin loop.",
+            "reason": "Behavioral misuse."
+          }
+        ]
+      },
+      "provenance": {
+        "created_by": "translation-terminologist",
+        "created_at": "2026-06-18",
+        "evidence_refs": [
+          "wiki/analyses/process-manager-external-data-warehouse-architecture.md#答案",
+          "translation/wiki/analyses/process-manager-external-data-warehouse-architecture.en-US.md#Answer"
+        ]
+      },
+      "maintenance": {
+        "revision": 1,
+        "owner": "terminology",
+        "reviewer": "translation-terminologist",
+        "approval_status": "approved",
+        "reliability": {
+          "code": 5,
+          "confidence": "high"
+        },
+        "last_reviewed_at": "2026-06-18"
+      }
+    },
+    {
+      "concept_id": "c-pm-0007",
+      "entry_id": "t-workflow-execution-orchestration-instance-zh-en",
+      "status": "approved",
+      "scope": {
+        "level": "domain",
+        "project_id": "process-manager-analysis-translation",
+        "domain": "bare-metal-cluster-buildout-process-management"
+      },
+      "source": {
+        "term": "Workflow Execution / orchestration instance",
+        "language": "zh-Hans",
+        "part_of_speech": "noun",
+        "term_type": "phrase"
+      },
+      "target": {
+        "preferred": "Workflow Execution",
+        "language": "en-US",
+        "allowed_variants": [
+          "workflow execution",
+          "orchestration instance"
+        ]
+      },
+      "context": {
+        "definition": "The long-running process identity used by Temporal and Azure Durable Functions to host durable orchestration.",
+        "usage_note": "Use Workflow Execution for Temporal-specific process identity and orchestration instance for Azure/Durable Task-specific process identity.",
+        "positive_examples": [
+          {
+            "source": "Workflow Execution 是过程身份；orchestration instance 也是过程身份。",
+            "target": "Workflow Execution is the process identity; an orchestration instance is also a process identity.",
+            "reason": "Captures the paired mapping."
+          }
+        ],
+        "negative_examples": [
+          {
+            "source": "DagRun 是调度区间实例。",
+            "bad_target": "Workflow Execution / orchestration instance",
+            "correct_guidance": "DagRun is not the long-running process identity here.",
+            "reason": "Wrong model object."
+          }
+        ]
+      },
+      "provenance": {
+        "created_by": "translation-terminologist",
+        "created_at": "2026-06-18",
+        "evidence_refs": [
+          "wiki/analyses/bare-metal-cluster-buildout-process-manager-selection.md#核心建模维度对比",
+          "translation/wiki/analyses/bare-metal-cluster-buildout-process-manager-selection.en-US.md#Core-modeling-dimension-comparison"
+        ]
+      },
+      "maintenance": {
+        "revision": 1,
+        "owner": "terminology",
+        "reviewer": "translation-terminologist",
+        "approval_status": "approved",
+        "reliability": {
+          "code": 5,
+          "confidence": "high"
+        },
+        "last_reviewed_at": "2026-06-18"
+      }
+    },
+    {
+      "concept_id": "c-pm-0008",
+      "entry_id": "t-child-workflow-sub-orchestration-zh-en",
+      "status": "approved",
+      "scope": {
+        "level": "domain",
+        "project_id": "process-manager-analysis-translation",
+        "domain": "bare-metal-cluster-buildout-process-management"
+      },
+      "source": {
+        "term": "Child Workflow / sub-orchestration",
+        "language": "zh-Hans",
+        "part_of_speech": "noun",
+        "term_type": "phrase"
+      },
+      "target": {
+        "preferred": "Child Workflow",
+        "language": "en-US",
+        "allowed_variants": [
+          "child workflow",
+          "sub-orchestration"
+        ]
+      },
+      "context": {
+        "definition": "A partitioned child process used to isolate history, retries, waiting, and localized failure catch-up.",
+        "usage_note": "Use Child Workflow for Temporal-specific child process partitioning and sub-orchestration for Azure/Durable Task-specific child process partitioning.",
+        "positive_examples": [
+          {
+            "source": "单节点、机架或 fabric 的处理可以通过 Child Workflow 隔离历史、等待、重试和局部失败。",
+            "target": "Per-node, per-rack, or per-fabric handling can use a Child Workflow or sub-orchestration to isolate history, waiting, retries, and localized failure.",
+            "reason": "Matches the partitioning role."
+          }
+        ],
+        "negative_examples": [
+          {
+            "source": "TaskInstance 是任务执行。",
+            "bad_target": "Child Workflow / sub-orchestration",
+            "correct_guidance": "TaskInstance is a task execution object, not a child process boundary.",
+            "reason": "Different abstraction."
+          }
+        ]
+      },
+      "provenance": {
+        "created_by": "translation-terminologist",
+        "created_at": "2026-06-18",
+        "evidence_refs": [
+          "wiki/analyses/bare-metal-cluster-buildout-process-manager-selection.md#Temporal-的-reference-architecture-价值与限制",
+          "translation/wiki/analyses/bare-metal-cluster-buildout-process-manager-selection.en-US.md#Temporal-s-value-as-a-reference-architecture-and-its-limits"
+        ]
+      },
+      "maintenance": {
+        "revision": 1,
+        "owner": "terminology",
+        "reviewer": "translation-terminologist",
+        "approval_status": "approved",
+        "reliability": {
+          "code": 5,
+          "confidence": "high"
+        },
+        "last_reviewed_at": "2026-06-18"
+      }
+    },
+    {
+      "concept_id": "c-pm-0009",
+      "entry_id": "t-event-history-zh-en",
+      "status": "approved",
+      "scope": {
+        "level": "domain",
+        "project_id": "process-manager-analysis-translation",
+        "domain": "bare-metal-cluster-buildout-process-management"
+      },
+      "source": {
+        "term": "Event History",
+        "language": "zh-Hans",
+        "part_of_speech": "noun",
+        "term_type": "fullForm"
+      },
+      "target": {
+        "preferred": "Event History",
+        "language": "en-US"
+      },
+      "context": {
+        "definition": "The durable orchestration history that records commands, timers, activities, signals, and recovery facts.",
+        "usage_note": "Use as the coordination truth line, not as a physical-state database.",
+        "positive_examples": [
+          {
+            "source": "Event History 作为协调命令事实线。",
+            "target": "Event History is the source of truth for coordination commands and command returns.",
+            "reason": "Directly names the history stream."
+          }
+        ],
+        "negative_examples": [
+          {
+            "source": "它不能单独证明机器此刻真实处于目标状态。",
+            "bad_target": "Event History",
+            "correct_guidance": "Event History does not prove current physical state.",
+            "reason": "Historical vs current-state confusion."
+          }
+        ]
+      },
+      "provenance": {
+        "created_by": "translation-terminologist",
+        "created_at": "2026-06-18",
+        "evidence_refs": [
+          "wiki/analyses/process-manager-external-data-warehouse-architecture.md#答案",
+          "translation/wiki/analyses/process-manager-external-data-warehouse-architecture.en-US.md#Answer"
+        ]
+      },
+      "maintenance": {
+        "revision": 1,
+        "owner": "terminology",
+        "reviewer": "translation-terminologist",
+        "approval_status": "approved",
+        "reliability": {
+          "code": 5,
+          "confidence": "high"
+        },
+        "last_reviewed_at": "2026-06-18"
+      }
+    },
+    {
+      "concept_id": "c-pm-0010",
+      "entry_id": "t-signal-update-zh-en",
+      "status": "approved",
+      "scope": {
+        "level": "domain",
+        "project_id": "process-manager-analysis-translation",
+        "domain": "bare-metal-cluster-buildout-process-management"
+      },
+      "source": {
+        "term": "Signal/Update",
+        "language": "zh-Hans",
+        "part_of_speech": "noun",
+        "term_type": "fullForm"
+      },
+      "target": {
+        "preferred": "Signal/Update",
+        "language": "en-US"
+      },
+      "context": {
+        "definition": "Temporal's interactive message entry surface for asynchronous signals and validated updates into a running workflow.",
+        "usage_note": "Use when discussing in-flight workflow interaction and command requests, not the physical-world observation baseline.",
+        "positive_examples": [
+          {
+            "source": "Signals/Updates 可以把外部消息送入运行中的 Workflow Execution。",
+            "target": "Signals/Updates can inject external messages into the running Workflow Execution.",
+            "reason": "Correct interactive ingress."
+          }
+        ],
+        "negative_examples": [
+          {
+            "source": "Signal 不是 command gateway 的全部。",
+            "bad_target": "Signal/Update",
+            "correct_guidance": "This is only an ingress surface; external auth and audit are still required.",
+            "reason": "Overstating the capability."
+          }
+        ]
+      },
+      "provenance": {
+        "created_by": "translation-terminologist",
+        "created_at": "2026-06-18",
+        "evidence_refs": [
+          "wiki/analyses/bare-metal-cluster-buildout-process-manager-selection.md#Temporal-的-reference-architecture-价值与限制",
+          "translation/wiki/analyses/bare-metal-cluster-buildout-process-manager-selection.en-US.md#Temporal-s-value-as-a-reference-architecture-and-its-limits"
+        ]
+      },
+      "maintenance": {
+        "revision": 1,
+        "owner": "terminology",
+        "reviewer": "translation-terminologist",
+        "approval_status": "approved",
+        "reliability": {
+          "code": 5,
+          "confidence": "high"
+        },
+        "last_reviewed_at": "2026-06-18"
+      }
+    },
+    {
+      "concept_id": "c-pm-0011",
+      "entry_id": "t-activity-zh-en",
+      "status": "approved",
+      "scope": {
+        "level": "domain",
+        "project_id": "process-manager-analysis-translation",
+        "domain": "bare-metal-cluster-buildout-process-management"
+      },
+      "source": {
+        "term": "Activity",
+        "language": "zh-Hans",
+        "part_of_speech": "noun",
+        "term_type": "fullForm"
+      },
+      "target": {
+        "preferred": "Activity",
+        "language": "en-US"
+      },
+      "context": {
+        "definition": "The explicit external I/O and real-world side-effect boundary in a durable workflow runtime.",
+        "usage_note": "Use for command submission, observation, and other external I/O boundaries.",
+        "positive_examples": [
+          {
+            "source": "Activity 是外部 I/O 和真实世界副作用的边界。",
+            "target": "Activity is the boundary for external I/O and real-world side effects.",
+            "reason": "Matches the runtime role."
+          }
+        ],
+        "negative_examples": [
+          {
+            "source": "Activity success 不能当成物理状态到达。",
+            "bad_target": "Activity",
+            "correct_guidance": "Activity success proves only command execution, not physical-state arrival.",
+            "reason": "Don't equate return value with state."
+          }
+        ]
+      },
+      "provenance": {
+        "created_by": "translation-terminologist",
+        "created_at": "2026-06-18",
+        "evidence_refs": [
+          "wiki/analyses/process-manager-external-data-warehouse-architecture.md#答案",
+          "translation/wiki/analyses/process-manager-external-data-warehouse-architecture.en-US.md#Answer"
+        ]
+      },
+      "maintenance": {
+        "revision": 1,
+        "owner": "terminology",
+        "reviewer": "translation-terminologist",
+        "approval_status": "approved",
+        "reliability": {
+          "code": 5,
+          "confidence": "high"
+        },
+        "last_reviewed_at": "2026-06-18"
+      }
+    },
+    {
+      "concept_id": "c-pm-0012",
+      "entry_id": "t-task-queue-zh-en",
+      "status": "approved",
+      "scope": {
+        "level": "domain",
+        "project_id": "process-manager-analysis-translation",
+        "domain": "bare-metal-cluster-buildout-process-management"
+      },
+      "source": {
+        "term": "Task Queue",
+        "language": "zh-Hans",
+        "part_of_speech": "noun",
+        "term_type": "fullForm"
+      },
+      "target": {
+        "preferred": "Task Queue",
+        "language": "en-US"
+      },
+      "context": {
+        "definition": "Temporal's worker-routing surface for assigning and isolating activities or child workflows to specific workers or resource pools.",
+        "usage_note": "Use when the discussion is about activity-level routing or worker placement.",
+        "positive_examples": [
+          {
+            "source": "Temporal 可在 workflow 中把不同 Activity 路由到不同 Task Queues。",
+            "target": "Temporal can route different activities to different Task Queues inside the workflow.",
+            "reason": "Correct routing term."
+          }
+        ],
+        "negative_examples": [
+          {
+            "source": "Function App 部署拓扑只是被动隔离。",
+            "bad_target": "Task Queue",
+            "correct_guidance": "Deployment topology is not the same as runtime task routing.",
+            "reason": "Topology vs runtime routing."
+          }
+        ]
+      },
+      "provenance": {
+        "created_by": "translation-terminologist",
+        "created_at": "2026-06-18",
+        "evidence_refs": [
+          "wiki/analyses/bare-metal-cluster-buildout-process-manager-selection.md#第一批强候选的证据矩阵",
+          "translation/wiki/analyses/bare-metal-cluster-buildout-process-manager-selection.en-US.md#Evidence-matrix-for-the-first-strong-candidates"
+        ]
+      },
+      "maintenance": {
+        "revision": 1,
+        "owner": "terminology",
+        "reviewer": "translation-terminologist",
+        "approval_status": "approved",
+        "reliability": {
+          "code": 5,
+          "confidence": "high"
+        },
+        "last_reviewed_at": "2026-06-18"
+      }
+    },
+    {
+      "concept_id": "c-pm-0013",
+      "entry_id": "t-idempotency-key-zh-en",
+      "status": "approved",
+      "scope": {
+        "level": "domain",
+        "project_id": "process-manager-analysis-translation",
+        "domain": "bare-metal-cluster-buildout-process-management"
+      },
+      "source": {
+        "term": "幂等键",
+        "language": "zh-Hans",
+        "part_of_speech": "noun",
+        "term_type": "fullForm"
+      },
+      "target": {
+        "preferred": "idempotency key",
+        "language": "en-US"
+      },
+      "context": {
+        "definition": "A stable key used to prevent repeated hazardous side effects across retries, replays, and manual re-submission.",
+        "usage_note": "Use for commands, approvals, and any side-effecting operation that may be retried.",
+        "positive_examples": [
+          {
+            "source": "每轮命令都使用幂等键、operation ID 和观察版本。",
+            "target": "Each command round uses an idempotency key, operation ID, and observation version.",
+            "reason": "Correct prevention mechanism."
+          }
+        ],
+        "negative_examples": [
+          {
+            "source": "retry 与 timeout 不能直接映射到物理状态。",
+            "bad_target": "idempotency key",
+            "correct_guidance": "An idempotency key protects against duplication; it does not prove state arrival.",
+            "reason": "Different function."
+          }
+        ]
+      },
+      "provenance": {
+        "created_by": "translation-terminologist",
+        "created_at": "2026-06-18",
+        "evidence_refs": [
+          "wiki/analyses/process-manager-external-data-warehouse-architecture.md#答案",
+          "translation/wiki/analyses/process-manager-external-data-warehouse-architecture.en-US.md#Answer"
+        ]
+      },
+      "maintenance": {
+        "revision": 1,
+        "owner": "terminology",
+        "reviewer": "translation-terminologist",
+        "approval_status": "approved",
+        "reliability": {
+          "code": 5,
+          "confidence": "high"
+        },
+        "last_reviewed_at": "2026-06-18"
+      }
+    },
+    {
+      "concept_id": "c-pm-0014",
+      "entry_id": "t-read-back-verification-zh-en",
+      "status": "approved",
+      "scope": {
+        "level": "domain",
+        "project_id": "process-manager-analysis-translation",
+        "domain": "bare-metal-cluster-buildout-process-management"
+      },
+      "source": {
+        "term": "读后校验",
+        "language": "zh-Hans",
+        "part_of_speech": "noun",
+        "term_type": "phrase"
+      },
+      "target": {
+        "preferred": "read-back verification",
+        "language": "en-US"
+      },
+      "context": {
+        "definition": "A verification step that reads external evidence back after a command to confirm the side effect actually happened.",
+        "usage_note": "Use for hazardous operations and any operation whose outcome must be observed, not merely reported.",
+        "positive_examples": [
+          {
+            "source": "所有候选都必须证明 external inventory/resource graph、幂等键、读后校验。",
+            "target": "All candidates must prove the external inventory/resource graph, idempotency keys, and read-back verification.",
+            "reason": "Matches the shared gate."
+          }
+        ],
+        "negative_examples": [
+          {
+            "source": "Activity 成功只让 controller 进入下一轮观察。",
+            "bad_target": "read-back verification",
+            "correct_guidance": "A successful Activity is only command evidence, not read-back verification.",
+            "reason": "Command vs verification."
+          }
+        ]
+      },
+      "provenance": {
+        "created_by": "translation-terminologist",
+        "created_at": "2026-06-18",
+        "evidence_refs": [
+          "wiki/analyses/process-manager-external-data-warehouse-architecture.md#答案",
+          "translation/wiki/analyses/process-manager-external-data-warehouse-architecture.en-US.md#Answer"
+        ]
+      },
+      "maintenance": {
+        "revision": 1,
+        "owner": "terminology",
+        "reviewer": "translation-terminologist",
+        "approval_status": "approved",
+        "reliability": {
+          "code": 5,
+          "confidence": "high"
+        },
+        "last_reviewed_at": "2026-06-18"
+      }
+    },
+    {
+      "concept_id": "c-pm-0015",
+      "entry_id": "t-activity-resource-pool-routing-zh-en",
+      "status": "approved",
+      "scope": {
+        "level": "domain",
+        "project_id": "process-manager-analysis-translation",
+        "domain": "bare-metal-cluster-buildout-process-management"
+      },
+      "source": {
+        "term": "activity 级主动资源池路由",
+        "language": "zh-Hans",
+        "part_of_speech": "noun",
+        "term_type": "phrase"
+      },
+      "target": {
+        "preferred": "activity resource-pool routing",
+        "language": "en-US"
+      },
+      "context": {
+        "definition": "The ability to route activities dynamically to the right worker fleet or resource pool based on activity type, network, credentials, SLA, or dependency profile.",
+        "usage_note": "Use when comparing Temporal's Task Queue routing with Azure/DTS passive filtering.",
+        "positive_examples": [
+          {
+            "source": "Temporal 可在 workflow 中把不同 Activity 路由到不同 Task Queues。",
+            "target": "Temporal can route different activities to different Task Queues inside the workflow.",
+            "reason": "Dynamic routing."
+          }
+        ],
+        "negative_examples": [
+          {
+            "source": "Azure 方案主要靠 Function App 级部署拓扑和 WorkItemFilters 被动隔离。",
+            "bad_target": "activity resource-pool routing",
+            "correct_guidance": "This is passive deployment isolation, not active activity routing.",
+            "reason": "Active vs passive distinction."
+          }
+        ]
+      },
+      "provenance": {
+        "created_by": "translation-terminologist",
+        "created_at": "2026-06-18",
+        "evidence_refs": [
+          "wiki/analyses/bare-metal-cluster-buildout-process-manager-selection.md#第一批强候选的证据矩阵",
+          "translation/wiki/analyses/bare-metal-cluster-buildout-process-manager-selection.en-US.md#Evidence-matrix-for-the-first-strong-candidates"
+        ]
+      },
+      "maintenance": {
+        "revision": 1,
+        "owner": "terminology",
+        "reviewer": "translation-terminologist",
+        "approval_status": "approved",
+        "reliability": {
+          "code": 5,
+          "confidence": "high"
+        },
+        "last_reviewed_at": "2026-06-18"
+      }
+    },
+    {
+      "concept_id": "c-pm-0016",
+      "entry_id": "t-external-event-zh-en",
+      "status": "approved",
+      "scope": {
+        "level": "domain",
+        "project_id": "process-manager-analysis-translation",
+        "domain": "bare-metal-cluster-buildout-process-management"
+      },
+      "source": {
+        "term": "external event",
+        "language": "zh-Hans",
+        "part_of_speech": "noun",
+        "term_type": "fullForm"
+      },
+      "target": {
+        "preferred": "external event",
+        "language": "en-US"
+      },
+      "context": {
+        "definition": "An asynchronous event coming from outside the running durable workflow or graph.",
+        "usage_note": "Use for vendor callbacks, human approvals, and other wakeups into an in-flight process object.",
+        "positive_examples": [
+          {
+            "source": "external event 可以让人工审批进入运行中实例。",
+            "target": "External event can let human approval enter the running instance.",
+            "reason": "Correct ingress."
+          }
+        ],
+        "negative_examples": [
+          {
+            "source": "它不等于物理状态已经到达。",
+            "bad_target": "external event",
+            "correct_guidance": "An external event only signals that a re-observation or action may be needed.",
+            "reason": "Event vs state."
+          }
+        ]
+      },
+      "provenance": {
+        "created_by": "translation-terminologist",
+        "created_at": "2026-06-18",
+        "evidence_refs": [
+          "wiki/analyses/bare-metal-cluster-buildout-process-manager-selection.md#Azure-Durable-Functions-Durable-Task-的候选定位",
+          "translation/wiki/analyses/bare-metal-cluster-buildout-process-manager-selection.en-US.md#Candidate-positioning-for-Azure-Durable-Functions-Durable-Task"
+        ]
+      },
+      "maintenance": {
+        "revision": 1,
+        "owner": "terminology",
+        "reviewer": "translation-terminologist",
+        "approval_status": "approved",
+        "reliability": {
+          "code": 5,
+          "confidence": "high"
+        },
+        "last_reviewed_at": "2026-06-18"
+      }
+    },
+    {
+      "concept_id": "c-pm-0017",
+      "entry_id": "t-request-port-zh-en",
+      "status": "approved",
+      "scope": {
+        "level": "domain",
+        "project_id": "process-manager-analysis-translation",
+        "domain": "bare-metal-cluster-buildout-process-management"
+      },
+      "source": {
+        "term": "RequestPort",
+        "language": "zh-Hans",
+        "part_of_speech": "noun",
+        "term_type": "fullForm"
+      },
+      "target": {
+        "preferred": "RequestPort",
+        "language": "en-US"
+      },
+      "context": {
+        "definition": "MAF's waiting surface for external input, human confirmation, or callbacks that wake a running graph.",
+        "usage_note": "Use it as an interaction surface, not as a synonym for the physical-state baseline.",
+        "positive_examples": [
+          {
+            "source": "RequestPort 适合表达“等待外部输入、人工确认或外部系统回调”。",
+            "target": "RequestPort is suitable for expressing 'wait for external input, human confirmation, or external system callback'.",
+            "reason": "Correct usage surface."
+          }
+        ],
+        "negative_examples": [
+          {
+            "source": "它不应单独被理解为等待物理状态已达成。",
+            "bad_target": "RequestPort",
+            "correct_guidance": "RequestPort is only a wakeup/input surface; the target state still comes from observation.",
+            "reason": "Input vs state."
+          }
+        ]
+      },
+      "provenance": {
+        "created_by": "translation-terminologist",
+        "created_at": "2026-06-18",
+        "evidence_refs": [
+          "wiki/analyses/process-manager-external-data-warehouse-architecture.md#MAF-Durable-Extension-在观察驱动架构下的建模",
+          "translation/wiki/analyses/process-manager-external-data-warehouse-architecture.en-US.md#MAF-Durable-Extension-modeling-in-an-observation-driven-architecture"
+        ]
+      },
+      "maintenance": {
+        "revision": 1,
+        "owner": "terminology",
+        "reviewer": "translation-terminologist",
+        "approval_status": "approved",
+        "reliability": {
+          "code": 5,
+          "confidence": "high"
+        },
+        "last_reviewed_at": "2026-06-18"
+      }
+    },
+    {
+      "concept_id": "c-pm-0018",
+      "entry_id": "t-custom-status-zh-en",
+      "status": "approved",
+      "scope": {
+        "level": "domain",
+        "project_id": "process-manager-analysis-translation",
+        "domain": "bare-metal-cluster-buildout-process-management"
+      },
+      "source": {
+        "term": "custom status",
+        "language": "zh-Hans",
+        "part_of_speech": "noun",
+        "term_type": "fullForm"
+      },
+      "target": {
+        "preferred": "custom status",
+        "language": "en-US"
+      },
+      "context": {
+        "definition": "A live runtime projection of graph or workflow coordination state, not the source of truth for resource state.",
+        "usage_note": "Use for in-flight coordination visibility only; business dashboards should query the external operational data warehouse directly.",
+        "positive_examples": [
+          {
+            "source": "MAF custom status 应是协调 live projection。",
+            "target": "MAF custom status should be a live coordination projection.",
+            "reason": "Correct projection role."
+          }
+        ],
+        "negative_examples": [
+          {
+            "source": "custom status 只能作为运行中 workflow/graph 的辅助观察面。",
+            "bad_target": "custom status",
+            "correct_guidance": "Custom status is an auxiliary surface, not the source of truth.",
+            "reason": "Projection vs truth."
+          }
+        ]
+      },
+      "provenance": {
+        "created_by": "translation-terminologist",
+        "created_at": "2026-06-18",
+        "evidence_refs": [
+          "wiki/analyses/process-manager-external-data-warehouse-architecture.md#MAF-Durable-Extension-在观察驱动架构下的建模",
+          "translation/wiki/analyses/process-manager-external-data-warehouse-architecture.en-US.md#MAF-Durable-Extension-modeling-in-an-observation-driven-architecture"
+        ]
+      },
+      "maintenance": {
+        "revision": 1,
+        "owner": "terminology",
+        "reviewer": "translation-terminologist",
+        "approval_status": "approved",
+        "reliability": {
+          "code": 5,
+          "confidence": "high"
+        },
+        "last_reviewed_at": "2026-06-18"
+      }
+    },
+    {
+      "concept_id": "c-pm-0019",
+      "entry_id": "t-continue-as-new-zh-en",
+      "status": "approved",
+      "scope": {
+        "level": "domain",
+        "project_id": "process-manager-analysis-translation",
+        "domain": "bare-metal-cluster-buildout-process-management"
+      },
+      "source": {
+        "term": "Continue-As-New",
+        "language": "zh-Hans",
+        "part_of_speech": "noun",
+        "term_type": "fullForm"
+      },
+      "target": {
+        "preferred": "Continue-As-New",
+        "language": "en-US",
+        "allowed_variants": [
+          "ContinueAsNew"
+        ]
+      },
+      "context": {
+        "definition": "Temporal's controlled run-boundary handoff that truncates history and starts a new run under the same Workflow ID.",
+        "usage_note": "Use for controlled rollover, not for arbitrary plan migration or rollback.",
+        "positive_examples": [
+          {
+            "source": "Continue-As-New 不是 agent 直接调用的“改图 API”。",
+            "target": "Continue-As-New is not an 'edit graph' API that an agent can call directly.",
+            "reason": "Correctly restricts the feature."
+          }
+        ],
+        "negative_examples": [
+          {
+            "source": "它也不是物理回滚或任意计划迁移魔法。",
+            "bad_target": "Continue-As-New",
+            "correct_guidance": "Continue-As-New only moves the run boundary and history.",
+            "reason": "Boundary handoff vs rollback."
+          }
+        ]
+      },
+      "provenance": {
+        "created_by": "translation-terminologist",
+        "created_at": "2026-06-18",
+        "evidence_refs": [
+          "wiki/analyses/bare-metal-cluster-buildout-process-manager-selection.md#Temporal-接入-Agent-与计划修订的边界",
+          "translation/wiki/analyses/bare-metal-cluster-buildout-process-manager-selection.en-US.md#Boundaries-for-Temporal-with-agents-and-plan-revisions"
+        ]
+      },
+      "maintenance": {
+        "revision": 1,
+        "owner": "terminology",
+        "reviewer": "translation-terminologist",
+        "approval_status": "approved",
+        "reliability": {
+          "code": 5,
+          "confidence": "high"
+        },
+        "last_reviewed_at": "2026-06-18"
+      }
+    },
+    {
+      "concept_id": "c-pm-0020",
+      "entry_id": "t-worker-versioning-zh-en",
+      "status": "approved",
+      "scope": {
+        "level": "domain",
+        "project_id": "process-manager-analysis-translation",
+        "domain": "bare-metal-cluster-buildout-process-management"
+      },
+      "source": {
+        "term": "Worker Versioning",
+        "language": "zh-Hans",
+        "part_of_speech": "noun",
+        "term_type": "fullForm"
+      },
+      "target": {
+        "preferred": "Worker Versioning",
+        "language": "en-US"
+      },
+      "context": {
+        "definition": "Temporal's worker/deployment routing and replay-safe upgrade mechanism for versioned workflows.",
+        "usage_note": "Use when discussing replay-safe upgrades; it does not migrate already executed physical side effects.",
+        "positive_examples": [
+          {
+            "source": "Worker Versioning 是 worker/deployment routing 与 replay-safe 升级机制。",
+            "target": "Worker Versioning is a worker/deployment routing and replay-safe upgrade mechanism.",
+            "reason": "Correct platform role."
+          }
+        ],
+        "negative_examples": [
+          {
+            "source": "它不会自动迁移已发生的物理副作用。",
+            "bad_target": "Worker Versioning",
+            "correct_guidance": "Versioning protects replay compatibility; it does not move hardware side effects.",
+            "reason": "Versioning vs side effects."
+          }
+        ]
+      },
+      "provenance": {
+        "created_by": "translation-terminologist",
+        "created_at": "2026-06-18",
+        "evidence_refs": [
+          "wiki/analyses/bare-metal-cluster-buildout-process-manager-selection.md#Temporal-的-reference-architecture-价值与限制",
+          "translation/wiki/analyses/bare-metal-cluster-buildout-process-manager-selection.en-US.md#Temporal-s-value-as-a-reference-architecture-and-its-limits"
+        ]
+      },
+      "maintenance": {
+        "revision": 1,
+        "owner": "terminology",
+        "reviewer": "translation-terminologist",
+        "approval_status": "approved",
+        "reliability": {
+          "code": 5,
+          "confidence": "high"
+        },
+        "last_reviewed_at": "2026-06-18"
+      }
+    },
+    {
+      "concept_id": "c-pm-0021",
+      "entry_id": "t-graph-workflow-zh-en",
+      "status": "approved",
+      "scope": {
+        "level": "domain",
+        "project_id": "process-manager-analysis-translation",
+        "domain": "bare-metal-cluster-buildout-process-management"
+      },
+      "source": {
+        "term": "graph workflow",
+        "language": "zh-Hans",
+        "part_of_speech": "noun",
+        "term_type": "fullForm"
+      },
+      "target": {
+        "preferred": "graph workflow",
+        "language": "en-US"
+      },
+      "context": {
+        "definition": "MAF's graph-based workflow surface that maps executor, agent, RequestPort, and subworkflow concepts onto Durable Task execution.",
+        "usage_note": "Use when the authoring surface is graph-based and durable-backed, not when describing a plain DAG.",
+        "positive_examples": [
+          {
+            "source": "graph workflow 是一等 authoring surface。",
+            "target": "Graph workflows are a first-class authoring surface.",
+            "reason": "Correct MAF term."
+          }
+        ],
+        "negative_examples": [
+          {
+            "source": "Airflow 的 DAG 不应被写成 graph workflow。",
+            "bad_target": "graph workflow",
+            "correct_guidance": "A DAG is a different modeling object from a graph workflow.",
+            "reason": "Different framework object."
+          }
+        ]
+      },
+      "provenance": {
+        "created_by": "translation-terminologist",
+        "created_at": "2026-06-18",
+        "evidence_refs": [
+          "wiki/analyses/process-manager-external-data-warehouse-architecture.md#MAF-Durable-Extension-在观察驱动架构下的建模",
+          "translation/wiki/analyses/process-manager-external-data-warehouse-architecture.en-US.md#MAF-Durable-Extension-modeling-in-an-observation-driven-architecture"
+        ]
+      },
+      "maintenance": {
+        "revision": 1,
+        "owner": "terminology",
+        "reviewer": "translation-terminologist",
+        "approval_status": "approved",
+        "reliability": {
+          "code": 5,
+          "confidence": "high"
+        },
+        "last_reviewed_at": "2026-06-18"
+      }
+    },
+    {
+      "concept_id": "c-pm-0022",
+      "entry_id": "t-agent-hitl-adapter-zh-en",
+      "status": "approved",
+      "scope": {
+        "level": "domain",
+        "project_id": "process-manager-analysis-translation",
+        "domain": "bare-metal-cluster-buildout-process-management"
+      },
+      "source": {
+        "term": "agent/HITL adapter",
+        "language": "zh-Hans",
+        "part_of_speech": "noun",
+        "term_type": "phrase"
+      },
+      "target": {
+        "preferred": "agent/HITL adapter",
+        "language": "en-US"
+      },
+      "context": {
+        "definition": "A layer that adapts agent and human-in-the-loop interaction onto a durable orchestration runtime without owning the primary process-control path.",
+        "usage_note": "Use when the framework is auxiliary to the process manager rather than the process owner.",
+        "positive_examples": [
+          {
+            "source": "否则它更准确地是 durable orchestration 之上的 agent/HITL adapter。",
+            "target": "Otherwise it is more accurately an agent/HITL adapter layered on top of durable orchestration.",
+            "reason": "Correct downstream role."
+          }
+        ],
+        "negative_examples": [
+          {
+            "source": "若 AI/HITL 只是辅助能力，就不应默认替代更小的 durable process substrate。",
+            "bad_target": "agent/HITL adapter",
+            "correct_guidance": "An adapter is not the primary process manager.",
+            "reason": "Adapter vs owner."
+          }
+        ]
+      },
+      "provenance": {
+        "created_by": "translation-terminologist",
+        "created_at": "2026-06-18",
+        "evidence_refs": [
+          "wiki/analyses/bare-metal-cluster-buildout-process-manager-selection.md#决策",
+          "translation/wiki/analyses/bare-metal-cluster-buildout-process-manager-selection.en-US.md#Decision",
+          "wiki/analyses/process-manager-external-data-warehouse-architecture.md#答案",
+          "translation/wiki/analyses/process-manager-external-data-warehouse-architecture.en-US.md#Answer"
+        ]
+      },
+      "maintenance": {
+        "revision": 1,
+        "owner": "terminology",
+        "reviewer": "translation-terminologist",
+        "approval_status": "approved",
+        "reliability": {
+          "code": 5,
+          "confidence": "high"
+        },
+        "last_reviewed_at": "2026-06-18"
+      }
+    }
+  ],
+  "conflicts": []
+}

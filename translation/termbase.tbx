@@ -1,0 +1,481 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tbx type="TBX-Basic" style="dca" xml:lang="en-US" xmlns="urn:iso:std:iso:30042:ed-2">
+  <tbxHeader>
+    <fileDesc>
+      <publicationStmt>
+        <p>Process-manager analysis translation termbase.</p>
+      </publicationStmt>
+      <sourceDesc>
+        <p>Generated from translation/termbase.job.json.</p>
+      </sourceDesc>
+    </fileDesc>
+  </tbxHeader>
+  <text>
+    <body>
+      <conceptEntry id="c-pm-0001">
+        <descrip type="subjectField">bare-metal-cluster-buildout-process-management</descrip>
+        <descrip type="definition">The end-to-end buildout of a physical-machine cluster, including nodes, racks, networking, firmware, provisioning, acceptance, and integration validation.</descrip>
+        <langSec xml:lang="zh-Hans">
+          <termSec>
+            <term>裸金属 Cluster Buildout</term>
+            <termNote type="partOfSpeech">noun</termNote>
+            <termNote type="termType">fullForm</termNote>
+          </termSec>
+        </langSec>
+        <langSec xml:lang="en-US">
+          <termSec>
+            <term>bare-metal cluster buildout</term>
+            <termNote type="administrativeStatus">preferredTerm-admn-sts</termNote>
+            <termNote type="partOfSpeech">noun</termNote>
+            <termNote type="termType">fullForm</termNote>
+            <descrip type="context">This page discusses buildout for physical-machine / bare-metal clusters.</descrip>
+          </termSec>
+          <termSec>
+            <term>bare-metal buildout</term>
+            <termNote type="administrativeStatus">admittedTerm-admn-sts</termNote>
+          </termSec>
+        </langSec>
+      </conceptEntry>
+      <conceptEntry id="c-pm-0002">
+        <descrip type="subjectField">bare-metal-cluster-buildout-process-management</descrip>
+        <descrip type="definition">The system that owns long-running process identity, command interpretation, localized catch-up, compensation decisions, side-effect boundaries, and audit truth lines.</descrip>
+        <langSec xml:lang="zh-Hans">
+          <termSec>
+            <term>主 process manager</term>
+            <termNote type="partOfSpeech">noun</termNote>
+            <termNote type="termType">phrase</termNote>
+          </termSec>
+        </langSec>
+        <langSec xml:lang="en-US">
+          <termSec>
+            <term>primary process manager</term>
+            <termNote type="administrativeStatus">preferredTerm-admn-sts</termNote>
+            <termNote type="partOfSpeech">noun</termNote>
+            <termNote type="termType">phrase</termNote>
+            <descrip type="context">Temporal has the highest modeling fit with the scenario at the core resource-process modeling dimension and should be treated as the primary baseline.</descrip>
+          </termSec>
+        </langSec>
+      </conceptEntry>
+      <conceptEntry id="c-pm-0003">
+        <descrip type="subjectField">bare-metal-cluster-buildout-process-management</descrip>
+        <descrip type="definition">An external store that aggregates monitoring, probes, logs, and operations-system results and serves as the observed-state baseline for physical assets.</descrip>
+        <langSec xml:lang="zh-Hans">
+          <termSec>
+            <term>外部运维数据仓库</term>
+            <termNote type="partOfSpeech">noun</termNote>
+            <termNote type="termType">fullForm</termNote>
+          </termSec>
+        </langSec>
+        <langSec xml:lang="en-US">
+          <termSec>
+            <term>external operational data warehouse</term>
+            <termNote type="administrativeStatus">preferredTerm-admn-sts</termNote>
+            <termNote type="partOfSpeech">noun</termNote>
+            <termNote type="termType">fullForm</termNote>
+            <descrip type="context">The external operational data warehouse is the observation baseline for physical state.</descrip>
+          </termSec>
+        </langSec>
+      </conceptEntry>
+      <conceptEntry id="c-pm-0004">
+        <descrip type="subjectField">bare-metal-cluster-buildout-process-management</descrip>
+        <descrip type="definition">The event/history stream that records what the orchestrator decided, which commands it scheduled, and which returns it received.</descrip>
+        <langSec xml:lang="zh-Hans">
+          <termSec>
+            <term>协调事实线</term>
+            <termNote type="partOfSpeech">noun</termNote>
+            <termNote type="termType">phrase</termNote>
+          </termSec>
+        </langSec>
+        <langSec xml:lang="en-US">
+          <termSec>
+            <term>coordination-command source-of-truth stream</term>
+            <termNote type="administrativeStatus">preferredTerm-admn-sts</termNote>
+            <termNote type="partOfSpeech">noun</termNote>
+            <termNote type="termType">phrase</termNote>
+            <descrip type="context">Event History is the source of truth for coordination commands and command returns.</descrip>
+          </termSec>
+        </langSec>
+      </conceptEntry>
+      <conceptEntry id="c-pm-0005">
+        <descrip type="subjectField">bare-metal-cluster-buildout-process-management</descrip>
+        <descrip type="definition">The stream of monitoring, probe, log, and acceptance observations that serves as the source of truth for physical-world state.</descrip>
+        <langSec xml:lang="zh-Hans">
+          <termSec>
+            <term>观察事实线</term>
+            <termNote type="partOfSpeech">noun</termNote>
+            <termNote type="termType">phrase</termNote>
+          </termSec>
+        </langSec>
+        <langSec xml:lang="en-US">
+          <termSec>
+            <term>observation source-of-truth stream</term>
+            <termNote type="administrativeStatus">preferredTerm-admn-sts</termNote>
+            <termNote type="partOfSpeech">noun</termNote>
+            <termNote type="termType">phrase</termNote>
+            <descrip type="context">The external operational data warehouse is the source of truth for the physical world's observed state.</descrip>
+          </termSec>
+        </langSec>
+      </conceptEntry>
+      <conceptEntry id="c-pm-0006">
+        <descrip type="subjectField">bare-metal-cluster-buildout-process-management</descrip>
+        <descrip type="definition">A control loop that repeatedly observes, compares, commands, waits, and re-observes until desired and observed state align.</descrip>
+        <langSec xml:lang="zh-Hans">
+          <termSec>
+            <term>reconcile loop</term>
+            <termNote type="partOfSpeech">noun</termNote>
+            <termNote type="termType">phrase</termNote>
+          </termSec>
+        </langSec>
+        <langSec xml:lang="en-US">
+          <termSec>
+            <term>reconcile loop</term>
+            <termNote type="administrativeStatus">preferredTerm-admn-sts</termNote>
+            <termNote type="partOfSpeech">noun</termNote>
+            <termNote type="termType">phrase</termNote>
+            <descrip type="context">Workflow or graph explicitly observe -&gt; compare -&gt; command -&gt; wait -&gt; observe.</descrip>
+          </termSec>
+        </langSec>
+      </conceptEntry>
+      <conceptEntry id="c-pm-0007">
+        <descrip type="subjectField">bare-metal-cluster-buildout-process-management</descrip>
+        <descrip type="definition">The long-running process identity used by Temporal and Azure Durable Functions to host durable orchestration.</descrip>
+        <langSec xml:lang="zh-Hans">
+          <termSec>
+            <term>Workflow Execution / orchestration instance</term>
+            <termNote type="partOfSpeech">noun</termNote>
+            <termNote type="termType">phrase</termNote>
+          </termSec>
+        </langSec>
+        <langSec xml:lang="en-US">
+          <termSec>
+            <term>Workflow Execution</term>
+            <termNote type="administrativeStatus">preferredTerm-admn-sts</termNote>
+            <termNote type="partOfSpeech">noun</termNote>
+            <termNote type="termType">phrase</termNote>
+            <descrip type="context">Workflow Execution is the process identity; an orchestration instance is also a process identity.</descrip>
+          </termSec>
+          <termSec>
+            <term>workflow execution</term>
+            <termNote type="administrativeStatus">admittedTerm-admn-sts</termNote>
+          </termSec>
+          <termSec>
+            <term>orchestration instance</term>
+            <termNote type="administrativeStatus">admittedTerm-admn-sts</termNote>
+          </termSec>
+        </langSec>
+      </conceptEntry>
+      <conceptEntry id="c-pm-0008">
+        <descrip type="subjectField">bare-metal-cluster-buildout-process-management</descrip>
+        <descrip type="definition">A partitioned child process used to isolate history, retries, waiting, and localized failure catch-up.</descrip>
+        <langSec xml:lang="zh-Hans">
+          <termSec>
+            <term>Child Workflow / sub-orchestration</term>
+            <termNote type="partOfSpeech">noun</termNote>
+            <termNote type="termType">phrase</termNote>
+          </termSec>
+        </langSec>
+        <langSec xml:lang="en-US">
+          <termSec>
+            <term>Child Workflow</term>
+            <termNote type="administrativeStatus">preferredTerm-admn-sts</termNote>
+            <termNote type="partOfSpeech">noun</termNote>
+            <termNote type="termType">phrase</termNote>
+            <descrip type="context">Per-node, per-rack, or per-fabric handling can use a Child Workflow or sub-orchestration to isolate history, waiting, retries, and localized failure.</descrip>
+          </termSec>
+          <termSec>
+            <term>child workflow</term>
+            <termNote type="administrativeStatus">admittedTerm-admn-sts</termNote>
+          </termSec>
+          <termSec>
+            <term>sub-orchestration</term>
+            <termNote type="administrativeStatus">admittedTerm-admn-sts</termNote>
+          </termSec>
+        </langSec>
+      </conceptEntry>
+      <conceptEntry id="c-pm-0009">
+        <descrip type="subjectField">bare-metal-cluster-buildout-process-management</descrip>
+        <descrip type="definition">The durable orchestration history that records commands, timers, activities, signals, and recovery facts.</descrip>
+        <langSec xml:lang="zh-Hans">
+          <termSec>
+            <term>Event History</term>
+            <termNote type="partOfSpeech">noun</termNote>
+            <termNote type="termType">fullForm</termNote>
+          </termSec>
+        </langSec>
+        <langSec xml:lang="en-US">
+          <termSec>
+            <term>Event History</term>
+            <termNote type="administrativeStatus">preferredTerm-admn-sts</termNote>
+            <termNote type="partOfSpeech">noun</termNote>
+            <termNote type="termType">fullForm</termNote>
+            <descrip type="context">Event History is the source of truth for coordination commands and command returns.</descrip>
+          </termSec>
+        </langSec>
+      </conceptEntry>
+      <conceptEntry id="c-pm-0010">
+        <descrip type="subjectField">bare-metal-cluster-buildout-process-management</descrip>
+        <descrip type="definition">Temporal's interactive message entry surface for asynchronous signals and validated updates into a running workflow.</descrip>
+        <langSec xml:lang="zh-Hans">
+          <termSec>
+            <term>Signal/Update</term>
+            <termNote type="partOfSpeech">noun</termNote>
+            <termNote type="termType">fullForm</termNote>
+          </termSec>
+        </langSec>
+        <langSec xml:lang="en-US">
+          <termSec>
+            <term>Signal/Update</term>
+            <termNote type="administrativeStatus">preferredTerm-admn-sts</termNote>
+            <termNote type="partOfSpeech">noun</termNote>
+            <termNote type="termType">fullForm</termNote>
+            <descrip type="context">Signals/Updates can inject external messages into the running Workflow Execution.</descrip>
+          </termSec>
+        </langSec>
+      </conceptEntry>
+      <conceptEntry id="c-pm-0011">
+        <descrip type="subjectField">bare-metal-cluster-buildout-process-management</descrip>
+        <descrip type="definition">The explicit external I/O and real-world side-effect boundary in a durable workflow runtime.</descrip>
+        <langSec xml:lang="zh-Hans">
+          <termSec>
+            <term>Activity</term>
+            <termNote type="partOfSpeech">noun</termNote>
+            <termNote type="termType">fullForm</termNote>
+          </termSec>
+        </langSec>
+        <langSec xml:lang="en-US">
+          <termSec>
+            <term>Activity</term>
+            <termNote type="administrativeStatus">preferredTerm-admn-sts</termNote>
+            <termNote type="partOfSpeech">noun</termNote>
+            <termNote type="termType">fullForm</termNote>
+            <descrip type="context">Activity is the boundary for external I/O and real-world side effects.</descrip>
+          </termSec>
+        </langSec>
+      </conceptEntry>
+      <conceptEntry id="c-pm-0012">
+        <descrip type="subjectField">bare-metal-cluster-buildout-process-management</descrip>
+        <descrip type="definition">Temporal's worker-routing surface for assigning and isolating activities or child workflows to specific workers or resource pools.</descrip>
+        <langSec xml:lang="zh-Hans">
+          <termSec>
+            <term>Task Queue</term>
+            <termNote type="partOfSpeech">noun</termNote>
+            <termNote type="termType">fullForm</termNote>
+          </termSec>
+        </langSec>
+        <langSec xml:lang="en-US">
+          <termSec>
+            <term>Task Queue</term>
+            <termNote type="administrativeStatus">preferredTerm-admn-sts</termNote>
+            <termNote type="partOfSpeech">noun</termNote>
+            <termNote type="termType">fullForm</termNote>
+            <descrip type="context">Temporal can route different activities to different Task Queues inside the workflow.</descrip>
+          </termSec>
+        </langSec>
+      </conceptEntry>
+      <conceptEntry id="c-pm-0013">
+        <descrip type="subjectField">bare-metal-cluster-buildout-process-management</descrip>
+        <descrip type="definition">A stable key used to prevent repeated hazardous side effects across retries, replays, and manual re-submission.</descrip>
+        <langSec xml:lang="zh-Hans">
+          <termSec>
+            <term>幂等键</term>
+            <termNote type="partOfSpeech">noun</termNote>
+            <termNote type="termType">fullForm</termNote>
+          </termSec>
+        </langSec>
+        <langSec xml:lang="en-US">
+          <termSec>
+            <term>idempotency key</term>
+            <termNote type="administrativeStatus">preferredTerm-admn-sts</termNote>
+            <termNote type="partOfSpeech">noun</termNote>
+            <termNote type="termType">fullForm</termNote>
+            <descrip type="context">Each command round uses an idempotency key, operation ID, and observation version.</descrip>
+          </termSec>
+        </langSec>
+      </conceptEntry>
+      <conceptEntry id="c-pm-0014">
+        <descrip type="subjectField">bare-metal-cluster-buildout-process-management</descrip>
+        <descrip type="definition">A verification step that reads external evidence back after a command to confirm the side effect actually happened.</descrip>
+        <langSec xml:lang="zh-Hans">
+          <termSec>
+            <term>读后校验</term>
+            <termNote type="partOfSpeech">noun</termNote>
+            <termNote type="termType">phrase</termNote>
+          </termSec>
+        </langSec>
+        <langSec xml:lang="en-US">
+          <termSec>
+            <term>read-back verification</term>
+            <termNote type="administrativeStatus">preferredTerm-admn-sts</termNote>
+            <termNote type="partOfSpeech">noun</termNote>
+            <termNote type="termType">phrase</termNote>
+            <descrip type="context">All candidates must prove the external inventory/resource graph, idempotency keys, and read-back verification.</descrip>
+          </termSec>
+        </langSec>
+      </conceptEntry>
+      <conceptEntry id="c-pm-0015">
+        <descrip type="subjectField">bare-metal-cluster-buildout-process-management</descrip>
+        <descrip type="definition">The ability to route activities dynamically to the right worker fleet or resource pool based on activity type, network, credentials, SLA, or dependency profile.</descrip>
+        <langSec xml:lang="zh-Hans">
+          <termSec>
+            <term>activity 级主动资源池路由</term>
+            <termNote type="partOfSpeech">noun</termNote>
+            <termNote type="termType">phrase</termNote>
+          </termSec>
+        </langSec>
+        <langSec xml:lang="en-US">
+          <termSec>
+            <term>activity resource-pool routing</term>
+            <termNote type="administrativeStatus">preferredTerm-admn-sts</termNote>
+            <termNote type="partOfSpeech">noun</termNote>
+            <termNote type="termType">phrase</termNote>
+            <descrip type="context">Temporal can route different activities to different Task Queues inside the workflow.</descrip>
+          </termSec>
+        </langSec>
+      </conceptEntry>
+      <conceptEntry id="c-pm-0016">
+        <descrip type="subjectField">bare-metal-cluster-buildout-process-management</descrip>
+        <descrip type="definition">An asynchronous event coming from outside the running durable workflow or graph.</descrip>
+        <langSec xml:lang="zh-Hans">
+          <termSec>
+            <term>external event</term>
+            <termNote type="partOfSpeech">noun</termNote>
+            <termNote type="termType">fullForm</termNote>
+          </termSec>
+        </langSec>
+        <langSec xml:lang="en-US">
+          <termSec>
+            <term>external event</term>
+            <termNote type="administrativeStatus">preferredTerm-admn-sts</termNote>
+            <termNote type="partOfSpeech">noun</termNote>
+            <termNote type="termType">fullForm</termNote>
+            <descrip type="context">External event can let human approval enter the running instance.</descrip>
+          </termSec>
+        </langSec>
+      </conceptEntry>
+      <conceptEntry id="c-pm-0017">
+        <descrip type="subjectField">bare-metal-cluster-buildout-process-management</descrip>
+        <descrip type="definition">MAF's waiting surface for external input, human confirmation, or callbacks that wake a running graph.</descrip>
+        <langSec xml:lang="zh-Hans">
+          <termSec>
+            <term>RequestPort</term>
+            <termNote type="partOfSpeech">noun</termNote>
+            <termNote type="termType">fullForm</termNote>
+          </termSec>
+        </langSec>
+        <langSec xml:lang="en-US">
+          <termSec>
+            <term>RequestPort</term>
+            <termNote type="administrativeStatus">preferredTerm-admn-sts</termNote>
+            <termNote type="partOfSpeech">noun</termNote>
+            <termNote type="termType">fullForm</termNote>
+            <descrip type="context">RequestPort is suitable for expressing 'wait for external input, human confirmation, or external system callback'.</descrip>
+          </termSec>
+        </langSec>
+      </conceptEntry>
+      <conceptEntry id="c-pm-0018">
+        <descrip type="subjectField">bare-metal-cluster-buildout-process-management</descrip>
+        <descrip type="definition">A live runtime projection of graph or workflow coordination state, not the source of truth for resource state.</descrip>
+        <langSec xml:lang="zh-Hans">
+          <termSec>
+            <term>custom status</term>
+            <termNote type="partOfSpeech">noun</termNote>
+            <termNote type="termType">fullForm</termNote>
+          </termSec>
+        </langSec>
+        <langSec xml:lang="en-US">
+          <termSec>
+            <term>custom status</term>
+            <termNote type="administrativeStatus">preferredTerm-admn-sts</termNote>
+            <termNote type="partOfSpeech">noun</termNote>
+            <termNote type="termType">fullForm</termNote>
+            <descrip type="context">MAF custom status should be a live coordination projection.</descrip>
+          </termSec>
+        </langSec>
+      </conceptEntry>
+      <conceptEntry id="c-pm-0019">
+        <descrip type="subjectField">bare-metal-cluster-buildout-process-management</descrip>
+        <descrip type="definition">Temporal's controlled run-boundary handoff that truncates history and starts a new run under the same Workflow ID.</descrip>
+        <langSec xml:lang="zh-Hans">
+          <termSec>
+            <term>Continue-As-New</term>
+            <termNote type="partOfSpeech">noun</termNote>
+            <termNote type="termType">fullForm</termNote>
+          </termSec>
+        </langSec>
+        <langSec xml:lang="en-US">
+          <termSec>
+            <term>Continue-As-New</term>
+            <termNote type="administrativeStatus">preferredTerm-admn-sts</termNote>
+            <termNote type="partOfSpeech">noun</termNote>
+            <termNote type="termType">fullForm</termNote>
+            <descrip type="context">Continue-As-New is not an 'edit graph' API that an agent can call directly.</descrip>
+          </termSec>
+          <termSec>
+            <term>ContinueAsNew</term>
+            <termNote type="administrativeStatus">admittedTerm-admn-sts</termNote>
+          </termSec>
+        </langSec>
+      </conceptEntry>
+      <conceptEntry id="c-pm-0020">
+        <descrip type="subjectField">bare-metal-cluster-buildout-process-management</descrip>
+        <descrip type="definition">Temporal's worker/deployment routing and replay-safe upgrade mechanism for versioned workflows.</descrip>
+        <langSec xml:lang="zh-Hans">
+          <termSec>
+            <term>Worker Versioning</term>
+            <termNote type="partOfSpeech">noun</termNote>
+            <termNote type="termType">fullForm</termNote>
+          </termSec>
+        </langSec>
+        <langSec xml:lang="en-US">
+          <termSec>
+            <term>Worker Versioning</term>
+            <termNote type="administrativeStatus">preferredTerm-admn-sts</termNote>
+            <termNote type="partOfSpeech">noun</termNote>
+            <termNote type="termType">fullForm</termNote>
+            <descrip type="context">Worker Versioning is a worker/deployment routing and replay-safe upgrade mechanism.</descrip>
+          </termSec>
+        </langSec>
+      </conceptEntry>
+      <conceptEntry id="c-pm-0021">
+        <descrip type="subjectField">bare-metal-cluster-buildout-process-management</descrip>
+        <descrip type="definition">MAF's graph-based workflow surface that maps executor, agent, RequestPort, and subworkflow concepts onto Durable Task execution.</descrip>
+        <langSec xml:lang="zh-Hans">
+          <termSec>
+            <term>graph workflow</term>
+            <termNote type="partOfSpeech">noun</termNote>
+            <termNote type="termType">fullForm</termNote>
+          </termSec>
+        </langSec>
+        <langSec xml:lang="en-US">
+          <termSec>
+            <term>graph workflow</term>
+            <termNote type="administrativeStatus">preferredTerm-admn-sts</termNote>
+            <termNote type="partOfSpeech">noun</termNote>
+            <termNote type="termType">fullForm</termNote>
+            <descrip type="context">Graph workflows are a first-class authoring surface.</descrip>
+          </termSec>
+        </langSec>
+      </conceptEntry>
+      <conceptEntry id="c-pm-0022">
+        <descrip type="subjectField">bare-metal-cluster-buildout-process-management</descrip>
+        <descrip type="definition">A layer that adapts agent and human-in-the-loop interaction onto a durable orchestration runtime without owning the primary process-control path.</descrip>
+        <langSec xml:lang="zh-Hans">
+          <termSec>
+            <term>agent/HITL adapter</term>
+            <termNote type="partOfSpeech">noun</termNote>
+            <termNote type="termType">phrase</termNote>
+          </termSec>
+        </langSec>
+        <langSec xml:lang="en-US">
+          <termSec>
+            <term>agent/HITL adapter</term>
+            <termNote type="administrativeStatus">preferredTerm-admn-sts</termNote>
+            <termNote type="partOfSpeech">noun</termNote>
+            <termNote type="termType">phrase</termNote>
+            <descrip type="context">Otherwise it is more accurately an agent/HITL adapter layered on top of durable orchestration.</descrip>
+          </termSec>
+        </langSec>
+      </conceptEntry>
+    </body>
+  </text>
+</tbx>
