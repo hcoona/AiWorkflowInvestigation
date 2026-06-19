@@ -54,18 +54,21 @@ and explicit human sign-off boundaries.
    acceptance criteria.
 2. **Evaluation gate**: choose relevant eval cases and assertions before
    changing skill or agent instructions.
-3. **Terminology pass**: extract required terms, conflicts, forbidden
-   translations, acronyms, product names, and placeholders.
+3. **Terminology pass**: maintain a TBX-compatible concept-level termbase,
+   extract job deltas, resolve conflicts, and enforce forbidden translations,
+   acronyms, product names, placeholders, context examples, and approvals.
 4. **Translation or post-edit pass**: translate only natural-language content
    while preserving Markdown, code, links, placeholders, numbers, and tables.
 5. **Independent bilingual revision**: compare source and target, record
    MQM-style issues, and propose targeted fixes.
 6. **Post-edit and reconciliation**: apply approved fixes and produce a
    resolved/unresolved issue report.
-7. **Final QA**: run deterministic checks first, then summarize subjective
-   residual risks.
-8. **Delivery package**: provide final files, termbase delta, QA report, and
-   unresolved questions.
+7. **Final QA**: run deterministic checks first, including termbase/schema,
+   forbidden-term, and TBX export checks, then summarize subjective residual
+   risks.
+8. **Delivery package**: provide final files, `termbase.job.json`,
+   `termbase.delta.jsonl`, `termbase.tbx`, `terminology-review.tsv`,
+   QA report, and unresolved questions.
 
 ## Minimal role handoff
 
@@ -81,11 +84,14 @@ When delegating to a custom agent, include only:
 - Explicit non-goals.
 
 Read `references/roles.md` for detailed role boundaries.
+Read `references/terminology-schema.md` before creating, updating, exporting,
+or QA-checking terminology assets.
 
 ## Available scripts
 
 - `scripts/check_translation_outputs.py` validates expected eval output files,
-  review JSON shape, terminology TSV headers, and basic Markdown deliverables.
+  review JSON shape, termbase JSON/TBX/TSV contracts, and basic Markdown
+  deliverables.
 
 Run scripts from the skill directory root.
 Example:

@@ -25,3 +25,7 @@ unless the brief requires Traditional Chinese or a regional variant.
 
 If the source is ambiguous, do not invent facts.
 Add a concise translator query or mark the segment as requiring clarification.
+When a concept-level termbase is provided,
+use applicable approved terms only in matching scope and context,
+avoid forbidden terms, and record candidate terms
+as deltas instead of silently changing the termbase.

@@ -16,19 +16,45 @@ Requirements:
 
 ## Terminology output
 
-Use `terminology.tsv` with this header:
+Terminology is a maintained termbase, not a two-column glossary.
+Use `references/terminology-schema.md` as the detailed contract.
+
+Default terminology package:
+
+- `termbase.job.json`: canonical agent-native resolved termbase for the job.
+- `termbase.delta.jsonl`: append-only job proposals, conflicts, overrides,
+  waivers, and promotion requests.
+- `termbase.tbx`: TBX-compatible exchange export.
+- `terminology-review.tsv`: lossy flattened human review view only.
+
+Do not use TSV as the canonical terminology asset.
+TSV edits must re-enter as JSONL delta proposals.
+
+`terminology-review.tsv` uses this header:
 
 ```text
-source_term	target_term	status	notes
+concept_id	entry_id	scope	status	source_term	preferred_target	allowed_variants	forbidden_targets	context_note	positive_example	negative_example	conflict_id	blocking	evidence_refs
 ```
 
-Allowed `status` values:
+Allowed canonical entry status values:
 
 - `approved`
 - `candidate`
 - `conflict`
 - `forbidden`
-- `needs-confirmation`
+- `needs_confirmation`
+- `deprecated`
+- `rejected`
+
+Blocking final delivery conditions:
+
+- An applicable `approved` term is missing without an explicit waiver.
+- A `forbidden` target term appears in the translation.
+- A `candidate`, `conflict`, or `needs_confirmation` term affects delivered
+  text.
+- A job override is used without approval or waiver.
+- `termbase.tbx` or `terminology-review.tsv` no longer matches
+  `termbase.job.json`.
 
 ## Review output
 

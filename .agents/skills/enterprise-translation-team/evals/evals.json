@@ -60,19 +60,24 @@
     },
     {
       "id": "terminology-glossary-conflict",
-      "prompt": "Use /enterprise-translation-team as the terminology role. Read evals/files/terminology-brief.json and write outputs/terminology.tsv with approved, conflict, forbidden, and needs-confirmation entries.",
-      "baseline_prompt": "Act as a terminology specialist. Read evals/files/terminology-brief.json and write outputs/terminology.tsv with approved, conflict, forbidden, and needs-confirmation entries.",
-      "expected_output": "terminology.tsv has the required header and flags conflicting product/domain terms instead of silently choosing one.",
+      "prompt": "Use /enterprise-translation-team as the terminology role. Read evals/files/terminology-brief.json and write outputs/termbase.job.json, outputs/termbase.delta.jsonl, outputs/termbase.tbx, and outputs/terminology-review.tsv. Model terminology by concept and scope, include context plus positive/negative examples, mark forbidden terms, and raise conflicts instead of silently choosing one.",
+      "baseline_prompt": "Act as a terminology specialist. Read evals/files/terminology-brief.json and write outputs/termbase.job.json, outputs/termbase.delta.jsonl, outputs/termbase.tbx, and outputs/terminology-review.tsv. Model terminology by concept and scope, include context plus positive/negative examples, mark forbidden terms, and raise conflicts instead of silently choosing one.",
+      "expected_output": "termbase.job.json is a concept-level, TBX-exportable job termbase; termbase.delta.jsonl records unresolved proposals/conflicts; termbase.tbx contains exchangeable TBX; terminology-review.tsv is only a flattened review view.",
       "files": [
         "evals/files/terminology-brief.json"
       ],
       "expected_files": [
-        "terminology.tsv"
+        "termbase.job.json",
+        "termbase.delta.jsonl",
+        "termbase.tbx",
+        "terminology-review.tsv"
       ],
       "assertions": [
-        "terminology.tsv exists and uses the required header.",
-        "Conflicting source terms are marked conflict or needs-confirmation.",
-        "Forbidden translations are present as forbidden entries.",
+        "termbase.job.json exists, uses schema_version enterprise-termbase-v2, and has concept-level entries with BCP-47 source and target languages.",
+        "Each approved entry has concept_id, scope, definition, positive example, negative example, provenance, approval status, and reliability.",
+        "Conflicting source terms are represented as conflicts or needs_confirmation instead of silently choosing one.",
+        "Forbidden translations are represented in canonical JSON and visible in terminology-review.tsv.",
+        "termbase.tbx contains conceptEntry/langSec/termSec/term elements for exchange.",
         "No full-document translation is produced for this terminology-only task."
       ]
     },
@@ -96,9 +101,9 @@
     },
     {
       "id": "final-qa-contract",
-      "prompt": "Use /enterprise-translation-team as final QA. Check evals/files/qa-package and write outputs/qa.md plus any machine-readable failures if the package violates the output contract.",
-      "baseline_prompt": "Act as final QA for a translation package. Check evals/files/qa-package and write outputs/qa.md plus any machine-readable failures if the package violates the output contract.",
-      "expected_output": "qa.md reports deterministic checks for required files, glossary adherence, Markdown structure, unresolved major issues, and human sign-off gaps.",
+      "prompt": "Use /enterprise-translation-team as final QA. Check evals/files/qa-package and write outputs/qa.md plus any machine-readable failures if the package violates the output contract. Include checks for termbase.job.json, termbase.tbx, terminology-review.tsv, forbidden-term absence, and unresolved blocking terminology conflicts.",
+      "baseline_prompt": "Act as final QA for a translation package. Check evals/files/qa-package and write outputs/qa.md plus any machine-readable failures if the package violates the output contract. Include checks for termbase.job.json, termbase.tbx, terminology-review.tsv, forbidden-term absence, and unresolved blocking terminology conflicts.",
+      "expected_output": "qa.md reports deterministic checks for required files, termbase schema/export consistency, forbidden-term absence, approved-term adherence, Markdown structure, unresolved major issues, and human sign-off gaps.",
       "files": [
         "evals/files/qa-package"
       ],
@@ -108,6 +113,8 @@
       "assertions": [
         "qa.md exists and lists files checked.",
         "The report distinguishes deterministic failures from subjective review notes.",
+        "The report checks termbase.job.json, termbase.tbx, and terminology-review.tsv.",
+        "Forbidden terminology is blocking when present in translation output.",
         "Unresolved major MQM issues are blocking.",
         "Required human or subject-matter expert sign-off is called out when risk is high."
       ]

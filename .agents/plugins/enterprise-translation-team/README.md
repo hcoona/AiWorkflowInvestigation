@@ -32,3 +32,9 @@ The plugin does not vendor public benchmark datasets.
 See `skills\enterprise-translation-team\references\evaluation.md`
 and `skills\enterprise-translation-team\evals\evals.json`
 for dataset references, baseline design, and fixture-driven eval cases.
+
+Terminology is JSON-first and TBX-compatible.
+The canonical job termbase is `termbase.job.json`;
+`termbase.delta.jsonl` records job-local proposals and conflicts;
+`termbase.tbx` is the exchange export;
+and `terminology-review.tsv` is a lossy review view only.

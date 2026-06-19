@@ -2,4 +2,5 @@
 extend-exclude = ["raw/**"]
 
 [default.extend-words]
+admn = "admn"
 Magentic = "Magentic"

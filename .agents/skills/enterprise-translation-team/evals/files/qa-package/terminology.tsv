@@ -1,4 +1,0 @@
-source_term	target_term	status	notes
-灰度发布	phased rollout	approved	Use for release management.
-租户	tenant	approved	Cloud account boundary.
-工单	support ticket	approved	Customer support workflow.

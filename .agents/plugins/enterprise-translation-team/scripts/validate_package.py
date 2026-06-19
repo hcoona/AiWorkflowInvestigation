@@ -96,6 +96,7 @@ def validate_skill() -> None:
         "references/evaluation.md",
         "references/mqm-taxonomy.md",
         "references/output-contracts.md",
+        "references/terminology-schema.md",
         "evals/evals.json",
         "scripts/check_translation_outputs.py",
         "../../scripts/run_copilot_evals.py",

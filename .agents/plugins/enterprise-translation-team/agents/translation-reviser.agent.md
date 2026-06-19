@@ -34,3 +34,7 @@ Use category values exactly as `Accuracy`, `Fluency`, `Terminology`, `Style`,
 
 Do not rewrite the whole translation unless requested.
 Focus on high-signal issues and make fixes auditable.
+For terminology, compare the translation against the concept-level termbase in
+its scope and context.
+Flag forbidden targets, missing approved terms, wrong-domain terms,
+and unresolved conflicts as `Terminology` issues.

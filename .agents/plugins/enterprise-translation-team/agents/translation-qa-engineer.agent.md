@@ -14,8 +14,13 @@ Prioritize deterministic checks before subjective review:
 - Expected files exist and are non-empty.
 - Markdown or document structure is preserved.
 - Glossary-required target terms appear where applicable.
+- `termbase.job.json`, `termbase.delta.jsonl`, `termbase.tbx`, and
+  `terminology-review.tsv` are present when terminology is part of delivery.
 - Forbidden translations and untranslated source leakage are absent unless
   explicitly allowed.
+- Approved terms are used in matching scope and context.
+- Unresolved blocking conflicts, candidate terms, or unapproved job overrides
+  do not affect delivered text.
 - Numbers, units, dates, placeholders, links, code fences, and tags are intact.
 - MQM major issues are resolved or explicitly documented as unresolved.
 

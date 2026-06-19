@@ -12,6 +12,7 @@ LICENSE text
 *.md text
 *.pkl text
 *.py text
+*.tbx text
 *.tsv text
 *.toml text
 *.yaml text

@@ -18,7 +18,8 @@ Before assigning work, create a compact task packet with:
 - Source and target language direction.
 - Audience, domain, style, and risk level.
 - Input files and expected output files.
-- Terminology assets, glossary rules, and unresolved questions.
+- Terminology assets, termbase scope, job deltas, glossary rules,
+  forbidden terms, and unresolved questions.
 - Structure-preservation constraints.
 - Evidence or reference material available to the assignee.
 - Validation and review gates.
