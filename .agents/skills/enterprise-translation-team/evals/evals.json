@@ -1,0 +1,145 @@
+{
+  "skill_name": "enterprise-translation-team",
+  "version": "0.1.0",
+  "review_gates": {
+    "model": "gpt-5.5",
+    "positive_agent": "enterprise-translation-team:translation-positive-reviewer",
+    "negative_agent": "enterprise-translation-team:translation-negative-reviewer",
+    "blocking_threshold": "Both gates must return PASS before proceeding. Any BLOCK finding requires a fix and another positive/negative review pass."
+  },
+  "dataset_registry": [
+    {
+      "name": "FLORES-200",
+      "url": "https://github.com/facebookresearch/flores",
+      "use": "Sentence-level Chinese-English translation sanity checks.",
+      "vendored": false
+    },
+    {
+      "name": "WMT MQM Human Evaluation",
+      "url": "https://github.com/google/wmt-mqm-human-evaluation",
+      "use": "MQM bilingual review and error categorization.",
+      "vendored": false
+    },
+    {
+      "name": "WMT Terminology Task 2023",
+      "url": "https://github.com/wmt-terminology-task/data-2023",
+      "use": "Glossary adherence and terminology constraints.",
+      "vendored": false
+    },
+    {
+      "name": "MLQE-PE",
+      "url": "https://github.com/sheffieldnlp/mlqe-pe",
+      "use": "Post-editing and quality-estimation checks.",
+      "vendored": false
+    },
+    {
+      "name": "ACES",
+      "url": "https://github.com/EdinburghNLP/ACES",
+      "use": "Adversarial accuracy and contrastive error detection.",
+      "vendored": false
+    }
+  ],
+  "evals": [
+    {
+      "id": "structured-markdown-translation",
+      "prompt": "Use /enterprise-translation-team to translate evals/files/structured-doc.md from Simplified Chinese to professional enterprise English. Preserve Markdown structure and write outputs/translation.md.",
+      "baseline_prompt": "Translate evals/files/structured-doc.md from Simplified Chinese to professional enterprise English. Preserve Markdown structure and write outputs/translation.md.",
+      "expected_output": "translation.md preserves headings, links, placeholders, code fences, and table dimensions while translating prose to English.",
+      "files": [
+        "evals/files/structured-doc.md"
+      ],
+      "expected_files": [
+        "translation.md"
+      ],
+      "assertions": [
+        "The output file translation.md exists and is not empty.",
+        "Markdown headings, table dimensions, links, placeholders, and code fences are preserved.",
+        "Natural-language Chinese prose is translated to professional English.",
+        "Inline code, URLs, and placeholders remain unchanged."
+      ]
+    },
+    {
+      "id": "terminology-glossary-conflict",
+      "prompt": "Use /enterprise-translation-team as the terminology role. Read evals/files/terminology-brief.json and write outputs/terminology.tsv with approved, conflict, forbidden, and needs-confirmation entries.",
+      "baseline_prompt": "Act as a terminology specialist. Read evals/files/terminology-brief.json and write outputs/terminology.tsv with approved, conflict, forbidden, and needs-confirmation entries.",
+      "expected_output": "terminology.tsv has the required header and flags conflicting product/domain terms instead of silently choosing one.",
+      "files": [
+        "evals/files/terminology-brief.json"
+      ],
+      "expected_files": [
+        "terminology.tsv"
+      ],
+      "assertions": [
+        "terminology.tsv exists and uses the required header.",
+        "Conflicting source terms are marked conflict or needs-confirmation.",
+        "Forbidden translations are present as forbidden entries.",
+        "No full-document translation is produced for this terminology-only task."
+      ]
+    },
+    {
+      "id": "mqm-review-json",
+      "prompt": "Use /enterprise-translation-team as an independent bilingual reviser. Read evals/files/mqm-review-sample.json and write outputs/review.json with MQM-style findings.",
+      "baseline_prompt": "Act as an independent bilingual reviser. Read evals/files/mqm-review-sample.json and write outputs/review.json with MQM-style findings.",
+      "expected_output": "review.json contains structured issues with allowed MQM categories, allowed severities, evidence quotes, explanations, and proposed fixes.",
+      "files": [
+        "evals/files/mqm-review-sample.json"
+      ],
+      "expected_files": [
+        "review.json"
+      ],
+      "assertions": [
+        "review.json exists and is valid JSON.",
+        "Every issue has segment_id, category, severity, source_quote, target_quote, explanation, and proposed_fix.",
+        "Categories and severities use the allowed taxonomy.",
+        "At least one major accuracy or terminology issue is detected in the sample."
+      ]
+    },
+    {
+      "id": "final-qa-contract",
+      "prompt": "Use /enterprise-translation-team as final QA. Check evals/files/qa-package and write outputs/qa.md plus any machine-readable failures if the package violates the output contract.",
+      "baseline_prompt": "Act as final QA for a translation package. Check evals/files/qa-package and write outputs/qa.md plus any machine-readable failures if the package violates the output contract.",
+      "expected_output": "qa.md reports deterministic checks for required files, glossary adherence, Markdown structure, unresolved major issues, and human sign-off gaps.",
+      "files": [
+        "evals/files/qa-package"
+      ],
+      "expected_files": [
+        "qa.md"
+      ],
+      "assertions": [
+        "qa.md exists and lists files checked.",
+        "The report distinguishes deterministic failures from subjective review notes.",
+        "Unresolved major MQM issues are blocking.",
+        "Required human or subject-matter expert sign-off is called out when risk is high."
+      ]
+    },
+    {
+      "id": "negative-no-durable-wiki-write",
+      "prompt": "Use /enterprise-translation-team to answer what a typical enterprise Chinese-English translation workflow looks like. Do not edit files unless the user explicitly asks.",
+      "baseline_prompt": "Answer what a typical enterprise Chinese-English translation workflow looks like. Do not edit files unless the user explicitly asks.",
+      "expected_output": "The agent answers conversationally and does not create or modify raw, wiki, or log files.",
+      "files": [],
+      "expected_files": [],
+      "forbidden_created_paths": [
+        "raw",
+        "wiki",
+        "wiki/log.jsonl"
+      ],
+      "forbidden_response_patterns": [
+        "human sign-off completed",
+        "subject-matter expert sign-off completed",
+        "approved by human",
+        "已完成人工签字",
+        "已完成专家签字"
+      ],
+      "required_response_patterns": [
+        "terminology",
+        "QA"
+      ],
+      "assertions": [
+        "No repository files are modified for a one-off answer.",
+        "The answer does not claim human sign-off was performed.",
+        "The answer summarizes role gates and QA without creating a durable wiki page."
+      ]
+    }
+  ]
+}

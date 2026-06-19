@@ -1,0 +1,53 @@
+lockfile_version: '1'
+generated_at: '2026-06-18T23:28:32.761383+00:00'
+apm_version: 0.20.0
+dependencies:
+- repo_url: _local/enterprise-translation-team
+  package_type: marketplace_plugin
+  deployed_files:
+  - .agents/skills/enterprise-translation-team
+  - .agents/skills/enterprise-translation-team/SKILL.md
+  - .agents/skills/enterprise-translation-team/evals/evals.json
+  - .agents/skills/enterprise-translation-team/evals/files/mqm-review-sample.json
+  - .agents/skills/enterprise-translation-team/evals/files/qa-package/review.json
+  - .agents/skills/enterprise-translation-team/evals/files/qa-package/terminology.tsv
+  - .agents/skills/enterprise-translation-team/evals/files/qa-package/translation.md
+  - .agents/skills/enterprise-translation-team/evals/files/structured-doc.md
+  - .agents/skills/enterprise-translation-team/evals/files/terminology-brief.json
+  - .agents/skills/enterprise-translation-team/references/context-packet.md
+  - .agents/skills/enterprise-translation-team/references/evaluation.md
+  - .agents/skills/enterprise-translation-team/references/mqm-taxonomy.md
+  - .agents/skills/enterprise-translation-team/references/output-contracts.md
+  - .agents/skills/enterprise-translation-team/references/roles.md
+  - .agents/skills/enterprise-translation-team/scripts/check_translation_outputs.py
+  - .github/agents/translation-linguist.agent.md
+  - .github/agents/translation-negative-reviewer.agent.md
+  - .github/agents/translation-positive-reviewer.agent.md
+  - .github/agents/translation-qa-engineer.agent.md
+  - .github/agents/translation-reviser.agent.md
+  - .github/agents/translation-terminologist.agent.md
+  - .github/agents/translation-workflow-lead.agent.md
+  deployed_file_hashes:
+    .agents/skills/enterprise-translation-team/SKILL.md: sha256:fbba8684698db53800b3475d188d30ceedb4e1b427bac90f4b82220bef9d1a8c
+    .agents/skills/enterprise-translation-team/evals/evals.json: sha256:50920ea27549a6cd9a11d54c788c494a4b88bf4bc5d7a9a04d8bc717f76d2b5c
+    .agents/skills/enterprise-translation-team/evals/files/mqm-review-sample.json: sha256:d4289df5f7fa3df5b9a171603f29638835ae249e1530691ca98e9f72f1cb111b
+    .agents/skills/enterprise-translation-team/evals/files/qa-package/review.json: sha256:364d4cc46e9219e12d65da4484adfd4419f228be63d923dd2a36579cc861390a
+    .agents/skills/enterprise-translation-team/evals/files/qa-package/terminology.tsv: sha256:b202e68f7512db35352aedc625330a00e04de8c23110bab4c58e7cbd2202ce26
+    .agents/skills/enterprise-translation-team/evals/files/qa-package/translation.md: sha256:d7f089c291376c5cef7cc79248dc5517c6fc38ec525de4cb9dbc56b3e579cb99
+    .agents/skills/enterprise-translation-team/evals/files/structured-doc.md: sha256:a5fdc2129362e5195074a37a21059406155d1c0fa6653c7783941a214ff7468c
+    .agents/skills/enterprise-translation-team/evals/files/terminology-brief.json: sha256:5053e2e4748bcf42de8e185cb64ccb17d84d267294793206097f81fe34e3011f
+    .agents/skills/enterprise-translation-team/references/context-packet.md: sha256:c4cff86c388f95b436d3934692cfc239cbee2125137a9fc942b1f434a920e8d1
+    .agents/skills/enterprise-translation-team/references/evaluation.md: sha256:38c2ece8e12ce63cc166cc520011532c9ad6306099988ddc134c29ef2c861064
+    .agents/skills/enterprise-translation-team/references/mqm-taxonomy.md: sha256:9d16c8a63c41c3dcc7539fc300a9968d5777615761e94dd81e77b71a70cd7f1f
+    .agents/skills/enterprise-translation-team/references/output-contracts.md: sha256:442a998b4ed5bf2306e00a051c0cc8b3ce449cad329d0664f8adf5a6ca477c22
+    .agents/skills/enterprise-translation-team/references/roles.md: sha256:1160fe375f3f92dfd2eb4a4b2fcfdd1bdbc2dc99fd9559b4ce891137d46bcb94
+    .agents/skills/enterprise-translation-team/scripts/check_translation_outputs.py: sha256:f58f45feb0f8a35dd74a929c4531dd7f591af9835269deacb07304eff071ffcd
+    .github/agents/translation-linguist.agent.md: sha256:a3d6d2202356422372928bdc9de85e0bb3f4d2027de84f96db98cfbd767dc240
+    .github/agents/translation-negative-reviewer.agent.md: sha256:fcc87b22dc20ea728f1294e151bca07dc1ee28ad229cb5f662b657e49af73312
+    .github/agents/translation-positive-reviewer.agent.md: sha256:1a8d2ec953a7c23ddc1ef1bdd495c5aca78f8bddbe8199735727c05cf2f05db0
+    .github/agents/translation-qa-engineer.agent.md: sha256:593dbc15b4261ce44c982fdc51540488485b69aedbfde81c320f6ea26c11a5a4
+    .github/agents/translation-reviser.agent.md: sha256:d4736c48423714044f12cb69356c5b1205caee4d6de6ac1b3bde15c5e79a79ba
+    .github/agents/translation-terminologist.agent.md: sha256:6581168775573bd849ba47d5c5c17d90d26a844dbca0c65c6bafaf425015ce7b
+    .github/agents/translation-workflow-lead.agent.md: sha256:6804738730acad7709e2cf846494825b16fd46ff761650813b240e012d44d5cd
+  source: local
+  local_path: ./.agents/plugins/enterprise-translation-team

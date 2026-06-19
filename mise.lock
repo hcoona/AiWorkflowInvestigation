@@ -28,6 +28,10 @@ url = "https://github.com/jdx/hk/releases/download/v1.48.0/hk-aarch64-apple-darw
 checksum = "sha256:6349ab27cd7a9c07e68edc7c2af0859c8a540482e97a5b7306e9e88460a5ca43"
 url = "https://github.com/jdx/hk/releases/download/v1.48.0/hk-x86_64-pc-windows-msvc.zip"
 
+[[tools."pipx:apm-cli"]]
+version = "0.20.0"
+backend = "pipx:apm-cli"
+
 [[tools.pkl]]
 version = "0.31.1"
 backend = "aqua:apple/pkl"

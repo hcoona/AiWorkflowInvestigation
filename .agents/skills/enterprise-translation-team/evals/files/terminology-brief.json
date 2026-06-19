@@ -1,0 +1,23 @@
+{
+  "language_direction": "zh-Hans -> en-US",
+  "terms": [
+    {
+      "source": "灰度发布",
+      "preferred_target": "phased rollout",
+      "forbidden_targets": ["gray release", "grayscale release"],
+      "context": "Enterprise SaaS release management"
+    },
+    {
+      "source": "租户",
+      "preferred_target": "tenant",
+      "conflicting_target": "renter",
+      "context": "Multi-tenant cloud service"
+    },
+    {
+      "source": "工单",
+      "preferred_target": "support ticket",
+      "conflicting_target": "work order",
+      "context": "Customer support workflow"
+    }
+  ]
+}

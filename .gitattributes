@@ -14,5 +14,7 @@ LICENSE text
 *.py text
 *.tsv text
 *.toml text
+*.yaml text
+*.yml text
 
 raw/git/** -text

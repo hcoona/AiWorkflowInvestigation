@@ -1,0 +1,15 @@
+name: AiWorkflowInvestigation
+version: 1.0.0
+description: APM project for AiWorkflowInvestigation
+author: Shuai Zhang
+# Which agent platforms to deploy to.
+# Resolution order: --target flag > this field > auto-detect from filesystem.
+# Accepted values: copilot, claude, cursor, opencode, codex, gemini, windsurf, all
+targets:
+- copilot
+dependencies:
+  apm:
+  - path: ./.agents/plugins/enterprise-translation-team
+  mcp: []
+includes: auto
+scripts: {}

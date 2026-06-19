@@ -8,6 +8,7 @@ pkl = "0.31.1"
 python = "3.12"
 typos = "1.47.2"
 rumdl = "0.2.14"
+"pipx:apm-cli" = "0.20.0"
 
 [env]
 HK_MISE = "1"
@@ -31,3 +32,7 @@ run = "python .agents/plugins/enterprise-translation-team/scripts/validate_packa
 [tasks.translation-agent-plugin-eval-dry-run]
 description = "Prepare a dry-run eval workspace for the enterprise translation team plugin"
 run = "python .agents/plugins/enterprise-translation-team/scripts/run_copilot_evals.py --mode dry-run"
+
+[tasks.apm-install-enterprise-translation-plugin]
+description = "Install the enterprise translation team plugin with APM"
+run = "apm install --target copilot"

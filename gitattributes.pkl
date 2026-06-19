@@ -20,6 +20,8 @@ textPatterns = List(
   "*.py",
   "*.tsv",
   "*.toml",
+  "*.yaml",
+  "*.yml",
 )
 
 verbatimPatterns = List(

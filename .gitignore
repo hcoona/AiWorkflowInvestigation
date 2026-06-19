@@ -3,3 +3,6 @@ hk.local.pkl
 .config/hk.local.pkl
 __pycache__
 .rumdl_cache/
+
+# APM dependencies
+apm_modules/
