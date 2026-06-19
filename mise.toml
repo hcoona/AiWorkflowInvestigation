@@ -1,4 +1,5 @@
 [tool_alias]
+marp = "npm:@marp-team/marp-cli"
 rumdl = "aqua:rvben/rumdl"
 typos = "github:crate-ci/typos"
 
@@ -9,6 +10,7 @@ python = "3.12"
 typos = "1.47.2"
 rumdl = "0.2.14"
 "pipx:apm-cli" = "0.20.0"
+marp = "4.4.0"
 
 [env]
 HK_MISE = "1"
