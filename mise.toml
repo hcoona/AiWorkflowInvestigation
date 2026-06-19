@@ -11,6 +11,8 @@ typos = "1.47.2"
 rumdl = "0.2.14"
 "pipx:apm-cli" = "0.20.0"
 marp = "4.4.0"
+uv = "latest"
+node = "24"
 
 [env]
 HK_MISE = "1"
